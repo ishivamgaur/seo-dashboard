@@ -13,7 +13,7 @@ export const updateHero = catchAsync(async (req, res) => {
   const updateData = { ...req.body };
 
   if (req.file) {
-    updateData.bannerImage = `/uploads/hero/${req.file.filename}`;
+    updateData.bannerImage = req.file.path;
     if (hero && hero.bannerImage) {
       await deleteFile(hero.bannerImage);
     }

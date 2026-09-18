@@ -11,7 +11,7 @@ export const getAll = crud.getAll;
 
 export const create = catchAsync(async (req, res) => {
   if (req.file) {
-    req.body.customerImage = `/uploads/testimonials/${req.file.filename}`;
+    req.body.customerImage = req.file.path;
   }
   const testimonial = await Testimonial.create(req.body);
   res.status(201).json(new ApiResponse(201, 'Testimonial created successfully', testimonial));
@@ -27,7 +27,7 @@ export const update = catchAsync(async (req, res) => {
     if (testimonial.customerImage) {
       deleteFile(testimonial.customerImage);
     }
-    req.body.customerImage = `/uploads/testimonials/${req.file.filename}`;
+    req.body.customerImage = req.file.path;
   }
 
   await testimonial.update(req.body);

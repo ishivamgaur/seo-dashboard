@@ -13,7 +13,7 @@ export const updateAbout = catchAsync(async (req, res) => {
   const updateData = { ...req.body };
 
   if (req.file) {
-    updateData.featuredImage = `/uploads/about/${req.file.filename}`;
+    updateData.featuredImage = req.file.path;
     if (about && about.featuredImage) {
       await deleteFile(about.featuredImage);
     }

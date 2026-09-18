@@ -1,34 +1,29 @@
-import fs from 'fs';
-import path from 'path';
+import { v2 as cloudinary } from 'cloudinary';
+import { config } from '../config/environment.js';
 
-const getUploadPath = (subfolder = '') => {
-  return path.join(process.cwd(), 'uploads', subfolder);
-};
+cloudinary.config({
+  cloud_name: config.cloudinary.cloudName,
+  api_key: config.cloudinary.apiKey,
+  api_secret: config.cloudinary.apiSecret,
+});
 
-const deleteFile = (filePath) => {
-  if (!filePath) return;
-
+export const deleteFile = async (fileUrl) => {
+  if (!fileUrl) return;
+  
   try {
-    const absolutePath = path.isAbsolute(filePath)
-      ? filePath
-      : path.join(process.cwd(), filePath.replace(/^\/+/, ''));
-
-    if (fs.existsSync(absolutePath)) {
-      fs.unlinkSync(absolutePath);
+    // Extract public ID from Cloudinary URL
+    // URL looks like: https://res.cloudinary.com/cloud_name/image/upload/v123456789/seo-dashboard/vehicles/filename.jpg
+    const parts = fileUrl.split('/');
+    const filenameWithExt = parts.pop();
+    const subfolder = parts.pop();
+    const rootFolder = parts.pop();
+    
+    if (rootFolder === 'seo-dashboard') {
+      const publicId = `${rootFolder}/${subfolder}/${filenameWithExt.split('.')[0]}`;
+      await cloudinary.uploader.destroy(publicId);
+      console.log(`Deleted image from Cloudinary: ${publicId}`);
     }
-  } catch {
-    // Suppress filesystem errors during media cleanup to avoid breaking main workflow
+  } catch (error) {
+    console.error(`Failed to delete Cloudinary file: ${fileUrl}`, error);
   }
-};
-
-const getFileUrl = (filename, subfolder = '') => {
-  if (!filename) return null;
-  return subfolder ? `/uploads/${subfolder}/${filename}` : `/uploads/${filename}`;
-};
-
-export { getUploadPath, deleteFile, getFileUrl };
-export default {
-  getUploadPath,
-  deleteFile,
-  getFileUrl
 };

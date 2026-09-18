@@ -37,6 +37,11 @@ export const config = Object.freeze({
   upload: Object.freeze({
     dir: process.env.UPLOAD_DIR || 'uploads',
   }),
+  cloudinary: Object.freeze({
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET,
+  }),
 });
 
 export const env = config;

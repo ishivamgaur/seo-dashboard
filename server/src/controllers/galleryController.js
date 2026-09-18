@@ -15,7 +15,7 @@ export const upload = catchAsync(async (req, res) => {
   }
 
   const imageData = req.files.map(file => ({
-    imagePath: `/uploads/gallery/${file.filename}`,
+    imagePath: file.path,
     altTag: req.body.altTag || ''
   }));
 

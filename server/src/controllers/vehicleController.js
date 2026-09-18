@@ -12,7 +12,7 @@ export const getOne = crud.getOne;
 
 export const create = catchAsync(async (req, res) => {
   if (req.file) {
-    req.body.image = `/uploads/vehicles/${req.file.filename}`;
+    req.body.image = req.file.path;
   }
   const vehicle = await Vehicle.create(req.body);
   res.status(201).json(new ApiResponse(201, 'Vehicle created successfully', vehicle));
@@ -28,7 +28,7 @@ export const update = catchAsync(async (req, res) => {
     if (vehicle.image) {
       deleteFile(vehicle.image);
     }
-    req.body.image = `/uploads/vehicles/${req.file.filename}`;
+    req.body.image = req.file.path;
   }
 
   await vehicle.update(req.body);

@@ -11,7 +11,7 @@ export const getAll = crud.getAll;
 
 export const create = catchAsync(async (req, res) => {
   if (req.file) {
-    req.body.image = `/uploads/occasions/${req.file.filename}`;
+    req.body.image = req.file.path;
   }
   const occasion = await Occasion.create(req.body);
   res.status(201).json(new ApiResponse(201, 'Occasion created successfully', occasion));
@@ -27,7 +27,7 @@ export const update = catchAsync(async (req, res) => {
     if (occasion.image) {
       deleteFile(occasion.image);
     }
-    req.body.image = `/uploads/occasions/${req.file.filename}`;
+    req.body.image = req.file.path;
   }
 
   await occasion.update(req.body);
