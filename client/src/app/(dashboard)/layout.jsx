@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '../../components/layout/Sidebar';
 import Header from '../../components/layout/Header';
 import { useAuth } from '../../context/AuthContext';
 
 export default function DashboardLayout({ children }) {
-  // Fallback if AuthContext is missing or returning undefined
   const auth = useAuth() || { user: true, loading: false }; 
   const { user, loading } = auth;
   const router = useRouter();
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -20,8 +20,8 @@ export default function DashboardLayout({ children }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FFAD00]"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[#fafafa] dark:bg-[#0c0d10]">
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-zinc-300 dark:border-zinc-700 border-t-teal-500 dark:border-t-teal-400"></div>
       </div>
     );
   }
@@ -31,11 +31,30 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-y-auto p-6">
+    <div className="flex h-screen bg-[#eceff3] dark:bg-[#090a0d] text-zinc-900 dark:text-zinc-100 font-sans antialiased overflow-hidden">
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex md:flex-shrink-0 h-full">
+        <Sidebar />
+      </div>
+
+      {/* Mobile Drawer Sidebar */}
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            onClick={() => setMobileSidebarOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="relative flex-1 flex flex-col max-w-xs w-full">
+            <Sidebar isOpen={true} onClose={() => setMobileSidebarOpen(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* Main Content Viewport */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <Header onMenuClick={() => setMobileSidebarOpen(true)} />
+        <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-5">
           {children}
         </main>
       </div>

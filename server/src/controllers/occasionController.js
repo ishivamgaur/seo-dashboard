@@ -47,3 +47,13 @@ export const remove = catchAsync(async (req, res) => {
   await occasion.destroy();
   res.status(200).json(new ApiResponse(200, 'Occasion deleted successfully', null));
 });
+
+export const reorder = catchAsync(async (req, res) => {
+  const { order } = req.body;
+  if (Array.isArray(order)) {
+    for (const item of order) {
+      await Occasion.update({ sortOrder: item.sortOrder }, { where: { id: item.id } });
+    }
+  }
+  res.status(200).json(new ApiResponse(200, 'Occasions reordered successfully', null));
+});

@@ -4,9 +4,10 @@ import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
 
 export const getAll = catchAsync(async (req, res) => {
+  const whereClause = req.query.all === 'true' ? {} : { is_active: true };
   const schemas = await Schema.findAll({
-    where: { is_active: true },
-    order: [['created_at', 'DESC']]
+    where: whereClause,
+    order: [['created_at', 'ASC']]
   });
   res.status(200).json(new ApiResponse(200, 'Schemas retrieved successfully', schemas));
 });

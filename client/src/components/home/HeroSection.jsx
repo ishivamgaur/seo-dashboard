@@ -1,48 +1,114 @@
+'use client';
+
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowRight, ChevronRight } from 'lucide-react';
 
 const HeroSection = ({ data }) => {
-  if (!data) return null;
-
-  const { heading, subHeading, ctaButtonText, ctaUrl, bannerImage } = data;
+  const heading = data?.heading || 'Commercial fleet and chauffeur rentals in India';
+  const subHeading = data?.subHeading || 'Tempo travellers, Force Urbania vans, and luxury coaches for corporate events, weddings, and outstation trips.';
+  const bannerImage = data?.bannerImage || 'https://res.cloudinary.com/dfurqcxo8/image/upload/v1742469972/urban-cruise/hero/luxury_hero_studio.jpg';
+  const ctaText = data?.ctaText || 'Reserve a vehicle';
+  const ctaUrl = data?.ctaUrl || '#contact';
 
   return (
-    <section className="relative w-full h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden">
-      {bannerImage && (
-        <div className="absolute inset-0 z-0">
-          <Image
-            src={bannerImage}
-            alt="Hero Banner"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-black/60" />
-        </div>
-      )}
-      
-      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-        {heading && (
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+    <section className="relative w-full min-h-[75vh] md:h-[80vh] flex items-center overflow-hidden bg-[#0c0d10] text-white">
+      {/* Background Image: Vehicles positioned on the right side */}
+      <div className="absolute inset-0 z-0 select-none">
+        <Image
+          src={bannerImage}
+          alt="Urban Cruise Commercial Fleet"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-right md:object-center brightness-95"
+        />
+        {/* Directional gradient overlay: allows text clarity on left while right stays visible */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0c0d10] via-[#0c0d10]/85 to-transparent w-full md:w-3/5" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d10] via-transparent to-black/25" />
+      </div>
+
+      {/* Subtle Architectural SVG Grid Accent */}
+      <div 
+        className="absolute inset-0 z-10 opacity-[0.04] pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.7) 1px, transparent 0)`,
+          backgroundSize: '32px 32px'
+        }}
+        aria-hidden="true"
+      />
+
+      {/* SVG Film-Grain Texture Filter */}
+      <svg
+        className="absolute inset-0 z-10 w-full h-full opacity-20 pointer-events-none mix-blend-overlay"
+        aria-hidden="true"
+      >
+        <filter id="hero-grain">
+          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" />
+          <feColorMatrix type="saturate" values="0" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#hero-grain)" />
+      </svg>
+
+      {/* Content Container */}
+      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-12 md:py-16">
+        <div className="max-w-xl">
+          
+          {/* Label: Clean, Zero Emojis */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md border border-zinc-700/80 bg-zinc-900/80 backdrop-blur-md mb-6 shadow-xs">
+            <span className="text-zinc-300 text-xs font-mono uppercase tracking-wider">
+              Urban Cruise Fleet
+            </span>
+          </div>
+
+          {/* Heading with text-balance and tight tracking */}
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-white mb-4 text-balance">
             {heading}
           </h1>
-        )}
-        
-        {subHeading && (
-          <p className="text-lg md:text-2xl text-gray-200 mb-10 max-w-2xl mx-auto">
+
+          {/* Subheading with text-pretty */}
+          <p className="text-zinc-300 text-sm sm:text-base font-normal leading-relaxed mb-8 max-w-lg text-pretty">
             {subHeading}
           </p>
-        )}
-        
-        {ctaButtonText && ctaUrl && (
-          <Link 
-            href={ctaUrl}
-            className="inline-block bg-[#FFAD00] hover:bg-[#e69c00] text-black font-semibold py-4 px-8 rounded-full transition-colors duration-300 text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-          >
-            {ctaButtonText}
-          </Link>
-        )}
+
+          {/* Action Buttons: Concentric Radius, Scale on Press */}
+          <div className="flex flex-wrap items-center gap-3 mb-10">
+            <Link
+              href={ctaUrl}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-[background-color,transform] duration-150 ease-out active:scale-[0.98] shadow-sm"
+            >
+              <span>{ctaText}</span>
+              <ArrowRight className="w-4 h-4 stroke-[2]" />
+            </Link>
+
+            <Link
+              href="#vehicles"
+              className="inline-flex items-center gap-1.5 px-5 py-3 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 font-semibold text-xs uppercase tracking-wider rounded-lg border border-zinc-700/70 transition-[background-color,border-color,transform] duration-150 ease-out active:scale-[0.98]"
+            >
+              <span>View Fleet</span>
+              <ChevronRight className="w-3.5 h-3.5 stroke-[1.75]" />
+            </Link>
+          </div>
+
+          {/* Factual Metrics Row: Tabular Numbers */}
+          <div className="flex items-center gap-6 pt-6 border-t border-zinc-800/80 text-xs text-zinc-400">
+            <div>
+              <span className="font-mono tabular-nums text-white font-bold text-base">15</span>
+              <span className="ml-1.5">Cities Covered</span>
+            </div>
+            <div className="w-px h-4 bg-zinc-800" />
+            <div>
+              <span className="font-mono tabular-nums text-white font-bold text-base">24/7</span>
+              <span className="ml-1.5">Dispatch Support</span>
+            </div>
+            <div className="w-px h-4 bg-zinc-800" />
+            <div>
+              <span className="text-zinc-300 font-medium">All-India Permits</span>
+            </div>
+          </div>
+
+        </div>
       </div>
     </section>
   );

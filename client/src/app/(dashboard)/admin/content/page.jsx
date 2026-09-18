@@ -1,220 +1,612 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import Link from 'next/link';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { CheckCircle2, AlertCircle, Save, LayoutTemplate, Building2, PhoneCall, ExternalLink } from 'lucide-react';
+import api from '@/lib/api';
 
-const Card = ({ children, title }) => (
-  <div className="bg-white rounded-[12px] border border-zinc-200 shadow-sm p-6 mb-6">
-    {title && <h2 className="text-xl font-semibold mb-4 text-zinc-800">{title}</h2>}
-    {children}
-  </div>
-);
+const VALID_CONTENT_TABS = ['hero', 'about', 'contact'];
 
-const Input = ({ label, ...props }) => (
-  <div className="mb-4">
-    {label && <label className="block text-sm font-medium text-zinc-700 mb-1">{label}</label>}
-    <input
-      className="w-full bg-white text-zinc-900 placeholder:text-zinc-400 border border-zinc-200 rounded-[8px] px-3 py-2 focus:ring-2 focus:ring-[#FFAD00] focus:outline-none"
-      {...props}
-    />
-  </div>
-);
+function ContentManagementContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
-const Textarea = ({ label, ...props }) => (
-  <div className="mb-4">
-    {label && <label className="block text-sm font-medium text-zinc-700 mb-1">{label}</label>}
-    <textarea
-      className="w-full bg-white text-zinc-900 placeholder:text-zinc-400 border border-zinc-200 rounded-[8px] px-3 py-2 focus:ring-2 focus:ring-[#FFAD00] focus:outline-none"
-      {...props}
-    />
-  </div>
-);
+  const tabParam = searchParams.get('tab');
+  const initialTab = VALID_CONTENT_TABS.includes(tabParam) ? tabParam : 'hero';
 
-const Button = ({ children, type = 'button', ...props }) => (
-  <button
-    type={type}
-    className="bg-[#FFAD00] hover:bg-black text-white px-4 py-2 rounded-[8px] transition-colors"
-    {...props}
-  >
-    {children}
-  </button>
-);
+  const [activeTab, setActiveTab] = useState(initialTab);
+  const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
+  const [loading, setLoading] = useState(false);
 
-export default function ContentManagementPage() {
-  const [activeTab, setActiveTab] = useState('hero');
-  const [statusMsg, setStatusMsg] = useState('');
+  // Sync tab with URL search parameter & set default '?tab=hero' if missing
+  useEffect(() => {
+    const currentTabInUrl = searchParams.get('tab');
+    if (!currentTabInUrl || !VALID_CONTENT_TABS.includes(currentTabInUrl)) {
+      router.replace(`${pathname}?tab=hero`, { scroll: false });
+      setActiveTab('hero');
+    } else if (currentTabInUrl !== activeTab) {
+      setActiveTab(currentTabInUrl);
+    }
+  }, [searchParams, pathname, router]);
 
-  const [heroForm, setHeroForm] = useState({ heading: '', subHeading: '', ctaText: '', ctaUrl: '', bannerImage: null });
-  const [aboutForm, setAboutForm] = useState({ title: '', description: '', featuredImage: null });
-  const [contactForm, setContactForm] = useState({ phone: '', email: '', address: '', mapEmbed: '' });
-  const [schemaForm, setSchemaForm] = useState({ organization: '', faq: '', breadcrumb: '' });
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    router.replace(`${pathname}?tab=${tabId}`, { scroll: false });
+  };
+
+  const [heroForm, setHeroForm] = useState({ 
+    heading: '', 
+    subHeading: '', 
+    ctaText: '', 
+    ctaUrl: '', 
+    bannerImage: '' 
+  });
+  const [heroFile, setHeroFile] = useState(null);
+  const [heroPreview, setHeroPreview] = useState('');
+
+  const [aboutForm, setAboutForm] = useState({ 
+    sectionTitle: '', 
+    description: '', 
+    featuredImage: '' 
+  });
+  const [aboutFile, setAboutFile] = useState(null);
+  const [aboutPreview, setAboutPreview] = useState('');
+
+  const [contactForm, setContactForm] = useState({ 
+    phone: '', 
+    email: '', 
+    address: '', 
+    mapEmbed: '' 
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [heroRes, aboutRes, contactRes, schemaRes] = await Promise.all([
-          fetch('/api/hero').then(res => res.ok ? res.json() : {}),
-          fetch('/api/about').then(res => res.ok ? res.json() : {}),
-          fetch('/api/contact').then(res => res.ok ? res.json() : {}),
-          fetch('/api/schema').then(res => res.ok ? res.json() : {})
+        const [heroRes, aboutRes, contactRes] = await Promise.all([
+          api.get('/hero').catch(() => ({ data: {} })),
+          api.get('/about').catch(() => ({ data: {} })),
+          api.get('/contact').catch(() => ({ data: {} })),
         ]);
-        if (heroRes.data) setHeroForm(prev => ({ ...prev, ...heroRes.data }));
-        if (aboutRes.data) setAboutForm(prev => ({ ...prev, ...aboutRes.data }));
-        if (contactRes.data) setContactForm(prev => ({ ...prev, ...contactRes.data }));
-        if (schemaRes.data) setSchemaForm(prev => ({ ...prev, ...schemaRes.data }));
+
+        if (heroRes.data?.data) {
+          const h = heroRes.data.data;
+          setHeroForm({
+            heading: h.heading || '',
+            subHeading: h.subHeading || '',
+            ctaText: h.ctaText || '',
+            ctaUrl: h.ctaUrl || '',
+            bannerImage: h.bannerImage || '',
+          });
+          setHeroPreview(h.bannerImage || '');
+        }
+
+        if (aboutRes.data?.data) {
+          const a = aboutRes.data.data;
+          setAboutForm({
+            sectionTitle: a.sectionTitle || '',
+            description: a.description || '',
+            featuredImage: a.featuredImage || '',
+          });
+          setAboutPreview(a.featuredImage || '');
+        }
+
+        if (contactRes.data?.data) {
+          const c = contactRes.data.data;
+          setContactForm({
+            phone: c.phone || '',
+            email: c.email || '',
+            address: c.address || '',
+            mapEmbed: c.mapEmbed || '',
+          });
+        }
       } catch (err) {
-        console.error('Failed to fetch initial data', err);
+        console.error('Failed to load content settings:', err);
       }
     };
+
     fetchData();
   }, []);
 
-  const showToast = (msg) => {
-    setStatusMsg(msg);
-    setTimeout(() => setStatusMsg(''), 3000);
+  const showToast = (type, text) => {
+    setStatusMsg({ type, text });
+    setTimeout(() => setStatusMsg({ type: '', text: '' }), 4000);
+  };
+
+  const handleHeroFile = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setHeroFile(file);
+      setHeroPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleAboutFile = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAboutFile(file);
+      setAboutPreview(URL.createObjectURL(file));
+    }
   };
 
   const handleHeroSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    Object.keys(heroForm).forEach(key => {
-      if (heroForm[key] !== null) formData.append(key, heroForm[key]);
-    });
+    setLoading(true);
     try {
-      const res = await fetch('/api/hero', { method: 'POST', body: formData });
-      if (res.ok) showToast('Hero section updated successfully');
+      const formData = new FormData();
+      formData.append('heading', heroForm.heading);
+      formData.append('subHeading', heroForm.subHeading);
+      formData.append('ctaText', heroForm.ctaText);
+      formData.append('ctaUrl', heroForm.ctaUrl);
+      if (heroFile) {
+        formData.append('bannerImage', heroFile);
+      } else if (heroForm.bannerImage) {
+        formData.append('bannerImage', heroForm.bannerImage);
+      }
+
+      const res = await api.put('/hero', formData);
+      if (res.status === 200) {
+        showToast('success', 'Hero section updated successfully.');
+      }
     } catch (err) {
-      showToast('Error updating hero section');
+      showToast('error', err.response?.data?.message || 'Failed to update hero section.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleAboutSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    Object.keys(aboutForm).forEach(key => {
-      if (aboutForm[key] !== null) formData.append(key, aboutForm[key]);
-    });
+    setLoading(true);
     try {
-      const res = await fetch('/api/about', { method: 'POST', body: formData });
-      if (res.ok) showToast('About section updated successfully');
+      const formData = new FormData();
+      formData.append('sectionTitle', aboutForm.sectionTitle);
+      formData.append('description', aboutForm.description);
+      if (aboutFile) {
+        formData.append('featuredImage', aboutFile);
+      } else if (aboutForm.featuredImage) {
+        formData.append('featuredImage', aboutForm.featuredImage);
+      }
+
+      const res = await api.put('/about', formData);
+      if (res.status === 200) {
+        showToast('success', 'About section updated successfully.');
+      }
     } catch (err) {
-      showToast('Error updating about section');
+      showToast('error', err.response?.data?.message || 'Failed to update about section.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleContactSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(contactForm)
-      });
-      if (res.ok) showToast('Contact info updated successfully');
+      const res = await api.put('/contact', contactForm);
+      if (res.status === 200) {
+        showToast('success', 'Contact info updated successfully.');
+      }
     } catch (err) {
-      showToast('Error updating contact info');
-    }
-  };
-
-  const handleSchemaSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch('/api/schema', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(schemaForm)
-      });
-      if (res.ok) showToast('Schema updated successfully');
-    } catch (err) {
-      showToast('Error updating schema');
+      showToast('error', err.response?.data?.message || 'Failed to update contact info.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const tabs = [
-    { id: 'hero', label: 'Hero Section' },
-    { id: 'about', label: 'About Section' },
-    { id: 'contact', label: 'Contact Info' },
-    { id: 'schema', label: 'Schema Markup' }
+    { id: 'hero', label: 'Hero Section', icon: LayoutTemplate },
+    { id: 'about', label: 'About Us Section', icon: Building2 },
+    { id: 'contact', label: 'Contact & Corporate Hub', icon: PhoneCall },
   ];
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-zinc-900">Content Management</h1>
-        {statusMsg && (
-          <div className="bg-green-100 text-green-800 px-4 py-2 rounded-[8px] text-sm">{statusMsg}</div>
+    <div className="w-full min-h-full space-y-4 font-sans antialiased">
+      {/* Top Header Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-white">
+            Homepage Content Management
+          </h1>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+            Modify studio hero headlines, company story, and official corporate contact information.
+          </p>
+        </div>
+
+        {statusMsg.text && (
+          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium ${
+            statusMsg.type === 'success'
+              ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300'
+              : 'bg-red-50 dark:bg-red-950/40 text-red-800 dark:text-red-300'
+          }`}>
+            {statusMsg.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-teal-600 dark:text-teal-400 stroke-[2]" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 stroke-[2]" />
+            )}
+            <span>{statusMsg.text}</span>
+          </div>
         )}
       </div>
 
-      <div className="flex space-x-2 mb-6 border-b border-zinc-200 pb-2 overflow-x-auto">
-        {tabs.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-t-[8px] font-medium transition-colors ${activeTab === tab.id ? 'bg-zinc-100 text-black border-b-2 border-[#FFAD00]' : 'text-zinc-500 hover:text-black hover:bg-zinc-50'}`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* Tabs Row */}
+      <div className="flex space-x-2 pb-1 overflow-x-auto">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => handleTabChange(tab.id)}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide active:scale-[0.98] cursor-pointer whitespace-nowrap transition-all ${
+                isActive
+                  ? 'bg-teal-600 text-white shadow-xs font-bold'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27]'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5 stroke-[1.75]" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
 
-      <div>
-        {activeTab === 'hero' && (
-          <Card title="Hero Section">
-            <form onSubmit={handleHeroSubmit}>
-              <Input label="Heading" value={heroForm.heading} onChange={e => setHeroForm({...heroForm, heading: e.target.value})} />
-              <Input label="Sub Heading" value={heroForm.subHeading} onChange={e => setHeroForm({...heroForm, subHeading: e.target.value})} />
-              <div className="grid grid-cols-2 gap-4">
-                <Input label="CTA Text" value={heroForm.ctaText} onChange={e => setHeroForm({...heroForm, ctaText: e.target.value})} />
-                <Input label="CTA URL" value={heroForm.ctaUrl} onChange={e => setHeroForm({...heroForm, ctaUrl: e.target.value})} />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-zinc-700 mb-1">Banner Image</label>
-                <input type="file" onChange={e => setHeroForm({...heroForm, bannerImage: e.target.files[0]})} className="w-full text-zinc-700" accept="image/*" />
-              </div>
-              <Button type="submit">Save Hero Section</Button>
-            </form>
-          </Card>
-        )}
+      {/* Hero Tab */}
+      {activeTab === 'hero' && (
+        <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
+            <div>
+              <h2 className="text-base font-bold text-zinc-950 dark:text-white">
+                Hero Section Content
+              </h2>
+              <span className="text-[11px] font-mono text-zinc-500">
+                Above-the-fold headline, CTA button, and studio visual
+              </span>
+            </div>
+            <Link
+              href="/#hero"
+              target="_blank"
+              className="text-xs font-mono text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1"
+            >
+              <span>View Live Hero</span>
+              <ExternalLink className="w-3 h-3" />
+            </Link>
+          </div>
 
-        {activeTab === 'about' && (
-          <Card title="About Section">
-            <form onSubmit={handleAboutSubmit}>
-              <Input label="Title" value={aboutForm.title} onChange={e => setAboutForm({...aboutForm, title: e.target.value})} />
-              <Textarea label="Description" rows={4} value={aboutForm.description} onChange={e => setAboutForm({...aboutForm, description: e.target.value})} />
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-zinc-700 mb-1">Featured Image</label>
-                <input type="file" onChange={e => setAboutForm({...aboutForm, featuredImage: e.target.files[0]})} className="w-full text-zinc-700" accept="image/*" />
+          <form onSubmit={handleHeroSubmit} className="space-y-4 text-xs">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500">
+                  Main Headline
+                </label>
+                <span className="text-[10px] font-mono text-zinc-400">
+                  {heroForm.heading.length} chars
+                </span>
               </div>
-              <Button type="submit">Save About Section</Button>
-            </form>
-          </Card>
-        )}
+              <input
+                type="text"
+                required
+                value={heroForm.heading}
+                onChange={(e) => setHeroForm({ ...heroForm, heading: e.target.value })}
+                placeholder="e.g. Commercial fleet and chauffeur rentals in India"
+                className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+              />
+            </div>
 
-        {activeTab === 'contact' && (
-          <Card title="Contact Info">
-            <form onSubmit={handleContactSubmit}>
-              <div className="grid grid-cols-2 gap-4">
-                <Input label="Phone" value={contactForm.phone} onChange={e => setContactForm({...contactForm, phone: e.target.value})} />
-                <Input label="Email" type="email" value={contactForm.email} onChange={e => setContactForm({...contactForm, email: e.target.value})} />
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500">
+                  Sub Heading
+                </label>
+                <span className="text-[10px] font-mono text-zinc-400">
+                  {heroForm.subHeading.length} chars
+                </span>
               </div>
-              <Textarea label="Address" rows={2} value={contactForm.address} onChange={e => setContactForm({...contactForm, address: e.target.value})} />
-              <Textarea label="Map Embed (HTML/Iframe)" rows={3} value={contactForm.mapEmbed} onChange={e => setContactForm({...contactForm, mapEmbed: e.target.value})} />
-              <Button type="submit">Save Contact Info</Button>
-            </form>
-          </Card>
-        )}
+              <input
+                type="text"
+                value={heroForm.subHeading}
+                onChange={(e) => setHeroForm({ ...heroForm, subHeading: e.target.value })}
+                placeholder="Pan-India Force Urbania and luxury van rentals..."
+                className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+              />
+            </div>
 
-        {activeTab === 'schema' && (
-          <Card title="Schema Markup (JSON-LD)">
-            <form onSubmit={handleSchemaSubmit}>
-              <Textarea label="Organization Schema" rows={4} value={schemaForm.organization} onChange={e => setSchemaForm({...schemaForm, organization: e.target.value})} placeholder="{ '@context': 'https://schema.org', '@type': 'Organization', ... }" />
-              <Textarea label="FAQ Schema" rows={4} value={schemaForm.faq} onChange={e => setSchemaForm({...schemaForm, faq: e.target.value})} />
-              <Textarea label="Breadcrumb Schema" rows={4} value={schemaForm.breadcrumb} onChange={e => setSchemaForm({...schemaForm, breadcrumb: e.target.value})} />
-              <Button type="submit">Save Schema Markup</Button>
-            </form>
-          </Card>
-        )}
-      </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  CTA Button Text
+                </label>
+                <input
+                  type="text"
+                  value={heroForm.ctaText}
+                  onChange={(e) => setHeroForm({ ...heroForm, ctaText: e.target.value })}
+                  placeholder="e.g. Reserve a vehicle"
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+                />
+              </div>
+
+              <div>
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  CTA Target Link
+                </label>
+                <input
+                  type="text"
+                  value={heroForm.ctaUrl}
+                  onChange={(e) => setHeroForm({ ...heroForm, ctaUrl: e.target.value })}
+                  placeholder="#contact"
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
+                />
+              </div>
+            </div>
+
+            {/* Banner Studio Image with Live Preview */}
+            <div>
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                Banner Studio Photograph
+              </label>
+
+              {heroPreview && (
+                <div className="mb-3 p-2.5 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] flex items-center gap-3">
+                  <div className="w-24 h-14 bg-white dark:bg-black rounded-lg overflow-hidden flex items-center justify-center shrink-0">
+                    <img src={heroPreview} alt="Hero Banner Preview" className="object-cover w-full h-full" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[10px] font-mono uppercase text-teal-600 dark:text-teal-400 font-bold block">
+                      Live Studio Visual
+                    </span>
+                    <p className="text-[11px] text-zinc-500 truncate">
+                      {heroFile ? heroFile.name : heroForm.bannerImage}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <input
+                type="file"
+                onChange={handleHeroFile}
+                className="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer mb-2"
+                accept="image/*"
+              />
+              <input
+                type="url"
+                value={heroForm.bannerImage}
+                onChange={(e) => {
+                  setHeroForm({ ...heroForm, bannerImage: e.target.value });
+                  if (!heroFile) setHeroPreview(e.target.value);
+                }}
+                placeholder="Or paste Cloudinary / WebP Studio URL"
+                className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
+              />
+            </div>
+
+            <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/60 flex justify-end">
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
+              >
+                <Save className="w-4 h-4 stroke-[2]" />
+                <span>{loading ? 'Saving...' : 'Save Hero Section'}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* About Tab */}
+      {activeTab === 'about' && (
+        <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
+            <div>
+              <h2 className="text-base font-bold text-zinc-950 dark:text-white">
+                About Us Section Content
+              </h2>
+              <span className="text-[11px] font-mono text-zinc-500">
+                Company narrative, fleet standards, and featured photograph
+              </span>
+            </div>
+            <Link
+              href="/#about"
+              target="_blank"
+              className="text-xs font-mono text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1"
+            >
+              <span>View Live About</span>
+              <ExternalLink className="w-3 h-3" />
+            </Link>
+          </div>
+
+          <form onSubmit={handleAboutSubmit} className="space-y-4 text-xs">
+            <div>
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                Section Title
+              </label>
+              <input
+                type="text"
+                required
+                value={aboutForm.sectionTitle}
+                onChange={(e) => setAboutForm({ ...aboutForm, sectionTitle: e.target.value })}
+                placeholder="About Urban Cruise"
+                className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+              />
+            </div>
+
+            <div>
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                Company Story & Capabilities
+              </label>
+              <textarea
+                rows={5}
+                required
+                value={aboutForm.description}
+                onChange={(e) => setAboutForm({ ...aboutForm, description: e.target.value })}
+                placeholder="Urban Cruise is India's premier luxury vehicle rental and ground mobility provider..."
+                className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium leading-relaxed border-0"
+              />
+            </div>
+
+            {/* Featured Image with Live Preview */}
+            <div>
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                Featured Fleet Photograph
+              </label>
+
+              {aboutPreview && (
+                <div className="mb-3 p-2.5 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] flex items-center gap-3">
+                  <div className="w-24 h-14 bg-white dark:bg-black rounded-lg overflow-hidden flex items-center justify-center shrink-0">
+                    <img src={aboutPreview} alt="About Featured Preview" className="object-cover w-full h-full" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[10px] font-mono uppercase text-teal-600 dark:text-teal-400 font-bold block">
+                      Featured Photo Active
+                    </span>
+                    <p className="text-[11px] text-zinc-500 truncate">
+                      {aboutFile ? aboutFile.name : aboutForm.featuredImage}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <input
+                type="file"
+                onChange={handleAboutFile}
+                className="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer mb-2"
+                accept="image/*"
+              />
+              <input
+                type="url"
+                value={aboutForm.featuredImage}
+                onChange={(e) => {
+                  setAboutForm({ ...aboutForm, featuredImage: e.target.value });
+                  if (!aboutFile) setAboutPreview(e.target.value);
+                }}
+                placeholder="Or paste Cloudinary / WebP Image URL"
+                className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
+              />
+            </div>
+
+            <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/60 flex justify-end">
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
+              >
+                <Save className="w-4 h-4 stroke-[2]" />
+                <span>{loading ? 'Saving...' : 'Save About Section'}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Contact Tab */}
+      {activeTab === 'contact' && (
+        <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
+            <div>
+              <h2 className="text-base font-bold text-zinc-950 dark:text-white">
+                Contact & Operations Hub
+              </h2>
+              <span className="text-[11px] font-mono text-zinc-500">
+                Official booking hotline, customer service email, and map location
+              </span>
+            </div>
+            <Link
+              href="/#contact"
+              target="_blank"
+              className="text-xs font-mono text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1"
+            >
+              <span>View Live Contact</span>
+              <ExternalLink className="w-3 h-3" />
+            </Link>
+          </div>
+
+          <form onSubmit={handleContactSubmit} className="space-y-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  Direct Phone / WhatsApp
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={contactForm.phone}
+                  onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
+                  placeholder="+91 98765 43210"
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
+                />
+              </div>
+
+              <div>
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  Operations Email
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={contactForm.email}
+                  onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                  placeholder="bookings@urbancruise.in"
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                Corporate Address
+              </label>
+              <textarea
+                rows={2}
+                required
+                value={contactForm.address}
+                onChange={(e) => setContactForm({ ...contactForm, address: e.target.value })}
+                placeholder="Plot No. 42, Sector 18, Gurugram, Haryana 122008, India"
+                className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+              />
+            </div>
+
+            <div>
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                Google Map Embed URL / Iframe
+              </label>
+              <textarea
+                rows={3}
+                value={contactForm.mapEmbed}
+                onChange={(e) => setContactForm({ ...contactForm, mapEmbed: e.target.value })}
+                placeholder="https://www.google.com/maps/embed?..."
+                className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
+              />
+            </div>
+
+            <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/60 flex justify-end">
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
+              >
+                <Save className="w-4 h-4 stroke-[2]" />
+                <span>{loading ? 'Saving...' : 'Save Contact Info'}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
+  );
+}
+
+export default function ContentManagementPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center h-64 font-mono text-xs text-zinc-500">
+          Loading content...
+        </div>
+      }
+    >
+      <ContentManagementContent />
+    </Suspense>
   );
 }

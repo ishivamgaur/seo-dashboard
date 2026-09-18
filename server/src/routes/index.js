@@ -16,6 +16,7 @@ const router = Router();
 router.use('/auth', authRoutes);
 router.use('/seo', seoRoutes);
 router.use('/schemas', schemaRoutes);
+router.use('/schema', schemaRoutes);
 router.use('/hero', heroRoutes);
 router.use('/about', aboutRoutes);
 router.use('/vehicles', vehicleRoutes);
