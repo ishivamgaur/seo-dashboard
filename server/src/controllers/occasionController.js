@@ -14,7 +14,7 @@ export const create = catchAsync(async (req, res) => {
     req.body.image = `/uploads/occasions/${req.file.filename}`;
   }
   const occasion = await Occasion.create(req.body);
-  res.status(201).json(new ApiResponse(201, occasion, 'Occasion created successfully'));
+  res.status(201).json(new ApiResponse(201, 'Occasion created successfully', occasion));
 });
 
 export const update = catchAsync(async (req, res) => {
@@ -31,7 +31,7 @@ export const update = catchAsync(async (req, res) => {
   }
 
   await occasion.update(req.body);
-  res.status(200).json(new ApiResponse(200, occasion, 'Occasion updated successfully'));
+  res.status(200).json(new ApiResponse(200, 'Occasion updated successfully', occasion));
 });
 
 export const remove = catchAsync(async (req, res) => {
@@ -45,5 +45,5 @@ export const remove = catchAsync(async (req, res) => {
   }
   
   await occasion.destroy();
-  res.status(200).json(new ApiResponse(200, null, 'Occasion deleted successfully'));
+  res.status(200).json(new ApiResponse(200, 'Occasion deleted successfully', null));
 });

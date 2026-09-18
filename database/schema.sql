@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS seo_settings (
 -- ---------------------------------------------------------------------------
 -- 3. schemas
 -- ---------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS schemas (
+CREATE TABLE IF NOT EXISTS `schemas` (
   id INT AUTO_INCREMENT PRIMARY KEY,
   schema_type ENUM('organization', 'faq', 'breadcrumb', 'website', 'local_business') NOT NULL,
   schema_data JSON NOT NULL,

@@ -28,7 +28,7 @@ export const login = catchAsync(async (req, res) => {
   const userData = user.toJSON();
   delete userData.password;
 
-  res.status(200).json(new ApiResponse(200, { token, user: userData }, 'Login successful'));
+  res.status(200).json(new ApiResponse(200, 'Login successful', { token, user: userData }));
 });
 
 export const getMe = catchAsync(async (req, res) => {
@@ -40,5 +40,5 @@ export const getMe = catchAsync(async (req, res) => {
   const userData = user.toJSON();
   delete userData.password;
 
-  res.status(200).json(new ApiResponse(200, userData, 'User retrieved successfully'));
+  res.status(200).json(new ApiResponse(200, 'User retrieved successfully', userData));
 });

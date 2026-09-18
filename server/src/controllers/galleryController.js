@@ -6,7 +6,7 @@ import GalleryImage from '../models/GalleryImage.js';
 
 export const getAll = catchAsync(async (req, res) => {
   const images = await GalleryImage.findAll({ order: [['sort_order', 'ASC']] });
-  res.status(200).json(new ApiResponse(200, images, 'Gallery images retrieved successfully'));
+  res.status(200).json(new ApiResponse(200, 'Gallery images retrieved successfully', images));
 });
 
 export const upload = catchAsync(async (req, res) => {
@@ -20,7 +20,7 @@ export const upload = catchAsync(async (req, res) => {
   }));
 
   const createdImages = await GalleryImage.bulkCreate(imageData);
-  res.status(201).json(new ApiResponse(201, createdImages, 'Images uploaded successfully'));
+  res.status(201).json(new ApiResponse(201, 'Images uploaded successfully', createdImages));
 });
 
 export const updateAlt = catchAsync(async (req, res) => {
@@ -30,7 +30,7 @@ export const updateAlt = catchAsync(async (req, res) => {
   }
 
   await image.update({ altTag: req.body.altTag });
-  res.status(200).json(new ApiResponse(200, image, 'Alt tag updated successfully'));
+  res.status(200).json(new ApiResponse(200, 'Alt tag updated successfully', image));
 });
 
 export const remove = catchAsync(async (req, res) => {
@@ -44,7 +44,7 @@ export const remove = catchAsync(async (req, res) => {
   }
 
   await image.destroy();
-  res.status(200).json(new ApiResponse(200, null, 'Image deleted successfully'));
+  res.status(200).json(new ApiResponse(200, 'Image deleted successfully', null));
 });
 
 export const reorder = catchAsync(async (req, res) => {
@@ -54,5 +54,5 @@ export const reorder = catchAsync(async (req, res) => {
       await GalleryImage.update({ sortOrder: item.sortOrder }, { where: { id: item.id } });
     }
   }
-  res.status(200).json(new ApiResponse(200, null, 'Images reordered successfully'));
+  res.status(200).json(new ApiResponse(200, 'Images reordered successfully', null));
 });

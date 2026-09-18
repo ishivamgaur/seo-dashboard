@@ -15,7 +15,7 @@ export const create = catchAsync(async (req, res) => {
     req.body.image = `/uploads/vehicles/${req.file.filename}`;
   }
   const vehicle = await Vehicle.create(req.body);
-  res.status(201).json(new ApiResponse(201, vehicle, 'Vehicle created successfully'));
+  res.status(201).json(new ApiResponse(201, 'Vehicle created successfully', vehicle));
 });
 
 export const update = catchAsync(async (req, res) => {
@@ -32,7 +32,7 @@ export const update = catchAsync(async (req, res) => {
   }
 
   await vehicle.update(req.body);
-  res.status(200).json(new ApiResponse(200, vehicle, 'Vehicle updated successfully'));
+  res.status(200).json(new ApiResponse(200, 'Vehicle updated successfully', vehicle));
 });
 
 export const remove = catchAsync(async (req, res) => {
@@ -46,7 +46,7 @@ export const remove = catchAsync(async (req, res) => {
   }
   
   await vehicle.destroy();
-  res.status(200).json(new ApiResponse(200, null, 'Vehicle deleted successfully'));
+  res.status(200).json(new ApiResponse(200, 'Vehicle deleted successfully', null));
 });
 
 export const reorder = catchAsync(async (req, res) => {
@@ -56,5 +56,5 @@ export const reorder = catchAsync(async (req, res) => {
       await Vehicle.update({ sortOrder: item.sortOrder }, { where: { id: item.id } });
     }
   }
-  res.status(200).json(new ApiResponse(200, null, 'Vehicles reordered successfully'));
+  res.status(200).json(new ApiResponse(200, 'Vehicles reordered successfully', null));
 });

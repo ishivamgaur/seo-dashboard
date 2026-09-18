@@ -4,7 +4,7 @@ import ApiResponse from '../utils/ApiResponse.js';
 
 export const getSeo = catchAsync(async (req, res) => {
   const seo = await SeoSetting.findOne();
-  res.status(200).json(new ApiResponse(200, seo || {}, 'SEO settings retrieved successfully'));
+  res.status(200).json(new ApiResponse(200, 'SEO settings retrieved successfully', seo || {}));
 });
 
 export const updateSeo = catchAsync(async (req, res) => {
@@ -16,5 +16,5 @@ export const updateSeo = catchAsync(async (req, res) => {
     seo = await SeoSetting.create(req.body);
   }
   
-  res.status(200).json(new ApiResponse(200, seo, 'SEO settings updated successfully'));
+  res.status(200).json(new ApiResponse(200, 'SEO settings updated successfully', seo));
 });

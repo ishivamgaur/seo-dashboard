@@ -8,7 +8,7 @@ export const getAll = catchAsync(async (req, res) => {
     where: { is_active: true },
     order: [['created_at', 'DESC']]
   });
-  res.status(200).json(new ApiResponse(200, schemas, 'Schemas retrieved successfully'));
+  res.status(200).json(new ApiResponse(200, 'Schemas retrieved successfully', schemas));
 });
 
 export const getOne = catchAsync(async (req, res) => {
@@ -16,12 +16,12 @@ export const getOne = catchAsync(async (req, res) => {
   if (!schema) {
     throw new ApiError(404, 'Schema not found');
   }
-  res.status(200).json(new ApiResponse(200, schema, 'Schema retrieved successfully'));
+  res.status(200).json(new ApiResponse(200, 'Schema retrieved successfully', schema));
 });
 
 export const create = catchAsync(async (req, res) => {
   const schema = await Schema.create(req.body);
-  res.status(201).json(new ApiResponse(201, schema, 'Schema created successfully'));
+  res.status(201).json(new ApiResponse(201, 'Schema created successfully', schema));
 });
 
 export const update = catchAsync(async (req, res) => {
@@ -30,7 +30,7 @@ export const update = catchAsync(async (req, res) => {
     throw new ApiError(404, 'Schema not found');
   }
   const updatedSchema = await schema.update(req.body);
-  res.status(200).json(new ApiResponse(200, updatedSchema, 'Schema updated successfully'));
+  res.status(200).json(new ApiResponse(200, 'Schema updated successfully', updatedSchema));
 });
 
 export const remove = catchAsync(async (req, res) => {
@@ -39,7 +39,7 @@ export const remove = catchAsync(async (req, res) => {
     throw new ApiError(404, 'Schema not found');
   }
   await schema.destroy();
-  res.status(200).json(new ApiResponse(200, null, 'Schema deleted successfully'));
+  res.status(200).json(new ApiResponse(200, 'Schema deleted successfully', null));
 });
 
 export const toggleActive = catchAsync(async (req, res) => {
@@ -49,5 +49,5 @@ export const toggleActive = catchAsync(async (req, res) => {
   }
   schema.is_active = !schema.is_active;
   await schema.save();
-  res.status(200).json(new ApiResponse(200, schema, 'Schema status toggled successfully'));
+  res.status(200).json(new ApiResponse(200, 'Schema status toggled successfully', schema));
 });
