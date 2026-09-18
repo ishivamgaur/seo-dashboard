@@ -1,0 +1,58 @@
+import catchAsync from '../utils/catchAsync.js';
+import ApiError from '../utils/ApiError.js';
+import ApiResponse from '../utils/ApiResponse.js';
+import { deleteFile } from '../utils/fileHelper.js';
+import GalleryImage from '../models/GalleryImage.js';
+
+export const getAll = catchAsync(async (req, res) => {
+  const images = await GalleryImage.findAll({ order: [['sort_order', 'ASC']] });
+  res.status(200).json(new ApiResponse(200, images, 'Gallery images retrieved successfully'));
+});
+
+export const upload = catchAsync(async (req, res) => {
+  if (!req.files || req.files.length === 0) {
+    throw new ApiError(400, 'No images provided');
+  }
+
+  const imageData = req.files.map(file => ({
+    imagePath: `/uploads/gallery/${file.filename}`,
+    altTag: req.body.altTag || ''
+  }));
+
+  const createdImages = await GalleryImage.bulkCreate(imageData);
+  res.status(201).json(new ApiResponse(201, createdImages, 'Images uploaded successfully'));
+});
+
+export const updateAlt = catchAsync(async (req, res) => {
+  const image = await GalleryImage.findByPk(req.params.id);
+  if (!image) {
+    throw new ApiError(404, 'Image not found');
+  }
+
+  await image.update({ altTag: req.body.altTag });
+  res.status(200).json(new ApiResponse(200, image, 'Alt tag updated successfully'));
+});
+
+export const remove = catchAsync(async (req, res) => {
+  const image = await GalleryImage.findByPk(req.params.id);
+  if (!image) {
+    throw new ApiError(404, 'Image not found');
+  }
+
+  if (image.imagePath) {
+    deleteFile(image.imagePath);
+  }
+
+  await image.destroy();
+  res.status(200).json(new ApiResponse(200, null, 'Image deleted successfully'));
+});
+
+export const reorder = catchAsync(async (req, res) => {
+  const { order } = req.body;
+  if (Array.isArray(order)) {
+    for (const item of order) {
+      await GalleryImage.update({ sortOrder: item.sortOrder }, { where: { id: item.id } });
+    }
+  }
+  res.status(200).json(new ApiResponse(200, null, 'Images reordered successfully'));
+});

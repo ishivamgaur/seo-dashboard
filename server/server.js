@@ -7,7 +7,7 @@ import helmet from 'helmet';
 
 import { config } from './src/config/environment.js';
 import { sequelize } from './src/config/database.js';
-// import routes from './src/routes/index.js'; // Routes will be added in upcoming phase
+import routes from './src/routes/index.js';
 import { errorHandler } from './src/middleware/errorHandler.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -22,8 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// API routes placeholder — uncomment when routes/index.js is created
-// app.use('/api', routes);
+app.use('/api', routes);
 
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'API is running' });
