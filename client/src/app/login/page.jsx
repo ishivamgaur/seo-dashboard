@@ -3,12 +3,24 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '../../context/AuthContext';
-import { Mail, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  ShieldCheck,
+  AlertCircle,
+  Loader2,
+} from 'lucide-react';
+import { FALLBACK_IMAGES } from '@/lib/site';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('admin@seodashboard.com');
   const [password, setPassword] = useState('admin123');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -34,40 +46,73 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-[#0c0d10] text-zinc-900 dark:text-zinc-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link href="/" className="inline-block mb-4">
-          <span className="text-xl font-extrabold tracking-wider font-mono text-zinc-950 dark:text-white">
-            URBAN <span className="text-teal-500 dark:text-teal-400">CRUISE</span>
-          </span>
-        </Link>
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">
-          Admin Authentication
-        </h1>
-        <p className="mt-1 text-xs text-zinc-500 font-mono">
-          Sign in to access SEO configurations and fleet management.
-        </p>
-      </div>
+    <div className="min-h-screen bg-[#eceff3] dark:bg-[#090a0d] text-zinc-900 dark:text-zinc-100 flex items-center justify-center p-4 sm:p-6 font-sans antialiased">
+      <div className="w-full max-w-3xl rounded-xl bg-[#faf7f2] dark:bg-[#13161c] shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] overflow-hidden grid grid-cols-1 md:grid-cols-2">
+        {/* Brand panel */}
+        <div className="relative hidden md:block bg-zinc-950">
+          <div className="absolute inset-0">
+            <Image
+              src={FALLBACK_IMAGES.hero}
+              alt="Urban Cruise fleet"
+              fill
+              priority
+              sizes="50vw"
+              className="object-cover"
+            />
+          </div>
+          <div className="absolute inset-0 bg-zinc-950/60" />
+          <div className="relative h-full flex flex-col justify-between p-8 min-h-[480px]">
+            <Link href="/" className="text-[15px] font-black font-mono tracking-[0.14em] text-white">
+              URBAN <span className="text-teal-400">CRUISE</span>
+            </Link>
+            <div>
+              <span className="inline-block text-xs font-mono text-teal-300 bg-teal-950/60 border border-teal-800/60 px-2.5 py-0.5 rounded font-semibold">
+                Admin Console
+              </span>
+              <p className="mt-3 text-2xl font-bold tracking-tight text-white text-balance leading-snug">
+                Manage SEO, fleet and homepage content in one place.
+              </p>
+              <div className="mt-6 flex items-center gap-2 text-xs text-zinc-300 font-medium">
+                <ShieldCheck className="w-3.5 h-3.5 text-teal-400" />
+                <span>Role-based access · JWT secured</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
-        <div className="bg-white dark:bg-[#121418] py-8 px-6 sm:px-8 shadow-sm rounded-2xl border border-zinc-200/90 dark:border-zinc-800">
-          <form className="space-y-4 text-xs" onSubmit={handleSubmit}>
+        {/* Form panel */}
+        <div className="p-6 sm:p-8">
+          <div className="md:hidden mb-6 text-center">
+            <Link href="/" className="text-[15px] font-black font-mono tracking-[0.14em] text-zinc-950 dark:text-white">
+              URBAN <span className="text-teal-500 dark:text-teal-400">CRUISE</span>
+            </Link>
+          </div>
+
+          <h1 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-white">
+            Welcome back
+          </h1>
+          <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">
+            Sign in to access the dashboard.
+          </p>
+
+          <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-3.5 py-2.5 rounded-lg">
-                {error}
+              <div className="flex items-start gap-2.5 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 px-3.5 py-2.5 rounded-lg text-xs font-medium">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-px" />
+                <span>{error}</span>
               </div>
             )}
 
             <div>
               <label
                 htmlFor="email"
-                className="block uppercase font-mono font-semibold text-zinc-500 mb-1"
+                className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5"
               >
                 Email Address
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                  <Mail className="h-4 w-4 stroke-[1.75]" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Mail className="h-4 w-4 text-zinc-400" />
                 </div>
                 <input
                   id="email"
@@ -77,7 +122,7 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-9 pr-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-950 dark:text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 outline-none text-xs font-mono"
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-[#f1eee7] dark:bg-[#1a1e27] rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:ring-1 focus:ring-teal-500 outline-none text-sm border-0"
                   placeholder="admin@seodashboard.com"
                 />
               </div>
@@ -86,25 +131,33 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block uppercase font-mono font-semibold text-zinc-500 mb-1"
+                className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5"
               >
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                  <Lock className="h-4 w-4 stroke-[1.75]" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Lock className="h-4 w-4 text-zinc-400" />
                 </div>
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-9 pr-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-950 dark:text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 outline-none text-xs font-mono"
+                  className="w-full pl-10 pr-11 py-2.5 bg-[#f1eee7] dark:bg-[#1a1e27] rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:ring-1 focus:ring-teal-500 outline-none text-sm border-0"
                   placeholder="••••••••"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
 
@@ -112,28 +165,34 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full inline-flex items-center justify-center gap-2 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-lg text-xs uppercase tracking-wider transition-[background-color,transform] duration-150 ease-out active:scale-[0.98] shadow-xs cursor-pointer"
+                className="w-full inline-flex items-center justify-center gap-2 h-10 px-5 bg-teal-600 hover:bg-teal-500 disabled:opacity-70 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer"
               >
-                <span>{loading ? 'Authenticating...' : 'Sign In to Dashboard'}</span>
-                <ArrowRight className="w-3.5 h-3.5 stroke-[2]" />
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Signing in…</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign in to dashboard</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </div>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-zinc-100 dark:border-zinc-800 text-center">
-            <span className="text-[11px] font-mono text-zinc-500">
-              Default Admin: admin@seodashboard.com / admin123
+          <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800/60 flex items-center justify-between gap-2">
+            <span className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
+              Demo: admin@seodashboard.com / admin123
             </span>
+            <Link
+              href="/"
+              className="text-[11px] font-mono text-teal-600 dark:text-teal-400 hover:underline shrink-0"
+            >
+              View site
+            </Link>
           </div>
-        </div>
-
-        <div className="mt-6 text-center">
-          <Link
-            href="/"
-            className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-white font-mono transition-colors"
-          >
-            Back to Public Website
-          </Link>
         </div>
       </div>
     </div>

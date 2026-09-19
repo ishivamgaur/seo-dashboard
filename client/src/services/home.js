@@ -1,12 +1,20 @@
 // Public homepage data layer — the ONLY place the site calls the API.
 // Server Components import from here; nothing else touches fetch directly.
+//
+// Caching strategy (production standard): responses are cached and
+// revalidated in the background. Visitors get instant cached pages,
+// and if the backend goes down Next.js keeps serving the last
+// good render instead of fake content.
 
 import { API_BASE, FALLBACK_IMAGES, BRAND } from '@/lib/site';
-import { FALLBACK_HOME } from '@/data/fallback';
+
+const REVALIDATE_SECONDS = 60;
 
 const fetchJson = async (endpoint) => {
   try {
-    const res = await fetch(`${API_BASE}${endpoint}`, { cache: 'no-store' });
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      next: { revalidate: REVALIDATE_SECONDS },
+    });
     if (!res.ok) return null;
     const json = await res.json();
     return json.data ?? null;
@@ -31,19 +39,15 @@ export const fetchHomeData = async () => {
       fetchJson('/contact'),
     ]);
 
-  // Backend-down resilience: any failed endpoint falls back to static
-  // backup content so the site always renders a complete page.
-  const listOr = (value, fallback) => (Array.isArray(value) && value.length > 0 ? value : fallback);
-
   return {
     schema,
-    hero: hero ?? FALLBACK_HOME.hero,
-    about: about ?? FALLBACK_HOME.about,
-    vehicles: listOr(vehicles, FALLBACK_HOME.vehicles),
-    occasions: listOr(occasions, FALLBACK_HOME.occasions),
-    testimonials: listOr(testimonials, FALLBACK_HOME.testimonials),
-    gallery: listOr(gallery, FALLBACK_HOME.gallery),
-    contact: contact ?? FALLBACK_HOME.contact,
+    hero,
+    about,
+    vehicles: Array.isArray(vehicles) ? vehicles : [],
+    occasions,
+    testimonials,
+    gallery,
+    contact,
   };
 };
 

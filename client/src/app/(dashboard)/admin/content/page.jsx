@@ -55,7 +55,6 @@ function ContentManagementContent() {
 
   const [aboutForm, setAboutForm] = useState({
     sectionTitle: '',
-    eyebrow: '',
     subtitle: '',
     description: '',
     highlights: '',
@@ -63,10 +62,7 @@ function ContentManagementContent() {
     citiesCovered: '',
     fleetSize: '',
     tripsCompleted: '',
-    badgeText: '',
-    ctaText: '',
-    ctaUrl: '',
-    featuredImage: '',
+    featuredImage: ''
   });
   const [aboutFile, setAboutFile] = useState(null);
   const [aboutPreview, setAboutPreview] = useState('');
@@ -103,7 +99,6 @@ function ContentManagementContent() {
           const a = aboutRes.data.data;
           setAboutForm({
             sectionTitle: a.sectionTitle || '',
-            eyebrow: a.eyebrow || '',
             subtitle: a.subtitle || '',
             description: a.description || '',
             highlights: (() => {
@@ -113,9 +108,7 @@ function ContentManagementContent() {
                 try {
                   const parsed = JSON.parse(h);
                   if (Array.isArray(parsed)) return parsed.join('\n');
-                } catch {
-                  /* plain newline text */
-                }
+                } catch { /* plain newline text */ }
                 return h;
               }
               return '';
@@ -124,9 +117,6 @@ function ContentManagementContent() {
             citiesCovered: a.citiesCovered ?? '',
             fleetSize: a.fleetSize ?? '',
             tripsCompleted: a.tripsCompleted ?? '',
-            badgeText: a.badgeText || '',
-            ctaText: a.ctaText || '',
-            ctaUrl: a.ctaUrl || '',
             featuredImage: a.featuredImage || '',
           });
           setAboutPreview(a.featuredImage || '');
@@ -202,7 +192,6 @@ function ContentManagementContent() {
     try {
       const formData = new FormData();
       formData.append('sectionTitle', aboutForm.sectionTitle);
-      formData.append('eyebrow', aboutForm.eyebrow);
       formData.append('subtitle', aboutForm.subtitle);
       formData.append('description', aboutForm.description);
       formData.append('highlights', aboutForm.highlights);
@@ -210,9 +199,6 @@ function ContentManagementContent() {
       formData.append('citiesCovered', aboutForm.citiesCovered);
       formData.append('fleetSize', aboutForm.fleetSize);
       formData.append('tripsCompleted', aboutForm.tripsCompleted);
-      formData.append('badgeText', aboutForm.badgeText);
-      formData.append('ctaText', aboutForm.ctaText);
-      formData.append('ctaUrl', aboutForm.ctaUrl);
       if (aboutFile) {
         formData.append('featuredImage', aboutFile);
       } else if (aboutForm.featuredImage) {
@@ -483,33 +469,6 @@ function ContentManagementContent() {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
-                  Eyebrow Label
-                </label>
-                <input
-                  type="text"
-                  value={aboutForm.eyebrow}
-                  onChange={(e) => setAboutForm({ ...aboutForm, eyebrow: e.target.value })}
-                  placeholder="Who we are (keep different from the title)"
-                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
-                />
-              </div>
-              <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
-                  Badge Text
-                </label>
-                <input
-                  type="text"
-                  value={aboutForm.badgeText}
-                  onChange={(e) => setAboutForm({ ...aboutForm, badgeText: e.target.value })}
-                  placeholder="Since 2015"
-                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
-                />
-              </div>
-            </div>
-
             <div>
               <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
                 Subtitle Hook
@@ -602,33 +561,6 @@ function ContentManagementContent() {
                   value={aboutForm.tripsCompleted}
                   onChange={(e) => setAboutForm({ ...aboutForm, tripsCompleted: e.target.value })}
                   placeholder="25000"
-                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
-                  CTA Button Text
-                </label>
-                <input
-                  type="text"
-                  value={aboutForm.ctaText}
-                  onChange={(e) => setAboutForm({ ...aboutForm, ctaText: e.target.value })}
-                  placeholder="Explore our fleet"
-                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
-                />
-              </div>
-              <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
-                  CTA Target Link
-                </label>
-                <input
-                  type="text"
-                  value={aboutForm.ctaUrl}
-                  onChange={(e) => setAboutForm({ ...aboutForm, ctaUrl: e.target.value })}
-                  placeholder="#vehicles"
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
                 />
               </div>

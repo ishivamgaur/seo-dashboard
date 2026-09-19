@@ -8,12 +8,16 @@ const TONES = {
 };
 
 // Standard homepage section: tone + melt divider + centered container.
-// Keeps every section's spacing identical.
-const SectionShell = ({ id, tone = 'base', fade = null, children }) => {
+// Keeps every section's spacing identical. Sections without a fade
+// (e.g. About, which follows the hero curve) can pass extra top
+// padding via `topClass` to match the same visual rhythm.
+const SectionShell = ({ id, tone = 'base', fade = null, topClass = 'pt-12 md:pt-16', children }) => {
   return (
     <section id={id} className={TONES[tone] || TONES.base}>
       {fade && <SectionFade className={fade} />}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 md:py-24">{children}</div>
+      <div className={`max-w-6xl mx-auto px-4 sm:px-6 pb-12 md:pb-16 ${topClass}`}>
+        {children}
+      </div>
     </section>
   );
 };

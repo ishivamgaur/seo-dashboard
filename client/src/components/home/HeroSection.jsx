@@ -50,11 +50,11 @@ const HeroSection = ({ data }) => {
           </h1>
           <p className="mt-4 text-sm sm:text-base text-zinc-300 leading-relaxed">{subHeading}</p>
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <Button href={ctaUrl} size="lg">
+            <Button href={ctaUrl}>
               <span>{ctaText}</span>
               <ArrowRight className="w-4 h-4" />
             </Button>
-            <Button href="#vehicles" size="lg" variant="ghostOnDark">
+            <Button href="#vehicles" variant="ghostOnDark">
               View fleet
             </Button>
           </div>

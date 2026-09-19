@@ -54,7 +54,6 @@ CREATE TABLE IF NOT EXISTS hero_section (
 CREATE TABLE IF NOT EXISTS about_section (
   id INT AUTO_INCREMENT PRIMARY KEY,
   section_title VARCHAR(255) NOT NULL,
-  eyebrow VARCHAR(100),
   subtitle VARCHAR(500),
   description TEXT,
   highlights JSON,
@@ -62,9 +61,6 @@ CREATE TABLE IF NOT EXISTS about_section (
   cities_covered INT,
   fleet_size INT,
   trips_completed INT,
-  badge_text VARCHAR(100),
-  cta_text VARCHAR(100),
-  cta_url VARCHAR(500),
   featured_image VARCHAR(500),
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -15,7 +15,7 @@ const [firstWord, ...restWords] = BRAND.logoWordmark.split(' ');
 
 const SiteFooter = () => {
   return (
-    <footer className="bg-white dark:bg-[#0d1117]">
+    <footer className="bg-[#faf7f2] dark:bg-[#0d1117]">
       <SectionFade className="from-[#dde7df] to-white dark:from-[#0c0f14] dark:to-[#0d1117]" />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

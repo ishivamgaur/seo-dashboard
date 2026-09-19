@@ -14,6 +14,40 @@
 
 html {
   scroll-behavior: smooth;
+  /* Reserve scrollbar width so layout never shifts when scroll appears */
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #c2cac5 transparent;
+}
+
+html.dark {
+  scrollbar-color: #2b3231 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c2cac5;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a7b1ab;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #2b3231;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3a4342;
 }
 
 body {

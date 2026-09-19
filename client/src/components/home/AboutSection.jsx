@@ -16,11 +16,11 @@ import {
   containsText,
 } from '@/lib/content';
 
+const CTA_TEXT = 'Explore our fleet';
+const CTA_URL = '#vehicles';
+
 const AboutSection = ({ data }) => {
   const sectionTitle = data?.sectionTitle || 'Chauffeur-driven fleet for every occasion';
-  const rawEyebrow = data?.eyebrow || '';
-  // Never render the eyebrow when it just repeats the heading
-  const eyebrow = !isSameText(rawEyebrow, sectionTitle) && rawEyebrow ? rawEyebrow : null;
   const description =
     data?.description ||
     'Urban Cruise is India’s premier luxury vehicle rental and chauffeur service, providing seamless corporate transit, destination wedding mobility, and personalized outstation travel with unmatched safety and sophistication.';
@@ -35,8 +35,6 @@ const AboutSection = ({ data }) => {
     return s;
   })();
   const featuredImage = resolveMediaUrl(data?.featuredImage, FALLBACK_IMAGES.about);
-  const ctaText = data?.ctaText || 'Explore our fleet';
-  const ctaUrl = data?.ctaUrl || '#vehicles';
 
   const fallbackHighlights = [
     'Verified chauffeurs with commercial licences',
@@ -63,19 +61,11 @@ const AboutSection = ({ data }) => {
   ];
 
   return (
-    <SectionShell id="about" tone="base">
+    <SectionShell id="about" tone="base" topClass="pt-20 md:pt-24">
       <Card className="p-5 sm:p-7">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 items-center">
           <Reveal>
-            {eyebrow && (
-              <p className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-medium">
-                {eyebrow}
-              </p>
-            )}
-
-            <h2
-              className={`${eyebrow ? 'mt-2' : ''} text-xl sm:text-2xl font-bold tracking-tight leading-tight text-zinc-950 dark:text-white text-balance`}
-            >
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight leading-tight text-zinc-950 dark:text-white text-balance">
               {sectionTitle}
             </h2>
 
@@ -127,21 +117,21 @@ const AboutSection = ({ data }) => {
               })}
             </div>
 
-            <Button href={ctaUrl} size="md" className="mt-6">
-              <span>{ctaText}</span>
+            <Button href={CTA_URL} className="mt-6">
+              <span>{CTA_TEXT}</span>
               <ArrowRight className="w-4 h-4" />
             </Button>
           </Reveal>
 
           <Reveal delay={0.12}>
-            <div className="p-2.5 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27]">
-              <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden bg-white dark:bg-black">
+            <div className="group p-2.5 rounded-xl bg-[#f1eee7] dark:bg-[#1a1e27]">
+              <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden bg-[#faf7f2] dark:bg-black">
                 <Image
                   src={featuredImage}
                   alt={sectionTitle}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
                 />
               </div>
             </div>

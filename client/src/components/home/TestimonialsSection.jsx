@@ -40,7 +40,7 @@ const TestimonialsSection = ({ data }) => {
               </blockquote>
               <figcaption className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800/60 flex items-center gap-3">
                 {t.customerImage ? (
-                  <span className="relative w-8 h-8 rounded-full overflow-hidden bg-[#f6f8fa] dark:bg-[#1a1e27] shrink-0">
+                  <span className="relative w-8 h-8 rounded-full overflow-hidden bg-[#f1eee7] dark:bg-[#1a1e27] shrink-0">
                     <Image
                       src={resolveMediaUrl(t.customerImage)}
                       alt={t.customerName}

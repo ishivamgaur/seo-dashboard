@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import FilterSelect from '@/components/common/FilterSelect';
 import Reveal from './Reveal';
 import SectionShell from '@/components/ui/SectionShell';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -10,7 +11,7 @@ import Button from '@/components/ui/Button';
 const ALT_FADE = 'from-[#eceff3] to-[#dde7df] dark:from-[#090a0d] dark:to-[#0c0f14]';
 
 const inputCls =
-  'w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-sm border-0';
+  'w-full bg-[#f1eee7] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-sm border-0';
 
 const labelCls =
   'block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5';
@@ -72,7 +73,7 @@ const ContactSection = ({ data, vehicles = [] }) => {
               {infoRows.map((row) => (
                 <div
                   key={row.label}
-                  className="px-3.5 py-2.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27]"
+                  className="px-3.5 py-2.5 rounded-lg bg-[#f1eee7] dark:bg-[#1a1e27]"
                 >
                   <dt className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-medium">
                     {row.label}
@@ -83,7 +84,7 @@ const ContactSection = ({ data, vehicles = [] }) => {
             </dl>
 
             {mapEmbed && (
-              <div className="mt-3 rounded-xl overflow-hidden bg-[#f6f8fa] dark:bg-black aspect-video">
+              <div className="mt-3 rounded-xl overflow-hidden bg-[#f1eee7] dark:bg-black aspect-video">
                 {isIframe ? (
                   <div
                     className="[&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0 w-full h-full"
@@ -133,18 +134,15 @@ const ContactSection = ({ data, vehicles = [] }) => {
                 </div>
                 <div>
                   <label className={labelCls}>Vehicle</label>
-                  <select
+                  <FilterSelect
                     value={form.vehicle}
-                    onChange={(e) => setForm({ ...form, vehicle: e.target.value })}
-                    className={inputCls}
-                  >
-                    <option value="">Select a vehicle</option>
-                    {vehicles.map((v) => (
-                      <option key={v.id} value={v.vehicleName}>
-                        {v.vehicleName}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) => setForm({ ...form, vehicle: val })}
+                    options={[
+                      { value: '', label: 'Select a vehicle' },
+                      ...vehicles.map((v) => ({ value: v.vehicleName, label: v.vehicleName })),
+                    ]}
+                    className="w-full [&>button]:w-full [&>button]:h-10 [&>button]:text-sm [&_[role=listbox]]:w-full"
+                  />
                 </div>
                 <div>
                   <label className={labelCls}>Message</label>
@@ -157,7 +155,7 @@ const ContactSection = ({ data, vehicles = [] }) => {
                   />
                 </div>
                 <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/60 flex justify-end">
-                  <Button type="submit" size="md">
+                  <Button type="submit">
                     Send request
                   </Button>
                 </div>

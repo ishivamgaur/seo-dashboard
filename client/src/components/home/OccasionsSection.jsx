@@ -21,16 +21,16 @@ const OccasionsSection = ({ data }) => {
       <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {occasions.map((o, i) => (
           <Reveal key={o.id || i} delay={(i % 3) * 0.08} className="h-full">
-            <Card className="h-full overflow-hidden">
+            <Card interactive className="h-full overflow-hidden group">
               {o.image && (
                 <div className="p-2.5 pb-0">
-                  <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden bg-[#f6f8fa] dark:bg-black">
+                  <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden bg-[#f1eee7] dark:bg-black">
                     <Image
                       src={resolveMediaUrl(o.image, FALLBACK_IMAGES.occasion)}
                       alt={o.title}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover"
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
                     />
                   </div>
                 </div>

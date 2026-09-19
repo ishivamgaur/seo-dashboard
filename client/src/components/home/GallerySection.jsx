@@ -28,14 +28,14 @@ const GallerySection = ({ data }) => {
       <div className="mt-8 columns-2 md:columns-3 gap-3">
         {gallery.map((img, i) => (
           <Reveal key={img.id || i} delay={(i % 3) * 0.06} className="mb-3 break-inside-avoid">
-            <div className="relative rounded-xl overflow-hidden bg-white dark:bg-[#13161c] shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
-              {/* Natural dimensions — full width + full height, zero cropping */}
-              <img
-                src={resolveMediaUrl(img.imagePath)}
-                alt={img.altTag || 'Fleet photo'}
-                loading="lazy"
-                className="w-full h-auto block"
-              />
+            <div className="group relative rounded-xl overflow-hidden bg-[#faf7f2] dark:bg-[#13161c] shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                {/* Natural dimensions — full width + full height, zero cropping */}
+                <img
+                  src={resolveMediaUrl(img.imagePath)}
+                  alt={img.altTag || 'Fleet photo'}
+                  loading="lazy"
+                  className="w-full h-auto block transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                />
               <span className="absolute left-2.5 top-2.5 font-mono tabular-nums text-[11px] font-semibold bg-black/55 text-white px-2 py-0.5 rounded backdrop-blur-sm">
                 {String(i + 1).padStart(2, '0')}
               </span>

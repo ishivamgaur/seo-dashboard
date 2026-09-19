@@ -30,15 +30,15 @@ const VehiclesSection = ({ data }) => {
           const features = parseStringArray(v.features);
           return (
             <Reveal key={v.id || i} delay={(i % 3) * 0.08} className="h-full">
-              <Card className="h-full overflow-hidden flex flex-col">
+              <Card interactive className="h-full overflow-hidden flex flex-col group">
                 <div className="p-2.5 pb-0">
-                  <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden bg-[#f6f8fa] dark:bg-black">
+                  <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden bg-[#f1eee7] dark:bg-black">
                     <Image
                       src={resolveMediaUrl(v.image, FALLBACK_IMAGES.vehicle)}
                       alt={v.vehicleName}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover"
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
                     />
                   </div>
                 </div>
@@ -59,7 +59,7 @@ const VehiclesSection = ({ data }) => {
                       {features.slice(0, 3).map((f, j) => (
                         <li
                           key={j}
-                          className="text-[11px] font-medium px-2 py-0.5 rounded bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-600 dark:text-zinc-400"
+                          className="text-[11px] font-medium px-2 py-0.5 rounded bg-[#f1eee7] dark:bg-[#1a1e27] text-zinc-600 dark:text-zinc-400"
                         >
                           {f}
                         </li>
@@ -67,7 +67,7 @@ const VehiclesSection = ({ data }) => {
                     </ul>
                   )}
                   <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800/60">
-                    <Button href="#contact" size="md">
+                    <Button href="#contact">
                       Reserve
                     </Button>
                   </div>
