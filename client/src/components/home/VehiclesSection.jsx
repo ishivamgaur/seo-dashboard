@@ -67,9 +67,7 @@ const VehiclesSection = ({ data }) => {
                     </ul>
                   )}
                   <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800/60">
-                    <Button href="#contact">
-                      Reserve
-                    </Button>
+                    <Button href="#contact">Reserve</Button>
                   </div>
                 </div>
               </Card>

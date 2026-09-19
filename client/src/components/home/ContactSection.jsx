@@ -155,9 +155,7 @@ const ContactSection = ({ data, vehicles = [] }) => {
                   />
                 </div>
                 <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/60 flex justify-end">
-                  <Button type="submit">
-                    Send request
-                  </Button>
+                  <Button type="submit">Send request</Button>
                 </div>
               </form>
             )}

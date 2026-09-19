@@ -50,9 +50,7 @@ const SiteHeader = () => {
             <User className="w-3.5 h-3.5 shrink-0" />
             <span className="leading-none">Admin</span>
           </Link>
-          <Button href="#contact">
-            Book
-          </Button>
+          <Button href="#contact">Book</Button>
         </div>
       </div>
     </header>

@@ -9,6 +9,8 @@ const sequelize = new Sequelize(config.db.name, config.db.user, config.db.passwo
   dialect: 'mysql',
   dialectModule: mysql2,
   logging: false,
+  // TiDB Cloud / managed MySQL require TLS — enabled via DB_SSL=true
+  dialectOptions: config.db.ssl ? { ssl: { require: true, rejectUnauthorized: false } } : {},
   pool: {
     max: 10,
     min: 0,

@@ -20,7 +20,7 @@ export const resolveMediaUrl = (src, fallback = '') => {
 };
 
 export const FALLBACK_IMAGES = {
-  hero: 'https://res.cloudinary.com/dfurqcxo8/image/upload/v1742469972/urban-cruise/hero/luxury_hero_studio.jpg',
+  hero: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=2000&q=80',
   about:
     'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=1200&q=80',
   vehicle: 'https://urbancruise.in/wp-content/uploads/tempo-traveller-9-seater-1x1-1.webp',

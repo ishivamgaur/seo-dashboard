@@ -9,10 +9,10 @@ const AboutSection = sequelize.define(
       field: 'section_title',
       allowNull: false,
     },
-  subtitle: {
-    type: DataTypes.STRING(500),
-    field: 'subtitle',
-  },
+    subtitle: {
+      type: DataTypes.STRING(500),
+      field: 'subtitle',
+    },
     description: {
       type: DataTypes.TEXT,
     },
@@ -32,11 +32,11 @@ const AboutSection = sequelize.define(
       type: DataTypes.INTEGER,
       field: 'fleet_size',
     },
-  tripsCompleted: {
-    type: DataTypes.INTEGER,
-    field: 'trips_completed',
-  },
-  featuredImage: {
+    tripsCompleted: {
+      type: DataTypes.INTEGER,
+      field: 'trips_completed',
+    },
+    featuredImage: {
       type: DataTypes.STRING(500),
       field: 'featured_image',
     },

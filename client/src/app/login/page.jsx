@@ -62,7 +62,10 @@ export default function LoginPage() {
           </div>
           <div className="absolute inset-0 bg-zinc-950/60" />
           <div className="relative h-full flex flex-col justify-between p-8 min-h-[480px]">
-            <Link href="/" className="text-[15px] font-black font-mono tracking-[0.14em] text-white">
+            <Link
+              href="/"
+              className="text-[15px] font-black font-mono tracking-[0.14em] text-white"
+            >
               URBAN <span className="text-teal-400">CRUISE</span>
             </Link>
             <div>
@@ -83,7 +86,10 @@ export default function LoginPage() {
         {/* Form panel */}
         <div className="p-6 sm:p-8">
           <div className="md:hidden mb-6 text-center">
-            <Link href="/" className="text-[15px] font-black font-mono tracking-[0.14em] text-zinc-950 dark:text-white">
+            <Link
+              href="/"
+              className="text-[15px] font-black font-mono tracking-[0.14em] text-zinc-950 dark:text-white"
+            >
               URBAN <span className="text-teal-500 dark:text-teal-400">CRUISE</span>
             </Link>
           </div>

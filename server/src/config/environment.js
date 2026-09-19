@@ -29,6 +29,7 @@ export const config = Object.freeze({
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASS || '',
     name: process.env.DB_NAME || 'seo_dashboard',
+    ssl: process.env.DB_SSL === 'true',
   }),
   jwt: Object.freeze({
     secret: process.env.JWT_SECRET,

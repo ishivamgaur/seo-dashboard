@@ -62,7 +62,7 @@ function ContentManagementContent() {
     citiesCovered: '',
     fleetSize: '',
     tripsCompleted: '',
-    featuredImage: ''
+    featuredImage: '',
   });
   const [aboutFile, setAboutFile] = useState(null);
   const [aboutPreview, setAboutPreview] = useState('');
@@ -108,7 +108,9 @@ function ContentManagementContent() {
                 try {
                   const parsed = JSON.parse(h);
                   if (Array.isArray(parsed)) return parsed.join('\n');
-                } catch { /* plain newline text */ }
+                } catch {
+                  /* plain newline text */
+                }
                 return h;
               }
               return '';
