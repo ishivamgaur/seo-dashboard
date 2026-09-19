@@ -33,7 +33,6 @@ const VehiclesSection = ({ data }) => {
       className="relative py-16 md:py-20 bg-[#fafafa] dark:bg-[#0c0d10] text-zinc-900 dark:text-zinc-100 border-t border-zinc-200/80 dark:border-zinc-800 transition-colors duration-150" 
       id="vehicles"
     >
-      {/* Subtle Architectural SVG Grid Accent */}
       <div 
         className="absolute inset-0 opacity-[0.025] dark:opacity-[0.02] pointer-events-none"
         style={{
@@ -45,7 +44,6 @@ const VehiclesSection = ({ data }) => {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header with quiet editorial hierarchy */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-4">
           <div>
             <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 block mb-1">
@@ -56,7 +54,6 @@ const VehiclesSection = ({ data }) => {
             </h2>
           </div>
 
-          {/* Navigation Controls: Optical Alignment, Scale on Press */}
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono tabular-nums text-zinc-500">
               <span className="text-zinc-950 dark:text-white font-bold">{selectedIndex + 1}</span> / {vehicles.length}
@@ -82,10 +79,8 @@ const VehiclesSection = ({ data }) => {
           </div>
         </div>
 
-        {/* FULL STAGE SHOWCASE: 80% HEIGHT CONTAINER, CONCENTRIC RADII, NATURAL ASPECT RATIO */}
         <div className="relative w-full h-[76vh] min-h-[560px] max-h-[760px] bg-white dark:bg-[#121418] rounded-2xl border border-zinc-200/90 dark:border-zinc-800 ring-1 ring-black/[0.04] dark:ring-white/[0.04] overflow-hidden flex flex-col justify-between p-6 sm:p-8 shadow-sm">
           
-          {/* Top Metadata Bar: Zero Emojis */}
           <div className="relative z-10 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-medium border border-zinc-200/80 dark:border-zinc-700/80">
@@ -101,7 +96,6 @@ const VehiclesSection = ({ data }) => {
             </div>
           </div>
 
-          {/* Full Stage Center Stage: Image takes full container width & height, zero cutoff */}
           <div className="relative w-full flex-1 min-h-[300px] sm:min-h-[380px] md:min-h-[440px] my-2 flex items-center justify-center overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div
@@ -124,7 +118,6 @@ const VehiclesSection = ({ data }) => {
             </AnimatePresence>
           </div>
 
-          {/* Bottom Info Bar: Concentric Radius (rounded-xl), Structured Typography */}
           <div className="relative z-10 bg-zinc-50/95 dark:bg-zinc-900/95 backdrop-blur-md p-4 sm:p-5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="max-w-2xl">
               <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 dark:text-white mb-1">
@@ -134,7 +127,6 @@ const VehiclesSection = ({ data }) => {
                 {currentVehicle.description}
               </p>
 
-              {/* Amenities: Clean pills, zero emojis */}
               {featuresList.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {featuresList.slice(0, 4).map((feat, idx) => (
@@ -149,7 +141,6 @@ const VehiclesSection = ({ data }) => {
               )}
             </div>
 
-            {/* Action Button: Scale on Press */}
             <div className="shrink-0">
               <Link
                 href="#contact"
@@ -163,7 +154,6 @@ const VehiclesSection = ({ data }) => {
 
         </div>
 
-        {/* Thumbnail Selector Rail: Concentric rounded-xl, Tabular Numbers */}
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5 mt-4">
           {vehicles.map((v, idx) => {
             const isSelected = idx === selectedIndex;

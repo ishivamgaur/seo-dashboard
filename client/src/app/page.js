@@ -89,7 +89,6 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#0c0d10] text-zinc-900 dark:text-zinc-100 flex flex-col font-sans selection:bg-teal-500 selection:text-white">
-      {/* Dynamic JSON-LD Schema Markup Injection */}
       {schemas.map((s, index) => {
         const schemaString = typeof s.schemaData === 'string'
           ? s.schemaData
@@ -103,16 +102,13 @@ export default async function Home() {
         );
       })}
 
-      {/* Quiet Announcement Banner: Zero Emojis, Clean Information */}
       <div className="bg-zinc-100 dark:bg-[#121418] border-b border-zinc-200/80 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs py-2 px-4 text-center">
         <span>Corporate and wedding fleet bookings across 15 cities. Direct helpline: +91 98765 43210</span>
       </div>
 
-      {/* Main Clean Nav Header */}
       <header className="sticky top-0 z-50 w-full bg-[#fafafa]/90 dark:bg-[#0c0d10]/90 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            {/* Brand Logo */}
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center">
                 <div className="relative w-40 sm:w-44 h-9">
@@ -125,7 +121,6 @@ export default async function Home() {
               </Link>
             </div>
 
-            {/* Nav Links: Clean Sans-Serif, Strict Dash Ban */}
             <nav className="hidden md:flex items-center space-x-6 text-xs font-mono uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
               <Link href="#about" className="hover:text-zinc-950 dark:hover:text-white transition-colors duration-150">
                 About
@@ -147,7 +142,6 @@ export default async function Home() {
               </Link>
             </nav>
 
-            {/* Action Buttons: Concentric Radius, Scale on Press */}
             <div className="flex items-center gap-2.5">
               <Link
                 href="/admin"
@@ -169,7 +163,6 @@ export default async function Home() {
         </div>
       </header>
 
-      {/* Main Content Sections */}
       <main className="flex-grow">
         <HeroSection data={data.hero} />
         <AboutSection data={data.about} />
@@ -180,12 +173,10 @@ export default async function Home() {
         <ContactSection data={data.contact} />
       </main>
 
-      {/* Quiet Structured Footer with Theme Selector */}
       <footer className="bg-zinc-100 dark:bg-[#07080a] text-zinc-600 dark:text-zinc-400 pt-16 pb-12 border-t border-zinc-200/80 dark:border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 pb-12 border-b border-zinc-200/80 dark:border-zinc-800">
             
-            {/* Brand Column */}
             <div className="lg:col-span-2 space-y-4">
               <div className="w-40 h-10 relative bg-white dark:bg-zinc-900 p-1.5 rounded-lg border border-zinc-200/90 dark:border-zinc-800 inline-block">
                 <img
@@ -203,7 +194,6 @@ export default async function Home() {
               </div>
             </div>
 
-            {/* Quick Links */}
             <div>
               <h4 className="text-zinc-950 dark:text-zinc-200 text-xs font-mono uppercase tracking-wider mb-3 font-semibold">
                 Navigation
@@ -218,7 +208,6 @@ export default async function Home() {
               </ul>
             </div>
 
-            {/* Fleet Categories */}
             <div>
               <h4 className="text-zinc-950 dark:text-zinc-200 text-xs font-mono uppercase tracking-wider mb-3 font-semibold">
                 Fleet
@@ -233,7 +222,6 @@ export default async function Home() {
               </ul>
             </div>
 
-            {/* Cities & Theme Switcher */}
             <div>
               <h4 className="text-zinc-950 dark:text-zinc-200 text-xs font-mono uppercase tracking-wider mb-3 font-semibold">
                 Service Areas
@@ -242,7 +230,6 @@ export default async function Home() {
                 Delhi NCR, Gurugram, Mumbai, Pune, Bengaluru, Hyderabad, Jaipur, Agra, Chandigarh, Dehradun.
               </p>
               
-              {/* Theme Switcher in Footer */}
               <div className="mt-6 pt-4 border-t border-zinc-200/80 dark:border-zinc-800">
                 <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-500 block mb-2">Theme Mode</span>
                 <ThemeSelector />
@@ -251,7 +238,6 @@ export default async function Home() {
 
           </div>
 
-          {/* Bottom Bar: Zero Em-Dashes, Clean Copyright */}
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-500 font-mono">
             <p>(c) {new Date().getFullYear()} Urban Cruise. All rights reserved.</p>
             <div className="flex items-center gap-3">
