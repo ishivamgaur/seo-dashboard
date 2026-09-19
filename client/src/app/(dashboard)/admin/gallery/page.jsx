@@ -7,8 +7,12 @@ import {
   X, 
   Images, 
   Edit2, 
+  Upload,
+  RotateCcw,
   ArrowUp, 
   ArrowDown, 
+  ArrowLeft,
+  ArrowRight,
   GripVertical, 
   Search, 
   LayoutList, 
@@ -24,12 +28,13 @@ export default function GalleryAdminPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingImage, setEditingImage] = useState(null);
-  const [viewMode, setViewMode] = useState('table'); // 'table' | 'grid'
+  const [editImageFile, setEditImageFile] = useState(null);
+  const [editPreviewUrl, setEditPreviewUrl] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [viewMode, setViewMode] = useState('table');
   
-  // Search State
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Form states
   const [formData, setFormData] = useState({ file: null, altTag: '' });
   const [uploadPreviewUrl, setUploadPreviewUrl] = useState('');
   const [editAltTag, setEditAltTag] = useState('');
@@ -82,12 +87,25 @@ export default function GalleryAdminPage() {
   const openEditModal = (img) => {
     setEditingImage(img);
     setEditAltTag(img.altTag || img.alt_tag || '');
+    setEditImageFile(null);
+    setEditPreviewUrl('');
     setEditModalOpen(true);
   };
 
   const closeEditModal = () => {
     setEditingImage(null);
+    setEditAltTag('');
+    setEditImageFile(null);
+    setEditPreviewUrl('');
     setEditModalOpen(false);
+  };
+
+  const handleEditFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEditImageFile(file);
+      setEditPreviewUrl(URL.createObjectURL(file));
+    }
   };
 
   const handleFileSelect = (e) => {
@@ -125,19 +143,29 @@ export default function GalleryAdminPage() {
     }
   };
 
-  const handleUpdateAlt = async (e) => {
+  const handleUpdateImage = async (e) => {
     e.preventDefault();
     if (!editingImage) return;
 
+    setIsSubmitting(true);
+    const form = new FormData();
+    form.append('altTag', editAltTag);
+    if (editImageFile) {
+      form.append('image', editImageFile);
+    }
+
     try {
-      const res = await api.put(`/gallery/${editingImage.id}`, { altTag: editAltTag });
+      const res = await api.put(`/gallery/${editingImage.id}`, form);
       if (res.status === 200) {
         closeEditModal();
         fetchGallery();
-        showToast('Alt tag updated successfully.');
+        showToast(editImageFile ? 'Gallery photo and alt tag updated.' : 'Alt tag description updated.');
       }
     } catch (err) {
-      console.error(err);
+      console.error('Failed to update gallery photo:', err);
+      showToast('Failed to update gallery image.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -207,8 +235,7 @@ export default function GalleryAdminPage() {
   };
 
   return (
-    <div className="w-full min-h-full space-y-4 font-sans antialiased">
-      {/* Top Header Bar */}
+    <div className="w-full max-w-8xl min-h-full space-y-4 font-sans antialiased">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-white">
@@ -237,7 +264,6 @@ export default function GalleryAdminPage() {
         </div>
       </div>
 
-      {/* Controls Bar: Search & View Mode Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#13161c] rounded-xl p-3 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400 stroke-[1.75]" />
@@ -251,17 +277,6 @@ export default function GalleryAdminPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {isFilterActive && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery('')}
-              className="text-xs text-zinc-500 hover:text-zinc-950 dark:hover:text-white underline font-mono cursor-pointer"
-            >
-              Clear Search
-            </button>
-          )}
-
-          {/* View Switcher */}
           <div className="flex items-center bg-[#f6f8fa] dark:bg-[#1a1e27] p-1 rounded-xl">
             <button
               type="button"
@@ -305,32 +320,42 @@ export default function GalleryAdminPage() {
           </p>
         </div>
       ) : viewMode === 'table' ? (
-        /* TABLE REORDER VIEW (Kanban Drag & Drop Table) */
         <div className="bg-white dark:bg-[#13161c] rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-500 dark:text-zinc-400 font-mono uppercase tracking-wider text-[11px]">
-                  <th className="px-4 py-3.5 w-24 text-center">Drag / Order</th>
-                  <th className="px-5 py-3.5 w-36">Thumbnail</th>
-                  <th className="px-5 py-3.5">SEO Alt Tag Description</th>
-                  <th className="px-5 py-3.5 w-32">Position</th>
-                  <th className="px-5 py-3.5 text-right">Actions</th>
-                </tr>
-              </thead>
+            <div className="min-w-[650px]">
+              <div className="grid grid-cols-[144px_144px_minmax(0,1fr)_100px] items-center bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-500 dark:text-zinc-400 font-mono uppercase tracking-wider text-[11px] border-b border-zinc-100 dark:border-zinc-800/80">
+                <div className="px-5 py-3.5 whitespace-nowrap">Drag / Order</div>
+                <div className="px-5 py-3.5">Thumbnail</div>
+                <div className="px-5 py-3.5">SEO Alt Tag Description</div>
+                <div className="px-5 py-3.5 text-right">Actions</div>
+              </div>
 
               {!isMounted ? (
-                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
+                <div className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
                   {filteredImages.map((img, index) => {
                     const src = img.imagePath || img.image_url;
                     const alt = img.altTag || img.alt_tag || 'Fleet Showcase Photo';
 
                     return (
-                      <tr key={img.id} className="text-zinc-900 dark:text-zinc-100 hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80 transition-colors">
-                        <td className="px-4 py-3.5 text-center">
-                          <span className="font-mono text-zinc-400 text-xs">#{index + 1}</span>
-                        </td>
-                        <td className="px-5 py-3.5">
+                      <div
+                        key={img.id}
+                        className="grid grid-cols-[144px_144px_minmax(0,1fr)_100px] items-center text-xs text-zinc-900 dark:text-zinc-100 hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80 transition-colors"
+                      >
+                        <div className="px-5 py-3.5 whitespace-nowrap">
+                          <div className="flex items-center gap-4">
+                            <div className="p-1 text-zinc-300 dark:text-zinc-600">
+                              <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
+                            </div>
+                            <div className="flex flex-col -space-y-0.5 opacity-25">
+                              <span className="p-0.5 text-zinc-400"><ArrowUp className="w-2.5 h-2.5 stroke-[2]" /></span>
+                              <span className="p-0.5 text-zinc-400"><ArrowDown className="w-2.5 h-2.5 stroke-[2]" /></span>
+                            </div>
+                            <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
+                              {index + 1}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="px-5 py-3.5">
                           <div className="relative w-24 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                             {src ? (
                               <img src={src} alt={alt} className="object-contain w-full h-full" />
@@ -338,20 +363,15 @@ export default function GalleryAdminPage() {
                               <Images className="w-5 h-5 text-zinc-400" />
                             )}
                           </div>
-                        </td>
-                        <td className="px-5 py-3.5 font-medium text-zinc-950 dark:text-white max-w-md">
-                          {alt}
-                        </td>
-                        <td className="px-5 py-3.5">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded font-mono text-[11px] font-semibold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/50">
-                            Pos #{index + 1}
-                          </span>
-                        </td>
-                        <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                        </div>
+                        <div className="px-5 py-3.5 font-medium text-zinc-950 dark:text-white min-w-0 pr-4">
+                          <span className="truncate block" title={alt}>{alt}</span>
+                        </div>
+                        <div className="px-5 py-3.5 text-right whitespace-nowrap">
                           <button
                             type="button"
                             onClick={() => openEditModal(img)}
-                            className="p-1.5 text-zinc-500 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md mr-1 cursor-pointer"
+                            className="p-1.5 text-zinc-500 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md mr-1 cursor-pointer transition-colors"
                             title="Edit Alt Tag"
                           >
                             <Edit2 className="w-4 h-4 stroke-[1.75]" />
@@ -359,84 +379,87 @@ export default function GalleryAdminPage() {
                           <button
                             type="button"
                             onClick={() => handleDelete(img.id)}
-                            className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md cursor-pointer"
+                            className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md cursor-pointer transition-colors"
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4 stroke-[1.75]" />
                           </button>
-                        </td>
-                      </tr>
+                        </div>
+                      </div>
                     );
                   })}
-                </tbody>
+                </div>
               ) : (
                 <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="gallery-table-droppable" ignoreContainerClipping>
+                  <Droppable droppableId="gallery-list-droppable">
                     {(provided) => (
-                      <tbody
+                      <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
                         className="divide-y divide-zinc-100 dark:divide-zinc-800/80"
                       >
                         {filteredImages.map((img, index) => {
                           const id = img.id.toString();
-                          const src = img.imagePath || img.image_url;
+                          const src = img.imagePath || img.image_path || img.image_url || img.image || img.url;
                           const alt = img.altTag || img.alt_tag || 'Fleet Showcase Photo';
 
                           return (
                             <Draggable key={id} draggableId={id} index={index} isDragDisabled={isFilterActive}>
                               {(providedDrag, snapshot) => (
-                                <tr
+                                <div
                                   ref={providedDrag.innerRef}
                                   {...providedDrag.draggableProps}
-                                  className={`text-zinc-900 dark:text-zinc-100 ${
+                                  style={providedDrag.draggableProps.style}
+                                  className={`grid grid-cols-[144px_144px_minmax(0,1fr)_100px] items-center text-xs text-zinc-900 dark:text-zinc-100 transition-colors ${
                                     snapshot.isDragging
-                                      ? 'bg-teal-50/80 dark:bg-teal-950/30 shadow-xl ring-2 ring-teal-500 z-50'
-                                      : 'hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80 transition-colors'
+                                      ? 'bg-white dark:bg-[#13161c] shadow-2xl ring-2 ring-teal-500 rounded-xl z-50'
+                                      : 'hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80'
                                   }`}
                                 >
-                                  {/* Drag Grip Handle & Up/Down Arrows */}
-                                  <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                                    <div className="inline-flex items-center gap-1.5">
+                                  <div className="px-5 py-3.5 whitespace-nowrap">
+                                    <div className="flex items-center gap-4">
                                       <button
                                         type="button"
                                         {...providedDrag.dragHandleProps}
                                         disabled={isFilterActive}
-                                        className={`p-1.5 rounded-md ${
+                                        className={`p-1 rounded transition-colors ${
                                           isFilterActive
                                             ? 'opacity-30 cursor-not-allowed text-zinc-400'
-                                            : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-grab active:cursor-grabbing'
+                                            : 'hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-grab active:cursor-grabbing'
                                         }`}
                                         title={isFilterActive ? 'Clear search to reorder' : 'Drag to reorder showroom position'}
                                       >
-                                        <GripVertical className="w-4 h-4 stroke-[2]" />
+                                        <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
                                       </button>
 
-                                      <div className="flex flex-col gap-0.5">
+                                      <div className="flex flex-col -space-y-0.5">
                                         <button
                                           type="button"
                                           disabled={index === 0 || isFilterActive}
                                           onClick={() => handleMove(index, -1)}
-                                          className="p-0.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-20 text-zinc-500 dark:text-zinc-400 cursor-pointer"
+                                          className="p-0.5 rounded hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] disabled:opacity-20 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
                                           title="Move Up"
                                         >
-                                          <ArrowUp className="w-3 h-3 stroke-[2]" />
+                                          <ArrowUp className="w-2.5 h-2.5 stroke-[2]" />
                                         </button>
                                         <button
                                           type="button"
                                           disabled={index === filteredImages.length - 1 || isFilterActive}
                                           onClick={() => handleMove(index, 1)}
-                                          className="p-0.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-20 text-zinc-500 dark:text-zinc-400 cursor-pointer"
+                                          className="p-0.5 rounded hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] disabled:opacity-20 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
                                           title="Move Down"
                                         >
-                                          <ArrowDown className="w-3 h-3 stroke-[2]" />
+                                          <ArrowDown className="w-2.5 h-2.5 stroke-[2]" />
                                         </button>
                                       </div>
-                                    </div>
-                                  </td>
 
-                                  {/* Thumbnail Preview */}
-                                  <td className="px-5 py-3.5">
+                                      <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
+                                        {index + 1}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <div className="px-5 py-3.5">
                                     <div className="relative w-24 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                                       {src ? (
                                         <img src={src} alt={alt} className="object-contain w-full h-full" />
@@ -444,24 +467,13 @@ export default function GalleryAdminPage() {
                                         <Images className="w-5 h-5 text-zinc-400" />
                                       )}
                                     </div>
-                                  </td>
+                                  </div>
 
-                                  {/* Alt Tag */}
-                                  <td className="px-5 py-3.5 font-medium text-zinc-950 dark:text-white max-w-md">
-                                    <div className="flex items-center gap-2">
-                                      <span className="truncate" title={alt}>{alt}</span>
-                                    </div>
-                                  </td>
+                                  <div className="px-5 py-3.5 font-medium text-zinc-950 dark:text-white min-w-0 pr-4">
+                                    <span className="truncate block" title={alt}>{alt}</span>
+                                  </div>
 
-                                  {/* Position */}
-                                  <td className="px-5 py-3.5 font-mono">
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/50">
-                                      Pos #{index + 1}
-                                    </span>
-                                  </td>
-
-                                  {/* Actions */}
-                                  <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                                  <div className="px-5 py-3.5 text-right whitespace-nowrap">
                                     <button
                                       type="button"
                                       onClick={() => openEditModal(img)}
@@ -478,100 +490,105 @@ export default function GalleryAdminPage() {
                                     >
                                       <Trash2 className="w-4 h-4 stroke-[1.75]" />
                                     </button>
-                                  </td>
-                                </tr>
+                                  </div>
+                                </div>
                               )}
                             </Draggable>
                           );
                         })}
                         {provided.placeholder}
-                      </tbody>
+                      </div>
                     )}
                   </Droppable>
                 </DragDropContext>
               )}
-            </table>
+            </div>
           </div>
         </div>
       ) : (
-        /* GRID SHOWCASE VIEW */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredImages.map((img, index) => {
-            const src = img.imagePath || img.image_url;
+            const src = img.imagePath || img.image_path || img.image_url || img.image || img.url;
             const alt = img.altTag || img.alt_tag || 'Fleet Showcase Photo';
 
             return (
               <div 
                 key={img.id} 
-                className="bg-white dark:bg-[#13161c] rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] flex flex-col justify-between hover:shadow-md transition-shadow duration-150"
+                className="group bg-white dark:bg-[#13161c] rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] hover:shadow-lg transition-all duration-200 flex flex-col justify-between"
               >
-                {/* Image Stage */}
-                <div className="relative aspect-[16/10] w-full bg-zinc-100 dark:bg-zinc-900 p-2 flex items-center justify-center ring-1 ring-black/[0.04] dark:ring-white/[0.04]">
+                <div className="relative aspect-[16/10] w-full bg-[#f6f8fa] dark:bg-[#1a1e27] overflow-hidden">
                   {src ? (
                     <img 
                       src={src} 
                       alt={alt} 
-                      className="object-contain w-full h-full" 
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300 ease-out" 
                     />
                   ) : (
-                    <Images className="w-8 h-8 text-zinc-400" />
+                    <div className="w-full h-full flex flex-col items-center justify-center text-zinc-400">
+                      <Images className="w-8 h-8 mb-1 opacity-50" />
+                      <span className="text-[11px] font-mono">No Image</span>
+                    </div>
                   )}
 
-                  {/* Position Badge */}
-                  <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-black/75 text-white px-2 py-1 rounded-lg shadow-sm font-mono text-[10px] font-bold">
-                    <span>Pos #{index + 1}</span>
-                  </div>
-
-                  {/* Top Right Action Controls */}
-                  <div className="absolute top-2.5 right-2.5 flex items-center gap-1">
-                    <button 
-                      type="button"
-                      onClick={() => openEditModal(img)}
-                      className="bg-black/75 hover:bg-teal-600 text-white p-1.5 rounded-lg cursor-pointer shadow-sm"
-                      title="Edit Alt Tag"
-                    >
-                      <Edit2 className="w-3.5 h-3.5 stroke-[1.75]" />
-                    </button>
-                    <button 
-                      type="button"
-                      onClick={() => handleDelete(img.id)}
-                      className="bg-black/75 hover:bg-red-600 text-white p-1.5 rounded-lg cursor-pointer shadow-sm"
-                      title="Delete image"
-                    >
-                      <Trash2 className="w-3.5 h-3.5 stroke-[1.75]" />
-                    </button>
-                  </div>
-
-                  {/* Bottom Reorder Controls */}
-                  <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1">
-                    <button
-                      type="button"
-                      disabled={index === 0 || isFilterActive}
-                      onClick={() => handleMove(index, -1)}
-                      className="p-1.5 rounded-lg bg-black/75 hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed text-white text-xs cursor-pointer"
-                      title="Move Left / Earlier"
-                    >
-                      <ArrowLeft className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={index === filteredImages.length - 1 || isFilterActive}
-                      onClick={() => handleMove(index, 1)}
-                      className="p-1.5 rounded-lg bg-black/75 hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed text-white text-xs cursor-pointer"
-                      title="Move Right / Later"
-                    >
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
+                  <div className="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-white font-mono text-[11px] font-semibold tracking-wider select-none shadow-sm">
+                    {index + 1}
                   </div>
                 </div>
 
-                <div className="p-3.5 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between gap-2">
-                  <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 truncate" title={alt}>
-                    {alt}
-                  </p>
-                  <span className="text-[10px] font-mono text-zinc-400 shrink-0">
-                    Pos #{index + 1}
-                  </span>
+                <div className="p-4 flex flex-col gap-3 flex-1 justify-between">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 block mb-1">
+                      Alt Tag SEO
+                    </span>
+                    <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200 line-clamp-2 leading-relaxed" title={alt}>
+                      {alt}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-zinc-100/80 dark:border-zinc-800/60">
+                    <div className="inline-flex items-center gap-1 bg-[#f6f8fa] dark:bg-[#1a1e27] p-1 rounded-lg">
+                      <button
+                        type="button"
+                        disabled={index === 0 || isFilterActive}
+                        onClick={() => handleMove(index, -1)}
+                        className="p-1 rounded text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-white dark:hover:bg-zinc-800 disabled:opacity-20 disabled:pointer-events-none transition-colors cursor-pointer"
+                        title="Move Earlier"
+                      >
+                        <ArrowLeft className="w-3.5 h-3.5 stroke-[2]" />
+                      </button>
+                      <span className="font-mono text-xs tabular-nums font-semibold text-zinc-500 dark:text-zinc-400 px-1.5 select-none">
+                        {index + 1}
+                      </span>
+                      <button
+                        type="button"
+                        disabled={index === filteredImages.length - 1 || isFilterActive}
+                        onClick={() => handleMove(index, 1)}
+                        className="p-1 rounded text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-white dark:hover:bg-zinc-800 disabled:opacity-20 disabled:pointer-events-none transition-colors cursor-pointer"
+                        title="Move Later"
+                      >
+                        <ArrowRight className="w-3.5 h-3.5 stroke-[2]" />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => openEditModal(img)}
+                        className="p-1.5 text-zinc-500 hover:text-zinc-950 dark:hover:text-white hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] rounded-md transition-colors cursor-pointer"
+                        title="Edit Alt Tag"
+                      >
+                        <Edit2 className="w-4 h-4 stroke-[1.75]" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(img.id)}
+                        className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md transition-colors cursor-pointer"
+                        title="Delete Photo"
+                      >
+                        <Trash2 className="w-4 h-4 stroke-[1.75]" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
@@ -579,7 +596,6 @@ export default function GalleryAdminPage() {
         </div>
       )}
 
-      {/* Upload Modal with Live Preview */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
           <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 shadow-xl w-full max-w-md">
@@ -674,14 +690,18 @@ export default function GalleryAdminPage() {
         </div>
       )}
 
-      {/* Edit Alt Tag Modal */}
-      {editModalOpen && (
+      {editModalOpen && editingImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
           <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 shadow-xl w-full max-w-md">
             <div className="flex justify-between items-center mb-5 pb-3 border-b border-zinc-100 dark:border-zinc-800">
-              <h2 className="text-lg font-bold text-zinc-950 dark:text-white">
-                Edit SEO Alt Tag
-              </h2>
+              <div>
+                <h2 className="text-lg font-bold text-zinc-950 dark:text-white">
+                  Edit Gallery Photo
+                </h2>
+                <span className="text-[11px] font-mono text-zinc-500">
+                  Replace image file and update Google SEO alt tag
+                </span>
+              </div>
               <button 
                 type="button"
                 onClick={closeEditModal} 
@@ -691,17 +711,83 @@ export default function GalleryAdminPage() {
               </button>
             </div>
             
-            <form onSubmit={handleUpdateAlt} className="space-y-4 text-xs">
+            <form onSubmit={handleUpdateImage} className="space-y-4 text-xs">
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500">
+                    Photo Preview
+                  </label>
+                  {editPreviewUrl && (
+                    <span className="text-[10px] font-mono font-semibold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/50 px-2 py-0.5 rounded-md">
+                      New Photo Selected
+                    </span>
+                  )}
+                </div>
+
+                <div className="relative aspect-[16/10] w-full bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-xl overflow-hidden flex items-center justify-center border border-zinc-200/60 dark:border-zinc-800">
+                  {editPreviewUrl ? (
+                    <img 
+                      src={editPreviewUrl} 
+                      alt="New selection preview" 
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (editingImage.imagePath || editingImage.image_path || editingImage.image_url || editingImage.image || editingImage.url) ? (
+                    <img 
+                      src={editingImage.imagePath || editingImage.image_path || editingImage.image_url || editingImage.image || editingImage.url} 
+                      alt={editAltTag || 'Fleet Showcase Photo'} 
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-zinc-400 py-8">
+                      <Images className="w-8 h-8 mb-1 opacity-50" />
+                      <span className="text-[11px] font-mono">No Image Preview</span>
+                    </div>
+                  )}
+
+                  <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-white font-mono text-[10px] font-semibold select-none shadow-sm">
+                    Position {images.findIndex((i) => i.id === editingImage.id) + 1 || 1}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between mt-2.5">
+                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27] hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium text-xs cursor-pointer transition-colors shadow-2xs">
+                    <Upload className="w-3.5 h-3.5 stroke-[1.75] text-zinc-500 dark:text-zinc-400" />
+                    <span>{editPreviewUrl ? 'Choose Different Photo' : 'Replace Photo'}</span>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleEditFileSelect} 
+                      className="hidden" 
+                    />
+                  </label>
+
+                  {editPreviewUrl && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditImageFile(null);
+                        setEditPreviewUrl('');
+                      }}
+                      className="inline-flex items-center gap-1 text-[11px] font-mono text-zinc-500 hover:text-zinc-900 dark:hover:text-white cursor-pointer px-2 py-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                    >
+                      <RotateCcw className="w-3 h-3 stroke-[1.75]" />
+                      <span>Revert Original</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
               <div>
                 <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
                   Alt Tag Description
                 </label>
-                <input 
-                  type="text" 
+                <textarea 
+                  rows={3}
                   value={editAltTag} 
                   onChange={(e) => setEditAltTag(e.target.value)} 
                   required 
-                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white border-0 rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium" 
+                  placeholder="Describe this fleet photo for search engine ranking..."
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white border-0 rounded-lg p-3 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium resize-none leading-relaxed" 
                 />
               </div>
 
@@ -715,9 +801,10 @@ export default function GalleryAdminPage() {
                 </button>
                 <button 
                   type="submit" 
-                  className="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-lg text-xs uppercase tracking-wider active:scale-[0.98] shadow-xs cursor-pointer"
+                  disabled={isSubmitting}
+                  className="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-lg text-xs uppercase tracking-wider active:scale-[0.98] shadow-xs cursor-pointer disabled:opacity-50"
                 >
-                  Update Alt Tag
+                  {isSubmitting ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </form>

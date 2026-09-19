@@ -13,10 +13,8 @@ export default function OccasionsPage() {
   const [editingOccasion, setEditingOccasion] = useState(null);
   const [statusMsg, setStatusMsg] = useState('');
   
-  // Search State
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Form state matching Occasion model (title, description, image)
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
@@ -182,8 +180,7 @@ export default function OccasionsPage() {
   };
 
   return (
-    <div className="w-full min-h-full space-y-4 font-sans antialiased">
-      {/* Top Header & Actions Bar */}
+    <div className="w-full max-w-8xl min-h-full space-y-4 font-sans antialiased">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-white">
@@ -212,7 +209,6 @@ export default function OccasionsPage() {
         </div>
       </div>
 
-      {/* Search & Control Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#13161c] rounded-xl p-3 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400 stroke-[1.75]" />
@@ -224,60 +220,53 @@ export default function OccasionsPage() {
             className="w-full pl-9 pr-3 py-2 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:ring-1 focus:ring-teal-500 outline-none font-medium border-0"
           />
         </div>
-
-        {isFilterActive && (
-          <button
-            type="button"
-            onClick={() => setSearchQuery('')}
-            className="text-xs text-zinc-500 hover:text-zinc-950 dark:hover:text-white underline font-mono cursor-pointer"
-          >
-            Clear Search
-          </button>
-        )}
       </div>
 
-      {/* Table Container */}
       <div className="bg-white dark:bg-[#13161c] rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-500 dark:text-zinc-400 font-mono uppercase tracking-wider text-[11px]">
-                <th className="px-4 py-3.5 w-20 text-center">Drag / Order</th>
-                <th className="px-5 py-3.5 w-36">16:9 Banner</th>
-                <th className="px-5 py-3.5">Title</th>
-                <th className="px-5 py-3.5">Description</th>
-                <th className="px-5 py-3.5 text-right">Actions</th>
-              </tr>
-            </thead>
+          <div className="min-w-[860px] w-full divide-y divide-zinc-100 dark:divide-zinc-800/80">
+            <div className="grid grid-cols-[144px_144px_200px_minmax(0,1fr)_100px] items-center bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-500 dark:text-zinc-400 font-mono uppercase tracking-wider text-[11px]">
+              <div className="px-5 py-3.5 whitespace-nowrap">Drag / Order</div>
+              <div className="px-5 py-3.5">16:9 Banner</div>
+              <div className="px-5 py-3.5">Title</div>
+              <div className="px-5 py-3.5">Description</div>
+              <div className="px-5 py-3.5 text-right">Actions</div>
+            </div>
 
             {isLoading ? (
-              <tbody className="divide-y divide-zinc-100/70 dark:divide-zinc-800/40">
-                <tr>
-                  <td colSpan="5" className="px-5 py-8 text-center text-zinc-500 font-mono">
-                    Loading occasions...
-                  </td>
-                </tr>
-              </tbody>
+              <div className="px-5 py-8 text-center text-zinc-500 font-mono text-xs">
+                Loading occasions...
+              </div>
             ) : filteredOccasions.length === 0 ? (
-              <tbody className="divide-y divide-zinc-100/70 dark:divide-zinc-800/40">
-                <tr>
-                  <td colSpan="5" className="px-5 py-12 text-center text-zinc-500 font-mono">
-                    <div className="max-w-sm mx-auto space-y-2">
-                      <Compass className="w-8 h-8 text-zinc-400 mx-auto" />
-                      <p className="font-semibold text-zinc-700 dark:text-zinc-300">No occasions match criteria</p>
-                      <p className="text-xs text-zinc-500">Click Add Occasion to register a new travel service.</p>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
+              <div className="px-5 py-12 text-center text-zinc-500 font-mono text-xs">
+                <div className="max-w-sm mx-auto space-y-2">
+                  <Compass className="w-8 h-8 text-zinc-400 mx-auto" />
+                  <p className="font-semibold text-zinc-700 dark:text-zinc-300">No occasions match criteria</p>
+                  <p className="text-xs text-zinc-500">Click Add Occasion to register a new travel service.</p>
+                </div>
+              </div>
             ) : !isMounted ? (
-              <tbody className="divide-y divide-zinc-100/70 dark:divide-zinc-800/40">
+              <div className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
                 {filteredOccasions.map((o, index) => (
-                  <tr key={o.id} className="text-zinc-900 dark:text-zinc-100 hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80 transition-colors">
-                    <td className="px-4 py-3.5 text-center">
-                      <span className="font-mono text-zinc-400 text-xs">#{index + 1}</span>
-                    </td>
-                    <td className="px-5 py-3.5">
+                  <div 
+                    key={o.id} 
+                    className="grid grid-cols-[144px_144px_200px_minmax(0,1fr)_100px] items-center text-xs text-zinc-900 dark:text-zinc-100 hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80 transition-colors"
+                  >
+                    <div className="px-5 py-3.5 whitespace-nowrap">
+                      <div className="flex items-center gap-4">
+                        <div className="p-1 text-zinc-300 dark:text-zinc-600">
+                          <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
+                        </div>
+                        <div className="flex flex-col -space-y-0.5 opacity-25">
+                          <span className="p-0.5 text-zinc-400"><ArrowUp className="w-2.5 h-2.5 stroke-[2]" /></span>
+                          <span className="p-0.5 text-zinc-400"><ArrowDown className="w-2.5 h-2.5 stroke-[2]" /></span>
+                        </div>
+                        <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
+                          {index + 1}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="px-5 py-3.5">
                       <div className="relative w-28 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                         {o.image ? (
                           <img src={o.image} alt={o.title} className="object-cover w-full h-full" />
@@ -285,14 +274,16 @@ export default function OccasionsPage() {
                           <Compass className="w-5 h-5 text-zinc-400" />
                         )}
                       </div>
-                    </td>
-                    <td className="px-5 py-3.5 font-bold text-zinc-950 dark:text-white">
-                      {o.title}
-                    </td>
-                    <td className="px-5 py-3.5 text-zinc-600 dark:text-zinc-300 max-w-md line-clamp-2">
-                      {o.description}
-                    </td>
-                    <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                    </div>
+                    <div className="px-5 py-3.5 font-bold text-zinc-950 dark:text-white truncate">
+                      <span title={o.title}>{o.title}</span>
+                    </div>
+                    <div className="px-5 py-3.5 min-w-0 overflow-hidden">
+                      <p className="text-zinc-600 dark:text-zinc-300 line-clamp-2 leading-relaxed text-xs break-words overflow-hidden" title={o.description}>
+                        {o.description}
+                      </p>
+                    </div>
+                    <div className="px-5 py-3.5 text-right whitespace-nowrap">
                       <button
                         type="button"
                         onClick={() => openEditModal(o)}
@@ -309,74 +300,78 @@ export default function OccasionsPage() {
                       >
                         <Trash2 className="w-4 h-4 stroke-[1.75]" />
                       </button>
-                    </td>
-                  </tr>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
+              </div>
             ) : (
               <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId="occasions-table-droppable" ignoreContainerClipping>
+                <Droppable droppableId="occasions-list-droppable">
                   {(provided) => (
-                    <tbody
+                    <div
                       ref={provided.innerRef}
                       {...provided.droppableProps}
-                      className="divide-y divide-zinc-100/70 dark:divide-zinc-800/40"
+                      className="divide-y divide-zinc-100 dark:divide-zinc-800/80"
                     >
                       {filteredOccasions.map((o, index) => {
                         const id = o.id.toString();
                         return (
                           <Draggable key={id} draggableId={id} index={index} isDragDisabled={isFilterActive}>
                             {(providedDrag, snapshot) => (
-                              <tr
+                              <div
                                 ref={providedDrag.innerRef}
                                 {...providedDrag.draggableProps}
-                                className={`text-zinc-900 dark:text-zinc-100 transition-colors ${
+                                style={providedDrag.draggableProps.style}
+                                className={`grid grid-cols-[144px_144px_200px_minmax(0,1fr)_100px] items-center text-xs text-zinc-900 dark:text-zinc-100 transition-colors ${
                                   snapshot.isDragging
-                                    ? 'bg-teal-50 dark:bg-[#1a1e27] shadow-xl ring-2 ring-teal-500 z-50'
+                                    ? 'bg-white dark:bg-[#13161c] shadow-2xl ring-2 ring-teal-500 rounded-xl z-50'
                                     : 'hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80'
                                 }`}
                               >
-                                {/* Drag Grip Handle */}
-                                <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                                  <div className="inline-flex items-center gap-1.5">
+                                <div className="px-5 py-3.5 whitespace-nowrap">
+                                  <div className="flex items-center gap-4">
                                     <button
                                       type="button"
                                       {...providedDrag.dragHandleProps}
                                       disabled={isFilterActive}
-                                      className={`p-1.5 rounded-md transition-colors ${
+                                      className={`p-1 rounded transition-colors ${
                                         isFilterActive
                                           ? 'opacity-30 cursor-not-allowed text-zinc-400'
-                                          : 'hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-grab active:cursor-grabbing'
+                                          : 'hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-grab active:cursor-grabbing'
                                       }`}
                                       title={isFilterActive ? 'Clear search to reorder' : 'Drag to reorder occasion position'}
                                     >
-                                      <GripVertical className="w-4 h-4 stroke-[2]" />
+                                      <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
                                     </button>
 
-                                    <div className="flex flex-col gap-0.5">
+                                    <div className="flex flex-col -space-y-0.5">
                                       <button
                                         type="button"
                                         disabled={index === 0 || isFilterActive}
                                         onClick={() => handleMove(index, -1)}
-                                        className="p-0.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-20 text-zinc-500 dark:text-zinc-400 transition-colors"
+                                        className="p-0.5 rounded hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] disabled:opacity-20 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
                                         title="Move Up"
                                       >
-                                        <ArrowUp className="w-3 h-3 stroke-[2]" />
+                                        <ArrowUp className="w-2.5 h-2.5 stroke-[2]" />
                                       </button>
                                       <button
                                         type="button"
                                         disabled={index === filteredOccasions.length - 1 || isFilterActive}
                                         onClick={() => handleMove(index, 1)}
-                                        className="p-0.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-20 text-zinc-500 dark:text-zinc-400 transition-colors"
+                                        className="p-0.5 rounded hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] disabled:opacity-20 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
                                         title="Move Down"
                                       >
-                                        <ArrowDown className="w-3 h-3 stroke-[2]" />
+                                        <ArrowDown className="w-2.5 h-2.5 stroke-[2]" />
                                       </button>
                                     </div>
-                                  </div>
-                                </td>
 
-                                <td className="px-5 py-3.5">
+                                    <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
+                                      {index + 1}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="px-5 py-3.5">
                                   <div className="relative w-28 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                                     {o.image ? (
                                       <img src={o.image} alt={o.title} className="object-cover w-full h-full" />
@@ -384,22 +379,19 @@ export default function OccasionsPage() {
                                       <Compass className="w-5 h-5 text-zinc-400" />
                                     )}
                                   </div>
-                                </td>
+                                </div>
 
-                                <td className="px-5 py-3.5 font-bold text-zinc-950 dark:text-white">
-                                  <div className="flex items-center gap-2">
-                                    <span>{o.title}</span>
-                                    <span className="text-[10px] font-mono text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">
-                                      Pos #{index + 1}
-                                    </span>
-                                  </div>
-                                </td>
+                                <div className="px-5 py-3.5 font-bold text-zinc-950 dark:text-white truncate">
+                                  <span title={o.title}>{o.title}</span>
+                                </div>
 
-                                <td className="px-5 py-3.5 text-zinc-600 dark:text-zinc-300 max-w-md line-clamp-2">
-                                  {o.description}
-                                </td>
+                                <div className="px-5 py-3.5 min-w-0 overflow-hidden">
+                                  <p className="text-zinc-600 dark:text-zinc-300 line-clamp-2 leading-relaxed text-xs break-words overflow-hidden" title={o.description}>
+                                    {o.description}
+                                  </p>
+                                </div>
 
-                                <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                                <div className="px-5 py-3.5 text-right whitespace-nowrap">
                                   <button
                                     type="button"
                                     onClick={() => openEditModal(o)}
@@ -416,23 +408,22 @@ export default function OccasionsPage() {
                                   >
                                     <Trash2 className="w-4 h-4 stroke-[1.75]" />
                                   </button>
-                                </td>
-                              </tr>
+                                </div>
+                              </div>
                             )}
                           </Draggable>
                         );
                       })}
                       {provided.placeholder}
-                    </tbody>
+                    </div>
                   )}
                 </Droppable>
               </DragDropContext>
             )}
-          </table>
+          </div>
         </div>
       </div>
 
-      {/* Modal Dialog */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
           <div className="bg-white dark:bg-[#13161c] rounded-2xl p-6 shadow-2xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
@@ -483,7 +474,6 @@ export default function OccasionsPage() {
                 />
               </div>
 
-              {/* 16:9 Banner Image with Live Preview Card */}
               <div>
                 <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
                   Banner Image (16:9 Aspect Ratio)

@@ -4,9 +4,6 @@ CREATE DATABASE IF NOT EXISTS seo_dashboard
 
 USE seo_dashboard;
 
--- ---------------------------------------------------------------------------
--- 1. users
--- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
@@ -17,9 +14,6 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------------------------
--- 2. seo_settings
--- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS seo_settings (
   id INT AUTO_INCREMENT PRIMARY KEY,
   page_identifier VARCHAR(50) NOT NULL DEFAULT 'homepage' UNIQUE,
@@ -38,9 +32,6 @@ CREATE TABLE IF NOT EXISTS seo_settings (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------------------------
--- 3. schemas
--- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `schemas` (
   id INT AUTO_INCREMENT PRIMARY KEY,
   schema_type ENUM('organization', 'faq', 'breadcrumb', 'website', 'local_business') NOT NULL,
@@ -50,9 +41,6 @@ CREATE TABLE IF NOT EXISTS `schemas` (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------------------------
--- 4. hero_section
--- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS hero_section (
   id INT AUTO_INCREMENT PRIMARY KEY,
   heading VARCHAR(255) NOT NULL,
@@ -63,9 +51,6 @@ CREATE TABLE IF NOT EXISTS hero_section (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------------------------
--- 5. about_section
--- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS about_section (
   id INT AUTO_INCREMENT PRIMARY KEY,
   section_title VARCHAR(255) NOT NULL,
@@ -74,9 +59,6 @@ CREATE TABLE IF NOT EXISTS about_section (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------------------------
--- 6. vehicles
--- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS vehicles (
   id INT AUTO_INCREMENT PRIMARY KEY,
   vehicle_name VARCHAR(200) NOT NULL,
@@ -90,9 +72,6 @@ CREATE TABLE IF NOT EXISTS vehicles (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------------------------
--- 7. occasions
--- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS occasions (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(200) NOT NULL,
@@ -103,9 +82,6 @@ CREATE TABLE IF NOT EXISTS occasions (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------------------------
--- 8. testimonials
--- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS testimonials (
   id INT AUTO_INCREMENT PRIMARY KEY,
   customer_name VARCHAR(150) NOT NULL,
@@ -117,9 +93,6 @@ CREATE TABLE IF NOT EXISTS testimonials (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------------------------
--- 9. gallery_images
--- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS gallery_images (
   id INT AUTO_INCREMENT PRIMARY KEY,
   image_path VARCHAR(500) NOT NULL,
@@ -128,9 +101,6 @@ CREATE TABLE IF NOT EXISTS gallery_images (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------------------------
--- 10. contact_info
--- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS contact_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   phone VARCHAR(20),
@@ -140,11 +110,6 @@ CREATE TABLE IF NOT EXISTS contact_info (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------------------------
--- Default seed rows
--- ---------------------------------------------------------------------------
-
--- Update the bcrypt hash placeholder before deploying to production
 INSERT INTO users (name, email, password, role)
 VALUES ('Admin User', 'admin@seodashboard.com', '$2a$10$placeholder', 'admin');
 

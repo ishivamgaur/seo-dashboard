@@ -17,7 +17,6 @@ const authenticate = (req, res, next) => {
     req.user = decoded;
     next();
   } catch {
-    // Catch token verification failures such as expiration or signature mismatch
     throw ApiError.unauthorized('Invalid or expired token.');
   }
 };

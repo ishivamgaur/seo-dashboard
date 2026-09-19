@@ -15,7 +15,6 @@ const OccasionsSection = ({ data }) => {
       className="relative py-16 md:py-24 bg-white dark:bg-[#0c0d10] text-zinc-900 dark:text-zinc-100 border-t border-zinc-200/80 dark:border-zinc-800 transition-colors duration-150" 
       id="occasions"
     >
-      {/* Subtle Architectural SVG Grid Accent */}
       <div 
         className="absolute inset-0 opacity-[0.025] dark:opacity-[0.02] pointer-events-none"
         style={{
@@ -27,7 +26,6 @@ const OccasionsSection = ({ data }) => {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header */}
         <div className="mb-12 max-w-2xl">
           <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 block mb-1">
             Services and Travel Occasions
@@ -40,14 +38,12 @@ const OccasionsSection = ({ data }) => {
           </p>
         </div>
 
-        {/* FULL WIDTH WIDESCREEN CARDS: TRUE 16:9 NATURAL ASPECT RATIO */}
         <div className="space-y-10">
           {occasions.map((occasion, index) => (
             <div
               key={occasion.id || index}
               className="bg-zinc-50 dark:bg-[#121418] border border-zinc-200/90 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-[border-color,box-shadow] duration-150"
             >
-              {/* Full Width 16:9 Container with Subtle Image Ring Outline */}
               <div className="relative w-full aspect-[16/9] bg-zinc-100 dark:bg-zinc-900 overflow-hidden ring-1 ring-black/[0.06] dark:ring-white/[0.06]">
                 <Image
                   src={occasion.image || 'https://urbancruise.in/wp-content/uploads/Luxury-Bus-rental-For-Wedding.webp'}
@@ -59,7 +55,6 @@ const OccasionsSection = ({ data }) => {
                 />
               </div>
 
-              {/* Information Row: Concentric Radius, Optical Alignment */}
               <div className="p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-zinc-200/80 dark:border-zinc-800">
                 <div className="max-w-2xl">
                   <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 dark:text-white mb-1.5">

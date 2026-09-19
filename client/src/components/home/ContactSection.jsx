@@ -28,7 +28,6 @@ const ContactSection = ({ data }) => {
       className="relative py-20 md:py-28 bg-white dark:bg-[#0c0d10] text-zinc-900 dark:text-zinc-100 border-t border-zinc-200/80 dark:border-zinc-800 transition-colors duration-150" 
       id="contact"
     >
-      {/* Subtle Architectural SVG Grid Accent */}
       <div 
         className="absolute inset-0 opacity-[0.025] dark:opacity-[0.02] pointer-events-none"
         style={{
@@ -40,7 +39,6 @@ const ContactSection = ({ data }) => {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header */}
         <div className="max-w-2xl mb-12">
           <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 block mb-1">
             Reservations & Inquiries
@@ -53,10 +51,8 @@ const ContactSection = ({ data }) => {
           </p>
         </div>
 
-        {/* Main Grid: Details + Form */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
           
-          {/* Contact Details Card: Concentric Radii (rounded-2xl) */}
           <div className="lg:col-span-5 p-6 sm:p-8 rounded-2xl bg-zinc-50 dark:bg-[#121418] border border-zinc-200/90 dark:border-zinc-800 flex flex-col justify-between shadow-xs">
             <div>
               <span className="text-xs font-mono uppercase tracking-wider text-teal-600 dark:text-teal-400 block mb-1">
@@ -67,7 +63,6 @@ const ContactSection = ({ data }) => {
               </h3>
 
               <div className="space-y-5">
-                {/* Phone */}
                 <div className="flex items-start gap-3.5">
                   <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200/80 dark:border-zinc-700 shrink-0">
                     <Phone className="w-4 h-4 text-teal-600 dark:text-teal-400 stroke-[1.75]" />
@@ -83,7 +78,6 @@ const ContactSection = ({ data }) => {
                   </div>
                 </div>
 
-                {/* Email */}
                 <div className="flex items-start gap-3.5">
                   <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200/80 dark:border-zinc-700 shrink-0">
                     <Mail className="w-4 h-4 text-teal-600 dark:text-teal-400 stroke-[1.75]" />
@@ -99,7 +93,6 @@ const ContactSection = ({ data }) => {
                   </div>
                 </div>
 
-                {/* Address */}
                 <div className="flex items-start gap-3.5">
                   <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200/80 dark:border-zinc-700 shrink-0">
                     <MapPin className="w-4 h-4 text-teal-600 dark:text-teal-400 stroke-[1.75]" />
@@ -114,14 +107,12 @@ const ContactSection = ({ data }) => {
               </div>
             </div>
 
-            {/* Quiet Bottom Spec: Zero Em-dashes */}
             <div className="pt-6 border-t border-zinc-200/70 dark:border-zinc-800 mt-8 flex items-center justify-between text-xs text-zinc-500 font-mono">
               <span>24/7 Operations</span>
               <span>All-India Permits</span>
             </div>
           </div>
 
-          {/* Inquiry Form: Concentric Inputs, Tactile Button */}
           <div className="lg:col-span-7 p-6 sm:p-8 rounded-2xl bg-zinc-50 dark:bg-[#121418] border border-zinc-200/90 dark:border-zinc-800 shadow-xs">
             <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 dark:text-white mb-1">
               Request a Quotation

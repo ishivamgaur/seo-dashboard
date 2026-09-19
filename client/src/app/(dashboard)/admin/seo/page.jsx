@@ -34,7 +34,6 @@ function SeoSettingsContent() {
   const [copied, setCopied] = useState(false);
   const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
 
-  // Sync tab with URL search parameter & set default '?tab=meta' if missing
   useEffect(() => {
     const currentTabInUrl = searchParams.get('tab');
     if (!currentTabInUrl || !VALID_TABS.includes(currentTabInUrl)) {
@@ -65,16 +64,13 @@ function SeoSettingsContent() {
     twitterImage: ''
   });
 
-  // Schema state
   const [schemas, setSchemas] = useState([]);
   const [selectedSchema, setSelectedSchema] = useState(null);
   const [isSchemaModalOpen, setIsSchemaModalOpen] = useState(false);
   const [editingSchema, setEditingSchema] = useState(null);
 
-  // Schema Generator Form state
   const [schemaType, setSchemaType] = useState('organization');
   
-  // Organization / Local Business fields
   const [orgName, setOrgName] = useState('Urban Cruise');
   const [legalName, setLegalName] = useState('Urban Cruise India Private Limited');
   const [siteUrl, setSiteUrl] = useState('https://urbancruise.in');
@@ -86,13 +82,11 @@ function SeoSettingsContent() {
   const [postalCode, setPostalCode] = useState('122008');
   const [priceRange, setPriceRange] = useState('₹₹ - ₹₹₹');
 
-  // FAQ items state
   const [faqItems, setFaqItems] = useState([
     { question: 'What vehicles are available in your fleet?', answer: 'We offer 9, 12, 16, and 20 seater tempo travellers, Force Urbania luxury vans, and Volvo luxury coaches.' },
     { question: 'Do you provide outstation chauffeur services?', answer: 'Yes, all our vehicles operate with verified commercial all-India tourist permits and experienced drivers.' }
   ]);
 
-  // Breadcrumb items state
   const [breadcrumbItems, setBreadcrumbItems] = useState([
     { name: 'Home', url: 'https://urbancruise.in' },
     { name: 'Fleet', url: 'https://urbancruise.in/#vehicles' }
@@ -200,7 +194,6 @@ function SeoSettingsContent() {
     }
   };
 
-  // Generate valid JSON-LD structure based on schemaType
   const generateJsonLd = () => {
     if (schemaType === 'organization') {
       return {
@@ -333,8 +326,7 @@ function SeoSettingsContent() {
   const descLength = (formData.metaDescription || '').length;
 
   return (
-    <div className="w-full min-h-full space-y-4 font-sans antialiased">
-      {/* Top Header Bar */}
+    <div className="w-full max-w-8xl min-h-full space-y-4 font-sans antialiased">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-white">
@@ -361,7 +353,6 @@ function SeoSettingsContent() {
         )}
       </div>
 
-      {/* Tabs Row */}
       <div className="flex space-x-2 pb-1 overflow-x-auto">
         <button
           type="button"
@@ -403,11 +394,9 @@ function SeoSettingsContent() {
         </button>
       </div>
 
-      {/* Meta & Crawling Tab */}
       {activeTab === 'meta' && (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            {/* Left Column: Form Fields */}
             <div className="md:col-span-7 bg-white dark:bg-[#13161c] rounded-xl p-6 shadow-xs space-y-4 text-xs">
               <h2 className="text-base font-bold text-zinc-950 dark:text-white">
                 Core Meta Directives
@@ -484,9 +473,7 @@ function SeoSettingsContent() {
               </div>
             </div>
 
-            {/* Right Column: Live Google SERP Snippet Preview & Crawling */}
             <div className="md:col-span-5 space-y-4 text-xs">
-              {/* Live Google Search Preview Box */}
               <div className="bg-white dark:bg-[#13161c] rounded-xl p-5 shadow-xs">
                 <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800/60 mb-3">
                   <span className="font-mono text-xs uppercase font-bold text-zinc-600 dark:text-zinc-300 flex items-center gap-1.5">
@@ -517,7 +504,6 @@ function SeoSettingsContent() {
                 </div>
               </div>
 
-              {/* Crawling Directives */}
               <div className="bg-white dark:bg-[#13161c] rounded-xl p-5 shadow-xs flex flex-col justify-between">
                 <div>
                   <h3 className="text-xs font-mono uppercase font-bold text-zinc-950 dark:text-white mb-3">
@@ -585,11 +571,9 @@ function SeoSettingsContent() {
         </form>
       )}
 
-      {/* Social Tab (OG & Twitter) with Live Previews */}
       {activeTab === 'social' && (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
-            {/* Open Graph Protocol Form & Preview */}
             <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 shadow-xs space-y-4">
               <h2 className="text-base font-bold text-zinc-950 dark:text-white">
                 Open Graph Protocol (Facebook / WhatsApp / LinkedIn)
@@ -637,7 +621,6 @@ function SeoSettingsContent() {
                 />
               </div>
 
-              {/* Live OG Card Preview */}
               <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
                 <span className="text-[10px] font-mono text-zinc-400 block mb-2">LIVE OPEN GRAPH SHARE PREVIEW:</span>
                 <div className="rounded-xl overflow-hidden bg-[#f6f8fa] dark:bg-[#1a1e27]">
@@ -661,7 +644,6 @@ function SeoSettingsContent() {
               </div>
             </div>
 
-            {/* Twitter Card Form & Preview */}
             <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 shadow-xs space-y-4">
               <h2 className="text-base font-bold text-zinc-950 dark:text-white">
                 Twitter Card (X Protocol)
@@ -709,7 +691,6 @@ function SeoSettingsContent() {
                 />
               </div>
 
-              {/* Live Twitter Card Preview */}
               <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
                 <span className="text-[10px] font-mono text-zinc-400 block mb-2">LIVE TWITTER SUMMARY CARD:</span>
                 <div className="rounded-xl overflow-hidden bg-[#f6f8fa] dark:bg-[#1a1e27]">
@@ -746,7 +727,6 @@ function SeoSettingsContent() {
         </form>
       )}
 
-      {/* JSON-LD Schemas Tab: Generator, Inspector, Copy to Clipboard */}
       {activeTab === 'schemas' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
@@ -764,7 +744,6 @@ function SeoSettingsContent() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 text-xs">
-            {/* Schemas List */}
             <div className="md:col-span-5 space-y-3">
               {schemas.map((s) => {
                 const isSelected = selectedSchema?.id === s.id;
@@ -821,7 +800,6 @@ function SeoSettingsContent() {
               })}
             </div>
 
-            {/* Schema JSON Preview Card with Copy Button */}
             <div className="md:col-span-7 bg-white dark:bg-[#13161c] rounded-xl p-6 shadow-xs flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-4">
@@ -871,7 +849,6 @@ function SeoSettingsContent() {
         </div>
       )}
 
-      {/* Schema Generator Modal */}
       {isSchemaModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
           <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 shadow-xl w-full max-w-xl overflow-y-auto max-h-[90vh]">
@@ -911,7 +888,6 @@ function SeoSettingsContent() {
                 </select>
               </div>
 
-              {/* Dynamic Sub-Forms for Different Schemas */}
               {schemaType === 'organization' && (
                 <div className="space-y-3 pt-2">
                   <div>
@@ -932,8 +908,8 @@ function SeoSettingsContent() {
                     </label>
                     <input
                       type="url"
-                      value={orgUrl}
-                      onChange={(e) => setOrgUrl(e.target.value)}
+                      value={siteUrl}
+                      onChange={(e) => setSiteUrl(e.target.value)}
                       className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
                       required
                     />
@@ -944,8 +920,8 @@ function SeoSettingsContent() {
                     </label>
                     <input
                       type="url"
-                      value={orgLogo}
-                      onChange={(e) => setOrgLogo(e.target.value)}
+                      value={logoUrl}
+                      onChange={(e) => setLogoUrl(e.target.value)}
                       className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
                       required
                     />
@@ -953,7 +929,6 @@ function SeoSettingsContent() {
                 </div>
               )}
 
-              {/* Local Business Schema Form */}
               {schemaType === 'local_business' && (
                 <div className="space-y-3 pt-2">
                   <div>
@@ -962,8 +937,8 @@ function SeoSettingsContent() {
                     </label>
                     <input
                       type="text"
-                      value={businessName}
-                      onChange={(e) => setBusinessName(e.target.value)}
+                      value={orgName}
+                      onChange={(e) => setOrgName(e.target.value)}
                       className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
                       required
                     />
@@ -975,8 +950,8 @@ function SeoSettingsContent() {
                       </label>
                       <input
                         type="tel"
-                        value={businessPhone}
-                        onChange={(e) => setBusinessPhone(e.target.value)}
+                        value={telephone}
+                        onChange={(e) => setTelephone(e.target.value)}
                         className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
                         required
                       />
@@ -987,8 +962,8 @@ function SeoSettingsContent() {
                       </label>
                       <input
                         type="text"
-                        value={businessCity}
-                        onChange={(e) => setBusinessCity(e.target.value)}
+                        value={addressLocality}
+                        onChange={(e) => setAddressLocality(e.target.value)}
                         className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
                         required
                       />
@@ -1000,8 +975,8 @@ function SeoSettingsContent() {
                     </label>
                     <input
                       type="text"
-                      value={businessAddress}
-                      onChange={(e) => setBusinessAddress(e.target.value)}
+                      value={streetAddress}
+                      onChange={(e) => setStreetAddress(e.target.value)}
                       className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
                       required
                     />
@@ -1009,7 +984,6 @@ function SeoSettingsContent() {
                 </div>
               )}
 
-              {/* Website Schema Form */}
               {schemaType === 'website' && (
                 <div className="space-y-3 pt-2">
                   <div>
@@ -1018,8 +992,8 @@ function SeoSettingsContent() {
                     </label>
                     <input
                       type="text"
-                      value={siteName}
-                      onChange={(e) => setSiteName(e.target.value)}
+                      value={orgName}
+                      onChange={(e) => setOrgName(e.target.value)}
                       className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
                       required
                     />
@@ -1039,7 +1013,6 @@ function SeoSettingsContent() {
                 </div>
               )}
 
-              {/* FAQ Schema Form */}
               {schemaType === 'faq' && (
                 <div className="space-y-3 pt-2">
                   <div className="flex justify-between items-center mb-1">
@@ -1096,7 +1069,6 @@ function SeoSettingsContent() {
                 </div>
               )}
 
-              {/* Breadcrumb Schema Form */}
               {schemaType === 'breadcrumb' && (
                 <div className="space-y-3 pt-2">
                   <div className="flex justify-between items-center mb-1">

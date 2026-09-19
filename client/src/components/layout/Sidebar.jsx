@@ -58,9 +58,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
           setSidebarWidth(parsed);
         }
       }
-    } catch {
-      // ignore
-    }
+    } catch {}
   }, []);
 
   const toggleCollapse = () => {
@@ -68,9 +66,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
       const next = !prev;
       try {
         localStorage.setItem('admin_sidebar_collapsed', String(next));
-      } catch {
-        // ignore
-      }
+      } catch {}
       return next;
     });
   };
@@ -126,9 +122,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
           if (!isCollapsedRef.current) {
             localStorage.setItem('admin_sidebar_width', String(sidebarWidthRef.current));
           }
-        } catch {
-          // ignore
-        }
+        } catch {}
       }
     };
 
@@ -140,7 +134,6 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
     if (onClose) onClose();
   };
 
-  // If mobile drawer (onClose provided), always stay expanded
   const collapsed = onClose ? false : isCollapsed;
 
   return (
@@ -150,7 +143,6 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
         isDragging ? 'transition-none' : 'transition-[width] duration-300 ease-in-out'
       }`}
     >
-      {/* Full-Height Border Slide / Resize & Toggle Interactive Strip */}
       {!onClose && (
         <div
           role="separator"
@@ -162,7 +154,6 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
             isDragging ? 'bg-teal-500/20' : ''
           }`}
         >
-          {/* Very light highlight line that appears on hover/drag */}
           <div 
             className={`w-[2px] h-full mx-auto transition-colors duration-150 ${
               isDragging 
@@ -173,7 +164,6 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
         </div>
       )}
 
-      {/* Brand Header */}
       <div 
         className={`h-16 flex items-center ${
           collapsed ? 'justify-center px-2' : 'justify-between px-5'
@@ -210,9 +200,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
         )}
       </div>
 
-      {/* Navigation Links */}
       <nav className={`flex-1 overflow-y-auto ${collapsed ? 'py-2' : 'py-4'}`}>
-        {/* Operations Section Title (only in expanded mode) */}
         {!collapsed && (
           <div className="px-4 mb-2 flex items-center">
             <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
@@ -270,7 +258,6 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
         </ul>
       </nav>
 
-      {/* Bottom Information */}
       <div 
         className={`${
           collapsed ? 'py-3 justify-center' : 'p-4 justify-between'

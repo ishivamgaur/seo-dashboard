@@ -29,7 +29,6 @@ export default function Header({ onMenuClick = () => {} }) {
 
   return (
     <header className="h-14 bg-white dark:bg-[#0d1117] shadow-[0_1px_2px_rgba(0,0,0,0.03)] flex items-center justify-between px-4 sm:px-6 z-10 shrink-0">
-      {/* Left side: Hamburger (mobile only) & Clean Page Title */}
       <div className="flex items-center gap-3 min-w-0">
         <button
           type="button"
@@ -45,12 +44,9 @@ export default function Header({ onMenuClick = () => {} }) {
         </h1>
       </div>
 
-      {/* Right side: Uniform h-8 buttons with matching padding, styles */}
       <div className="flex items-center gap-2">
-        {/* Minimal Theme Toggle */}
         <ThemeSelector minimal={true} />
 
-        {/* View Site Button */}
         <Link
           href="/"
           target="_blank"
@@ -62,7 +58,6 @@ export default function Header({ onMenuClick = () => {} }) {
           <span className="hidden sm:inline leading-none">View Site</span>
         </Link>
 
-        {/* Admin Profile Badge */}
         <div
           className="h-8 px-3 inline-flex items-center gap-1.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27] text-xs font-medium text-zinc-700 dark:text-zinc-300 select-none"
           title={`Administrator: ${user?.name || 'Admin'} (${user?.email || 'admin@seodashboard.com'})`}
@@ -71,7 +66,6 @@ export default function Header({ onMenuClick = () => {} }) {
           <span className="leading-none">Admin</span>
         </div>
 
-        {/* Logout Button */}
         <button
           type="button"
           onClick={logout}

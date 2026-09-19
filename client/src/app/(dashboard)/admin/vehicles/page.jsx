@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Edit2, Trash2, Plus, X, CarFront, ArrowUp, ArrowDown, GripVertical, Search } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import api from '@/lib/api';
+import FilterSelect from '@/components/common/FilterSelect';
 
 export default function VehiclesPage() {
   const [vehicles, setVehicles] = useState([]);
@@ -14,11 +15,9 @@ export default function VehiclesPage() {
   const [editingVehicle, setEditingVehicle] = useState(null);
   const [statusMsg, setStatusMsg] = useState('');
   
-  // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
   const [capacityFilter, setCapacityFilter] = useState('all');
 
-  // Form state matching Vehicle model
   const [vehicleName, setVehicleName] = useState('');
   const [seatingCapacity, setSeatingCapacity] = useState('');
   const [description, setDescription] = useState('');
@@ -48,7 +47,6 @@ export default function VehiclesPage() {
     setTimeout(() => setStatusMsg(''), 3500);
   };
 
-  // Filtered vehicles based on search and capacity
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((v) => {
       const matchesSearch = v.vehicleName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -208,8 +206,7 @@ export default function VehiclesPage() {
   };
 
   return (
-    <div className="w-full min-h-full space-y-4 font-sans antialiased">
-      {/* Top Header & Actions Bar */}
+    <div className="w-full max-w-8xl min-h-full space-y-4 font-sans antialiased">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-white">
@@ -238,8 +235,7 @@ export default function VehiclesPage() {
         </div>
       </div>
 
-      {/* Search, Filter, and Controls Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#13161c] rounded-xl p-3 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#13161c] rounded-xl p-3 relative z-20 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400 stroke-[1.75]" />
           <input
@@ -251,75 +247,47 @@ export default function VehiclesPage() {
           />
         </div>
 
-        <div className="flex items-center gap-1.5 overflow-x-auto">
-          <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mr-1 hidden lg:inline">Capacity:</span>
-          {['all', '9-12', '13-16', '17+'].map((cap) => (
-            <button
-              key={cap}
-              type="button"
-              onClick={() => setCapacityFilter(cap)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide cursor-pointer transition-colors ${
-                capacityFilter === cap
-                  ? 'bg-teal-600 text-white font-bold'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27]'
-              }`}
-            >
-              {cap === 'all' ? 'All Fleet' : `${cap} Seats`}
-            </button>
-          ))}
-          
-          {isFilterActive && (
-            <button
-              type="button"
-              onClick={() => {
-                setSearchQuery('');
-                setCapacityFilter('all');
-              }}
-              className="text-xs text-zinc-500 hover:text-zinc-950 dark:hover:text-white underline ml-2 font-mono cursor-pointer"
-            >
-              Reset
-            </button>
-          )}
+        <div className="flex items-center gap-2 overflow-visible">
+          <FilterSelect
+            label="Capacity"
+            value={capacityFilter}
+            onChange={setCapacityFilter}
+            options={[
+              { value: 'all', label: 'All Fleet' },
+              { value: '9-12', label: '9-12 Seats' },
+              { value: '13-16', label: '13-16 Seats' },
+              { value: '17+', label: '17+ Seats' },
+            ]}
+          />
         </div>
       </div>
 
-      {/* Table Container */}
       <div className="bg-white dark:bg-[#13161c] rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-500 dark:text-zinc-400 font-mono uppercase tracking-wider text-[11px]">
-                <th className="px-4 py-3.5 w-20 text-center">Drag / Order</th>
-                <th className="px-4 py-3.5 w-28">Preview</th>
-                <th className="px-5 py-3.5">Vehicle Model</th>
-                <th className="px-5 py-3.5">Capacity</th>
-                <th className="px-5 py-3.5">Features</th>
-                <th className="px-5 py-3.5 text-right">Actions</th>
-              </tr>
-            </thead>
+          <div className="min-w-[850px]">
+            <div className="grid grid-cols-[144px_120px_220px_120px_minmax(0,1fr)_100px] items-center bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-500 dark:text-zinc-400 font-mono uppercase tracking-wider text-[11px] border-b border-zinc-100 dark:border-zinc-800/80">
+              <div className="px-5 py-3.5 whitespace-nowrap">Drag / Order</div>
+              <div className="px-5 py-3.5">Preview</div>
+              <div className="px-5 py-3.5">Vehicle Model</div>
+              <div className="px-5 py-3.5">Capacity</div>
+              <div className="px-5 py-3.5">Features</div>
+              <div className="px-5 py-3.5 text-right">Actions</div>
+            </div>
 
             {isLoading ? (
-              <tbody className="divide-y divide-zinc-100/70 dark:divide-zinc-800/40">
-                <tr>
-                  <td colSpan="6" className="px-5 py-8 text-center text-zinc-500 font-mono">
-                    Loading fleet inventory...
-                  </td>
-                </tr>
-              </tbody>
+              <div className="px-5 py-8 text-center text-zinc-500 font-mono text-xs">
+                Loading fleet inventory...
+              </div>
             ) : filteredVehicles.length === 0 ? (
-              <tbody className="divide-y divide-zinc-100/70 dark:divide-zinc-800/40">
-                <tr>
-                  <td colSpan="6" className="px-5 py-12 text-center text-zinc-500 font-mono">
-                    <div className="max-w-sm mx-auto space-y-2">
-                      <CarFront className="w-8 h-8 text-zinc-400 mx-auto" />
-                      <p className="font-semibold text-zinc-700 dark:text-zinc-300">No vehicles found</p>
-                      <p className="text-xs text-zinc-500">Try adjusting your search terms or add a new vehicle to the fleet.</p>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
+              <div className="px-5 py-12 text-center text-zinc-500 font-mono text-xs">
+                <div className="max-w-sm mx-auto space-y-2">
+                  <CarFront className="w-8 h-8 text-zinc-400 mx-auto" />
+                  <p className="font-semibold text-zinc-700 dark:text-zinc-300">No vehicles found</p>
+                  <p className="text-xs text-zinc-500">Try adjusting your search terms or add a new vehicle to the fleet.</p>
+                </div>
+              </div>
             ) : !isMounted ? (
-              <tbody className="divide-y divide-zinc-100/70 dark:divide-zinc-800/40">
+              <div className="divide-y divide-zinc-100/70 dark:divide-zinc-800/40">
                 {filteredVehicles.map((v, index) => {
                   const featArray = Array.isArray(v.features)
                     ? v.features
@@ -328,11 +296,25 @@ export default function VehiclesPage() {
                     : [];
 
                   return (
-                    <tr key={v.id} className="text-zinc-900 dark:text-zinc-100 hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80 transition-colors">
-                      <td className="px-4 py-3.5 text-center">
-                        <span className="font-mono text-zinc-400 text-xs">#{index + 1}</span>
-                      </td>
-                      <td className="px-4 py-3.5">
+                    <div
+                      key={v.id}
+                      className="grid grid-cols-[144px_120px_220px_120px_minmax(0,1fr)_100px] items-center text-xs text-zinc-900 dark:text-zinc-100 hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80 transition-colors"
+                    >
+                      <div className="px-5 py-3.5 whitespace-nowrap">
+                        <div className="flex items-center gap-4">
+                          <div className="p-1 text-zinc-300 dark:text-zinc-600">
+                            <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
+                          </div>
+                          <div className="flex flex-col -space-y-0.5 opacity-25">
+                            <span className="p-0.5 text-zinc-400"><ArrowUp className="w-2.5 h-2.5 stroke-[2]" /></span>
+                            <span className="p-0.5 text-zinc-400"><ArrowDown className="w-2.5 h-2.5 stroke-[2]" /></span>
+                          </div>
+                          <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
+                            {index + 1}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="px-5 py-3.5">
                         <div className="relative w-20 h-12 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                           {v.image ? (
                             <img src={v.image} alt={v.vehicleName} className="object-contain w-full h-full" />
@@ -340,23 +322,26 @@ export default function VehiclesPage() {
                             <CarFront className="w-5 h-5 text-zinc-400" />
                           )}
                         </div>
-                      </td>
-                      <td className="px-5 py-3.5 font-bold text-zinc-950 dark:text-white">
+                      </div>
+                      <div className="px-5 py-3.5 font-bold text-zinc-950 dark:text-white truncate">
                         {v.vehicleName}
-                      </td>
-                      <td className="px-5 py-3.5 font-mono tabular-nums font-semibold">
+                      </div>
+                      <div className="px-5 py-3.5 font-mono tabular-nums font-semibold">
                         {v.seatingCapacity} Seats
-                      </td>
-                      <td className="px-5 py-3.5">
+                      </div>
+                      <div className="px-5 py-3.5">
                         <div className="flex flex-wrap gap-1 max-w-sm">
                           {featArray.slice(0, 3).map((feat, idx) => (
                             <span key={idx} className="px-2 py-0.5 rounded bg-[#f6f8fa] dark:bg-[#1a1e27] text-[10px] font-medium text-zinc-600 dark:text-zinc-300">
                               {feat}
                             </span>
                           ))}
+                          {featArray.length > 3 && (
+                            <span className="text-[10px] font-mono text-zinc-400">+{featArray.length - 3}</span>
+                          )}
                         </div>
-                      </td>
-                      <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                      </div>
+                      <div className="px-5 py-3.5 text-right whitespace-nowrap">
                         <button
                           type="button"
                           onClick={() => openEditModal(v)}
@@ -373,16 +358,16 @@ export default function VehiclesPage() {
                         >
                           <Trash2 className="w-4 h-4 stroke-[1.75]" />
                         </button>
-                      </td>
-                    </tr>
+                      </div>
+                    </div>
                   );
                 })}
-              </tbody>
+              </div>
             ) : (
               <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId="vehicles-table-droppable" ignoreContainerClipping>
+                <Droppable droppableId="vehicles-list-droppable">
                   {(provided) => (
-                    <tbody
+                    <div
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                       className="divide-y divide-zinc-100/70 dark:divide-zinc-800/40"
@@ -398,56 +383,60 @@ export default function VehiclesPage() {
                         return (
                           <Draggable key={id} draggableId={id} index={index} isDragDisabled={isFilterActive}>
                             {(providedDrag, snapshot) => (
-                              <tr
+                              <div
                                 ref={providedDrag.innerRef}
                                 {...providedDrag.draggableProps}
-                                className={`text-zinc-900 dark:text-zinc-100 transition-colors ${
+                                style={providedDrag.draggableProps.style}
+                                className={`grid grid-cols-[144px_120px_220px_120px_minmax(0,1fr)_100px] items-center text-xs text-zinc-900 dark:text-zinc-100 transition-colors ${
                                   snapshot.isDragging
-                                    ? 'bg-teal-50 dark:bg-[#1a1e27] shadow-xl ring-2 ring-teal-500 z-50'
+                                    ? 'bg-white dark:bg-[#13161c] shadow-2xl ring-2 ring-teal-500 rounded-xl z-50'
                                     : 'hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80'
                                 }`}
                               >
-                                {/* Drag Grip Handle */}
-                                <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                                  <div className="inline-flex items-center gap-1.5">
+                                <div className="px-5 py-3.5 whitespace-nowrap">
+                                  <div className="flex items-center gap-4">
                                     <button
                                       type="button"
                                       {...providedDrag.dragHandleProps}
                                       disabled={isFilterActive}
-                                      className={`p-1.5 rounded-md transition-colors ${
+                                      className={`p-1 rounded transition-colors ${
                                         isFilterActive
                                           ? 'opacity-30 cursor-not-allowed text-zinc-400'
-                                          : 'hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-grab active:cursor-grabbing'
+                                          : 'hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-grab active:cursor-grabbing'
                                       }`}
                                       title={isFilterActive ? 'Clear filters to reorder' : 'Drag to reorder showroom position'}
                                     >
-                                      <GripVertical className="w-4 h-4 stroke-[2]" />
+                                      <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
                                     </button>
 
-                                    <div className="flex flex-col gap-0.5">
+                                    <div className="flex flex-col -space-y-0.5">
                                       <button
                                         type="button"
                                         disabled={index === 0 || isFilterActive}
                                         onClick={() => handleMove(index, -1)}
-                                        className="p-0.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-20 text-zinc-500 dark:text-zinc-400 transition-colors"
+                                        className="p-0.5 rounded hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] disabled:opacity-20 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
                                         title="Move Up"
                                       >
-                                        <ArrowUp className="w-3 h-3 stroke-[2]" />
+                                        <ArrowUp className="w-2.5 h-2.5 stroke-[2]" />
                                       </button>
                                       <button
                                         type="button"
                                         disabled={index === filteredVehicles.length - 1 || isFilterActive}
                                         onClick={() => handleMove(index, 1)}
-                                        className="p-0.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-20 text-zinc-500 dark:text-zinc-400 transition-colors"
+                                        className="p-0.5 rounded hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] disabled:opacity-20 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
                                         title="Move Down"
                                       >
-                                        <ArrowDown className="w-3 h-3 stroke-[2]" />
+                                        <ArrowDown className="w-2.5 h-2.5 stroke-[2]" />
                                       </button>
                                     </div>
-                                  </div>
-                                </td>
 
-                                <td className="px-4 py-3.5">
+                                    <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
+                                      {index + 1}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="px-5 py-3.5">
                                   <div className="relative w-20 h-12 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                                     {v.image ? (
                                       <img src={v.image} alt={v.vehicleName} className="object-contain w-full h-full" />
@@ -455,22 +444,22 @@ export default function VehiclesPage() {
                                       <CarFront className="w-5 h-5 text-zinc-400" />
                                     )}
                                   </div>
-                                </td>
+                                </div>
 
-                                <td className="px-5 py-3.5 font-bold text-zinc-950 dark:text-white">
+                                <div className="px-5 py-3.5 font-bold text-zinc-950 dark:text-white truncate">
                                   <div className="flex items-center gap-2">
                                     <span>{v.vehicleName}</span>
                                     <span className="text-[10px] font-mono font-semibold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/50 px-1.5 py-0.5 rounded">
-                                      Pos #{index + 1}
+                                      Pos {index + 1}
                                     </span>
                                   </div>
-                                </td>
+                                </div>
 
-                                <td className="px-5 py-3.5 font-mono tabular-nums font-semibold">
+                                <div className="px-5 py-3.5 font-mono tabular-nums font-semibold">
                                   {v.seatingCapacity} Seats
-                                </td>
+                                </div>
 
-                                <td className="px-5 py-3.5">
+                                <div className="px-5 py-3.5">
                                   <div className="flex flex-wrap gap-1 max-w-sm">
                                     {featArray.slice(0, 3).map((feat, idx) => (
                                       <span key={idx} className="px-2 py-0.5 rounded bg-[#f6f8fa] dark:bg-[#1a1e27] text-[10px] font-medium text-zinc-600 dark:text-zinc-300">
@@ -481,9 +470,9 @@ export default function VehiclesPage() {
                                       <span className="text-[10px] font-mono text-zinc-400">+{featArray.length - 3}</span>
                                     )}
                                   </div>
-                                </td>
+                                </div>
 
-                                <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                                <div className="px-5 py-3.5 text-right whitespace-nowrap">
                                   <button
                                     type="button"
                                     onClick={() => openEditModal(v)}
@@ -500,23 +489,22 @@ export default function VehiclesPage() {
                                   >
                                     <Trash2 className="w-4 h-4 stroke-[1.75]" />
                                   </button>
-                                </td>
-                              </tr>
+                                </div>
+                              </div>
                             )}
                           </Draggable>
                         );
                       })}
                       {provided.placeholder}
-                    </tbody>
+                    </div>
                   )}
                 </Droppable>
               </DragDropContext>
             )}
-          </table>
+          </div>
         </div>
       </div>
 
-      {/* Modal Dialog */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
           <div className="bg-white dark:bg-[#13161c] rounded-2xl p-6 shadow-2xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
@@ -609,7 +597,6 @@ export default function VehiclesPage() {
                 />
               </div>
 
-              {/* Image Input with Live Preview Card */}
               <div>
                 <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
                   Vehicle Image

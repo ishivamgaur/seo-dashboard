@@ -23,15 +23,29 @@ export const upload = catchAsync(async (req, res) => {
   res.status(201).json(new ApiResponse(201, 'Images uploaded successfully', createdImages));
 });
 
-export const updateAlt = catchAsync(async (req, res) => {
+export const update = catchAsync(async (req, res) => {
   const image = await GalleryImage.findByPk(req.params.id);
   if (!image) {
     throw new ApiError(404, 'Image not found');
   }
 
-  await image.update({ altTag: req.body.altTag });
-  res.status(200).json(new ApiResponse(200, 'Alt tag updated successfully', image));
+  const updates = {};
+  if (req.body.altTag !== undefined) {
+    updates.altTag = req.body.altTag;
+  }
+
+  if (req.file) {
+    if (image.imagePath) {
+      deleteFile(image.imagePath);
+    }
+    updates.imagePath = req.file.path;
+  }
+
+  await image.update(updates);
+  res.status(200).json(new ApiResponse(200, 'Gallery image updated successfully', image));
 });
+
+export const updateAlt = update;
 
 export const remove = catchAsync(async (req, res) => {
   const image = await GalleryImage.findByPk(req.params.id);

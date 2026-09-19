@@ -32,7 +32,6 @@ const AboutSection = ({ data }) => {
       className="relative py-20 md:py-28 bg-[#fafafa] dark:bg-[#0c0d10] text-zinc-900 dark:text-zinc-100 border-t border-zinc-200/80 dark:border-zinc-800 transition-colors duration-150" 
       id="about"
     >
-      {/* Subtle Architectural SVG Grid Accent */}
       <div 
         className="absolute inset-0 opacity-[0.025] dark:opacity-[0.02] pointer-events-none"
         style={{
@@ -45,7 +44,6 @@ const AboutSection = ({ data }) => {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
-          {/* Left Column: Featured Image with 1px Image Outline & Natural Aspect */}
           <div className="lg:col-span-6 relative">
             <div className="relative h-[420px] sm:h-[480px] w-full rounded-2xl overflow-hidden shadow-xs border border-zinc-200/90 dark:border-zinc-800 ring-1 ring-black/[0.06] dark:ring-white/[0.06] bg-zinc-100 dark:bg-zinc-900">
               <Image
@@ -57,7 +55,6 @@ const AboutSection = ({ data }) => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               
-              {/* Overlay Metadata Card with Concentric Radii */}
               <div className="absolute bottom-5 left-5 right-5 p-4 sm:p-5 rounded-xl bg-white/95 dark:bg-[#121418]/95 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between shadow-xs">
                 <div>
                   <span className="text-zinc-500 dark:text-zinc-400 text-xs font-mono uppercase tracking-wider block">
@@ -74,7 +71,6 @@ const AboutSection = ({ data }) => {
             </div>
           </div>
 
-          {/* Right Column: Editorial Overview & Specifications */}
           <div className="lg:col-span-6 flex flex-col justify-center space-y-6">
             <div>
               <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 block mb-2">
@@ -89,7 +85,6 @@ const AboutSection = ({ data }) => {
               {description}
             </p>
 
-            {/* Specification Cards: Concentric Radii, Optical Alignment, 1.5px Icon Stroke */}
             <div className="space-y-3 pt-2">
               {highlights.map((item, idx) => {
                 const IconComponent = item.icon;

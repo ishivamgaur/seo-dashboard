@@ -20,7 +20,6 @@ function ContentManagementContent() {
   const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
   const [loading, setLoading] = useState(false);
 
-  // Sync tab with URL search parameter & set default '?tab=hero' if missing
   useEffect(() => {
     const currentTabInUrl = searchParams.get('tab');
     if (!currentTabInUrl || !VALID_CONTENT_TABS.includes(currentTabInUrl)) {
@@ -202,8 +201,7 @@ function ContentManagementContent() {
   ];
 
   return (
-    <div className="w-full min-h-full space-y-4 font-sans antialiased">
-      {/* Top Header Bar */}
+    <div className="w-full max-w-8xl min-h-full space-y-4 font-sans antialiased">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-white">
@@ -230,7 +228,6 @@ function ContentManagementContent() {
         )}
       </div>
 
-      {/* Tabs Row */}
       <div className="flex space-x-2 pb-1 overflow-x-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -253,7 +250,6 @@ function ContentManagementContent() {
         })}
       </div>
 
-      {/* Hero Tab */}
       {activeTab === 'hero' && (
         <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
@@ -341,7 +337,6 @@ function ContentManagementContent() {
               </div>
             </div>
 
-            {/* Banner Studio Image with Live Preview */}
             <div>
               <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
                 Banner Studio Photograph
@@ -395,7 +390,6 @@ function ContentManagementContent() {
         </div>
       )}
 
-      {/* About Tab */}
       {activeTab === 'about' && (
         <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
@@ -446,7 +440,6 @@ function ContentManagementContent() {
               />
             </div>
 
-            {/* Featured Image with Live Preview */}
             <div>
               <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
                 Featured Fleet Photograph
@@ -500,7 +493,6 @@ function ContentManagementContent() {
         </div>
       )}
 
-      {/* Contact Tab */}
       {activeTab === 'contact' && (
         <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">

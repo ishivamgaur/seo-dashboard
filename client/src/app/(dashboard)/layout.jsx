@@ -32,12 +32,10 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="flex h-screen bg-[#eceff3] dark:bg-[#090a0d] text-zinc-900 dark:text-zinc-100 font-sans antialiased overflow-hidden">
-      {/* Desktop Sidebar */}
       <div className="hidden md:flex md:flex-shrink-0 h-full">
         <Sidebar />
       </div>
 
-      {/* Mobile Drawer Sidebar */}
       {mobileSidebarOpen && (
         <div className="fixed inset-0 z-50 md:hidden flex">
           <div 
@@ -51,7 +49,6 @@ export default function DashboardLayout({ children }) {
         </div>
       )}
 
-      {/* Main Content Viewport */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header onMenuClick={() => setMobileSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-5">

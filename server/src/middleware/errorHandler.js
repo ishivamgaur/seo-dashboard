@@ -4,7 +4,6 @@ import { ValidationError } from 'sequelize';
 import { config } from '../config/environment.js';
 import { ApiError } from '../utils/ApiError.js';
 
-// Express identifies error middleware by 4-parameter signature
 const errorHandler = (err, req, res, next) => {
   let statusCode = 500;
   let message = 'Internal server error';
@@ -28,7 +27,6 @@ const errorHandler = (err, req, res, next) => {
       : err.message;
     errors = [{ field: err.field || 'file', message: err.message }];
   } else if (config.env === 'development') {
-    // Expose root cause in development to accelerate debugging
     message = err.message || message;
   }
 

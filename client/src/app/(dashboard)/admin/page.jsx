@@ -98,8 +98,7 @@ export default function DashboardOverview() {
   ];
 
   return (
-    <div className="w-full min-h-full space-y-4 font-sans antialiased">
-      {/* KPI Cards Grid - Crisp pure white on neutral canvas in light mode, deep dark obsidian in dark mode */}
+    <div className="w-full max-w-8xl min-h-full space-y-4 font-sans antialiased">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((kpi, index) => {
           const Icon = kpi.icon;
@@ -135,11 +134,8 @@ export default function DashboardOverview() {
         })}
       </div>
 
-      {/* Main Operational Hub */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Left: Quick Actions & Priority Snapshot */}
         <div className="lg:col-span-8 space-y-4">
-          {/* Quick Actions */}
           <div className="rounded-xl bg-white dark:bg-[#13161c] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-white">
@@ -201,7 +197,6 @@ export default function DashboardOverview() {
             </div>
           </div>
 
-          {/* Recent Vehicles Live Snapshot */}
           <div className="rounded-xl bg-white dark:bg-[#13161c] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-white">
@@ -252,9 +247,7 @@ export default function DashboardOverview() {
           </div>
         </div>
 
-        {/* Right Column: System Status & SEO Health */}
         <div className="lg:col-span-4 space-y-4">
-          {/* SEO Health Snapshot */}
           <div className="rounded-xl bg-white dark:bg-[#13161c] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-white">
@@ -296,7 +289,6 @@ export default function DashboardOverview() {
             </div>
           </div>
 
-          {/* System Services Card */}
           <div className="rounded-xl bg-white dark:bg-[#13161c] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
@@ -327,7 +319,7 @@ export default function DashboardOverview() {
 
             <div className="pt-3.5 mt-2">
               <span className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500 block font-medium">
-                Zero-delay hydration & DnD active
+                All systems operational
               </span>
             </div>
           </div>

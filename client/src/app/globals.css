@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --max-width-8xl: 90rem;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
