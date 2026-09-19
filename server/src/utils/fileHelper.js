@@ -9,7 +9,7 @@ cloudinary.config({
 
 export const deleteFile = async (fileUrl) => {
   if (!fileUrl) return;
-  
+
   try {
     // Extract public ID from Cloudinary URL
     // URL looks like: https://res.cloudinary.com/cloud_name/image/upload/v123456789/seo-dashboard/vehicles/filename.jpg
@@ -17,7 +17,7 @@ export const deleteFile = async (fileUrl) => {
     const filenameWithExt = parts.pop();
     const subfolder = parts.pop();
     const rootFolder = parts.pop();
-    
+
     if (rootFolder === 'seo-dashboard') {
       const publicId = `${rootFolder}/${subfolder}/${filenameWithExt.split('.')[0]}`;
       await cloudinary.uploader.destroy(publicId);

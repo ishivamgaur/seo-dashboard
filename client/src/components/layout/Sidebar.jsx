@@ -3,15 +3,15 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  Search, 
-  CarFront, 
-  Compass, 
-  Star, 
-  Images, 
+import {
+  LayoutDashboard,
+  Search,
+  CarFront,
+  Compass,
+  Star,
+  Images,
   LayoutTemplate,
-  X
+  X,
 } from 'lucide-react';
 
 const navItems = [
@@ -137,7 +137,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
   const collapsed = onClose ? false : isCollapsed;
 
   return (
-    <aside 
+    <aside
       style={{ width: collapsed ? 68 : sidebarWidth }}
       className={`relative bg-white dark:bg-[#0c0d10] text-zinc-900 dark:text-zinc-100 flex flex-col h-full border-r border-zinc-200/90 dark:border-zinc-800/80 shadow-xs shrink-0 select-none ${
         isDragging ? 'transition-none' : 'transition-[width] duration-300 ease-in-out'
@@ -148,30 +148,34 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
           role="separator"
           tabIndex={0}
           onMouseDown={handleMouseDown}
-          title={collapsed ? 'Slide right or click to expand' : 'Slide left to collapse or click to toggle'}
+          title={
+            collapsed
+              ? 'Slide right or click to expand'
+              : 'Slide left to collapse or click to toggle'
+          }
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           className={`hidden md:block absolute top-0 -right-1.5 w-3.5 h-full z-30 cursor-col-resize group/border select-none ${
             isDragging ? 'bg-teal-500/20' : ''
           }`}
         >
-          <div 
+          <div
             className={`w-[2px] h-full mx-auto transition-colors duration-150 ${
-              isDragging 
-                ? 'bg-teal-500 dark:bg-teal-400' 
+              isDragging
+                ? 'bg-teal-500 dark:bg-teal-400'
                 : 'bg-transparent group-hover/border:bg-teal-500/60 dark:group-hover/border:bg-teal-400/60'
-            }`} 
+            }`}
           />
         </div>
       )}
 
-      <div 
+      <div
         className={`h-16 flex items-center ${
           collapsed ? 'justify-center px-2' : 'justify-between px-5'
         } border-b border-zinc-200/90 dark:border-zinc-800/80 shrink-0 overflow-hidden`}
       >
-        <Link 
-          href="/admin" 
-          onClick={handleLinkClick} 
+        <Link
+          href="/admin"
+          onClick={handleLinkClick}
           className="flex items-center group cursor-pointer overflow-hidden whitespace-nowrap"
           title={collapsed ? 'Urban Cruise' : undefined}
         >
@@ -187,7 +191,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
             </span>
           )}
         </Link>
-        
+
         {onClose && (
           <button
             type="button"
@@ -212,8 +216,10 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
         <ul className={`space-y-1 ${collapsed ? 'px-2' : 'px-3'}`}>
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(`${item.href}/`));
-            
+            const isActive =
+              pathname === item.href ||
+              (item.href !== '/admin' && pathname.startsWith(`${item.href}/`));
+
             if (collapsed) {
               return (
                 <li key={item.name}>
@@ -248,9 +254,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
                     <Icon className="w-[18px] h-[18px] shrink-0 stroke-[1.75]" />
                     <span>{item.name}</span>
                   </div>
-                  {isActive && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
-                  )}
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-white"></span>}
                 </Link>
               </li>
             );
@@ -258,7 +262,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
         </ul>
       </nav>
 
-      <div 
+      <div
         className={`${
           collapsed ? 'py-3 justify-center' : 'p-4 justify-between'
         } border-t border-zinc-200/90 dark:border-zinc-800/80 flex items-center text-[11px] font-mono text-zinc-400 dark:text-zinc-500 shrink-0`}

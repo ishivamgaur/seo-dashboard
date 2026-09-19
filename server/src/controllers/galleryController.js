@@ -14,9 +14,9 @@ export const upload = catchAsync(async (req, res) => {
     throw new ApiError(400, 'No images provided');
   }
 
-  const imageData = req.files.map(file => ({
+  const imageData = req.files.map((file) => ({
     imagePath: file.path,
-    altTag: req.body.altTag || ''
+    altTag: req.body.altTag || '',
   }));
 
   const createdImages = await GalleryImage.bulkCreate(imageData);

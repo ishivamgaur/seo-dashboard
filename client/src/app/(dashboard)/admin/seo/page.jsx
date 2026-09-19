@@ -2,19 +2,19 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { 
-  Save, 
-  CheckCircle2, 
-  AlertCircle, 
-  Code, 
-  Search, 
-  Share2, 
-  Plus, 
-  Trash2, 
-  X, 
-  Copy, 
-  Globe, 
-  Check 
+import {
+  Save,
+  CheckCircle2,
+  AlertCircle,
+  Code,
+  Search,
+  Share2,
+  Plus,
+  Trash2,
+  X,
+  Copy,
+  Globe,
+  Check,
 } from 'lucide-react';
 import api from '@/lib/api';
 
@@ -48,7 +48,7 @@ function SeoSettingsContent() {
     setActiveTab(tabKey);
     router.replace(`${pathname}?tab=${tabKey}`, { scroll: false });
   };
-  
+
   const [formData, setFormData] = useState({
     metaTitle: '',
     metaDescription: '',
@@ -61,7 +61,7 @@ function SeoSettingsContent() {
     ogImage: '',
     twitterTitle: '',
     twitterDescription: '',
-    twitterImage: ''
+    twitterImage: '',
   });
 
   const [schemas, setSchemas] = useState([]);
@@ -70,11 +70,13 @@ function SeoSettingsContent() {
   const [editingSchema, setEditingSchema] = useState(null);
 
   const [schemaType, setSchemaType] = useState('organization');
-  
+
   const [orgName, setOrgName] = useState('Urban Cruise');
   const [legalName, setLegalName] = useState('Urban Cruise India Private Limited');
   const [siteUrl, setSiteUrl] = useState('https://urbancruise.in');
-  const [logoUrl, setLogoUrl] = useState('https://urbancruise.in/wp-content/uploads/gurugramlogo.webp');
+  const [logoUrl, setLogoUrl] = useState(
+    'https://urbancruise.in/wp-content/uploads/gurugramlogo.webp'
+  );
   const [telephone, setTelephone] = useState('+91 98765 43210');
   const [streetAddress, setStreetAddress] = useState('Plot No. 42, Sector 18');
   const [addressLocality, setAddressLocality] = useState('Gurugram');
@@ -83,13 +85,21 @@ function SeoSettingsContent() {
   const [priceRange, setPriceRange] = useState('₹₹ - ₹₹₹');
 
   const [faqItems, setFaqItems] = useState([
-    { question: 'What vehicles are available in your fleet?', answer: 'We offer 9, 12, 16, and 20 seater tempo travellers, Force Urbania luxury vans, and Volvo luxury coaches.' },
-    { question: 'Do you provide outstation chauffeur services?', answer: 'Yes, all our vehicles operate with verified commercial all-India tourist permits and experienced drivers.' }
+    {
+      question: 'What vehicles are available in your fleet?',
+      answer:
+        'We offer 9, 12, 16, and 20 seater tempo travellers, Force Urbania luxury vans, and Volvo luxury coaches.',
+    },
+    {
+      question: 'Do you provide outstation chauffeur services?',
+      answer:
+        'Yes, all our vehicles operate with verified commercial all-India tourist permits and experienced drivers.',
+    },
   ]);
 
   const [breadcrumbItems, setBreadcrumbItems] = useState([
     { name: 'Home', url: 'https://urbancruise.in' },
-    { name: 'Fleet', url: 'https://urbancruise.in/#vehicles' }
+    { name: 'Fleet', url: 'https://urbancruise.in/#vehicles' },
   ]);
 
   const fetchSettings = async () => {
@@ -100,9 +110,9 @@ function SeoSettingsContent() {
       ]);
 
       if (seoRes.data?.data) {
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-          ...seoRes.data.data
+          ...seoRes.data.data,
         }));
       }
 
@@ -131,9 +141,9 @@ function SeoSettingsContent() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
@@ -158,9 +168,10 @@ function SeoSettingsContent() {
 
   const handleCopySchema = () => {
     if (!selectedSchema) return;
-    const text = typeof selectedSchema.schemaData === 'string'
-      ? selectedSchema.schemaData
-      : JSON.stringify(selectedSchema.schemaData, null, 2);
+    const text =
+      typeof selectedSchema.schemaData === 'string'
+        ? selectedSchema.schemaData
+        : JSON.stringify(selectedSchema.schemaData, null, 2);
     navigator.clipboard.writeText(text);
     setCopied(true);
     showToast('success', 'JSON-LD schema copied to clipboard.');
@@ -170,9 +181,11 @@ function SeoSettingsContent() {
   const handleToggleSchema = async (schemaId, currentStatus) => {
     try {
       await api.patch(`/schemas/${schemaId}/toggle`);
-      setSchemas(prev => prev.map(s => s.id === schemaId ? { ...s, isActive: !currentStatus } : s));
+      setSchemas((prev) =>
+        prev.map((s) => (s.id === schemaId ? { ...s, isActive: !currentStatus } : s))
+      );
       if (selectedSchema?.id === schemaId) {
-        setSelectedSchema(prev => ({ ...prev, isActive: !currentStatus }));
+        setSelectedSchema((prev) => ({ ...prev, isActive: !currentStatus }));
       }
       showToast('success', 'Schema active state updated.');
     } catch (err) {
@@ -184,7 +197,7 @@ function SeoSettingsContent() {
     if (!confirm('Are you sure you want to delete this JSON-LD schema?')) return;
     try {
       await api.delete(`/schemas/${schemaId}`);
-      setSchemas(prev => prev.filter(s => s.id !== schemaId));
+      setSchemas((prev) => prev.filter((s) => s.id !== schemaId));
       if (selectedSchema?.id === schemaId) {
         setSelectedSchema(null);
       }
@@ -199,17 +212,17 @@ function SeoSettingsContent() {
       return {
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        'name': orgName,
-        'legalName': legalName,
-        'url': siteUrl,
-        'logo': logoUrl,
-        'contactPoint': {
+        name: orgName,
+        legalName: legalName,
+        url: siteUrl,
+        logo: logoUrl,
+        contactPoint: {
           '@type': 'ContactPoint',
-          'telephone': telephone,
-          'contactType': 'customer service',
-          'areaServed': 'IN',
-          'availableLanguage': ['en', 'hi']
-        }
+          telephone: telephone,
+          contactType: 'customer service',
+          areaServed: 'IN',
+          availableLanguage: ['en', 'hi'],
+        },
       };
     }
 
@@ -217,19 +230,19 @@ function SeoSettingsContent() {
       return {
         '@context': 'https://schema.org',
         '@type': 'LocalBusiness',
-        'name': orgName,
-        'image': logoUrl,
-        'telephone': telephone,
-        'priceRange': priceRange,
-        'address': {
+        name: orgName,
+        image: logoUrl,
+        telephone: telephone,
+        priceRange: priceRange,
+        address: {
           '@type': 'PostalAddress',
-          'streetAddress': streetAddress,
-          'addressLocality': addressLocality,
-          'addressRegion': addressRegion,
-          'postalCode': postalCode,
-          'addressCountry': 'IN'
+          streetAddress: streetAddress,
+          addressLocality: addressLocality,
+          addressRegion: addressRegion,
+          postalCode: postalCode,
+          addressCountry: 'IN',
         },
-        'url': siteUrl
+        url: siteUrl,
       };
     }
 
@@ -237,13 +250,13 @@ function SeoSettingsContent() {
       return {
         '@context': 'https://schema.org',
         '@type': 'WebSite',
-        'name': orgName,
-        'url': siteUrl,
-        'potentialAction': {
+        name: orgName,
+        url: siteUrl,
+        potentialAction: {
           '@type': 'SearchAction',
-          'target': `${siteUrl}/#vehicles`,
-          'query-input': 'required name=search_term_string'
-        }
+          target: `${siteUrl}/#vehicles`,
+          'query-input': 'required name=search_term_string',
+        },
       };
     }
 
@@ -251,14 +264,14 @@ function SeoSettingsContent() {
       return {
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
-        'mainEntity': faqItems.map(item => ({
+        mainEntity: faqItems.map((item) => ({
           '@type': 'Question',
-          'name': item.question,
-          'acceptedAnswer': {
+          name: item.question,
+          acceptedAnswer: {
             '@type': 'Answer',
-            'text': item.answer
-          }
-        }))
+            text: item.answer,
+          },
+        })),
       };
     }
 
@@ -266,12 +279,12 @@ function SeoSettingsContent() {
       return {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
-        'itemListElement': breadcrumbItems.map((item, idx) => ({
+        itemListElement: breadcrumbItems.map((item, idx) => ({
           '@type': 'ListItem',
-          'position': idx + 1,
-          'name': item.name,
-          'item': item.url
-        }))
+          position: idx + 1,
+          name: item.name,
+          item: item.url,
+        })),
       };
     }
 
@@ -333,16 +346,19 @@ function SeoSettingsContent() {
             SEO & Schema Management
           </h1>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-            Configure global meta tags, Open Graph cards, crawling directives, and structured JSON-LD schemas.
+            Configure global meta tags, Open Graph cards, crawling directives, and structured
+            JSON-LD schemas.
           </p>
         </div>
 
         {statusMsg.text && (
-          <div className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium ${
-            statusMsg.type === 'success'
-              ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300'
-              : 'bg-red-50 dark:bg-red-950/40 text-red-800 dark:text-red-300'
-          }`}>
+          <div
+            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium ${
+              statusMsg.type === 'success'
+                ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300'
+                : 'bg-red-50 dark:bg-red-950/40 text-red-800 dark:text-red-300'
+            }`}
+          >
             {statusMsg.type === 'success' ? (
               <CheckCircle2 className="w-4 h-4 text-teal-600 dark:text-teal-400 stroke-[2]" />
             ) : (
@@ -407,9 +423,11 @@ function SeoSettingsContent() {
                   <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500">
                     Meta Title
                   </label>
-                  <span className={`text-[10px] font-mono font-semibold ${
-                    titleLength > 60 ? 'text-amber-500' : 'text-teal-500'
-                  }`}>
+                  <span
+                    className={`text-[10px] font-mono font-semibold ${
+                      titleLength > 60 ? 'text-amber-500' : 'text-teal-500'
+                    }`}
+                  >
                     {titleLength} / 60 chars (Optimal 40-60)
                   </span>
                 </div>
@@ -428,9 +446,11 @@ function SeoSettingsContent() {
                   <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500">
                     Meta Description
                   </label>
-                  <span className={`text-[10px] font-mono font-semibold ${
-                    descLength > 160 ? 'text-amber-500' : 'text-teal-500'
-                  }`}>
+                  <span
+                    className={`text-[10px] font-mono font-semibold ${
+                      descLength > 160 ? 'text-amber-500' : 'text-teal-500'
+                    }`}
+                  >
                     {descLength} / 160 chars (Optimal 120-160)
                   </span>
                 </div>
@@ -489,17 +509,23 @@ function SeoSettingsContent() {
                       U
                     </div>
                     <div className="text-[11px] leading-tight">
-                      <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">Urban Cruise</span>
-                      <span className="text-zinc-500 text-[10px] truncate block max-w-xs">{formData.canonicalUrl || 'https://urbancruise.in'}</span>
+                      <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">
+                        Urban Cruise
+                      </span>
+                      <span className="text-zinc-500 text-[10px] truncate block max-w-xs">
+                        {formData.canonicalUrl || 'https://urbancruise.in'}
+                      </span>
                     </div>
                   </div>
-                  
+
                   <h4 className="text-sm font-medium text-[#1a0dab] dark:text-[#8ab4f8] hover:underline cursor-pointer line-clamp-1 pt-1">
-                    {formData.metaTitle || 'Urban Cruise - Vehicle Rentals & Chauffeur Services India'}
+                    {formData.metaTitle ||
+                      'Urban Cruise - Vehicle Rentals & Chauffeur Services India'}
                   </h4>
-                  
+
                   <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">
-                    {formData.metaDescription || 'Book luxury tempo travellers, Force Urbania vans, and Volvo coaches across 15 Indian cities.'}
+                    {formData.metaDescription ||
+                      'Book luxury tempo travellers, Force Urbania vans, and Volvo coaches across 15 Indian cities.'}
                   </p>
                 </div>
               </div>
@@ -551,7 +577,8 @@ function SeoSettingsContent() {
 
                 <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/60 mt-4">
                   <span className="text-[11px] font-mono text-zinc-500">
-                    Directive: {Boolean(formData.robotsIndex) ? 'index' : 'noindex'}, {Boolean(formData.robotsFollow) ? 'follow' : 'nofollow'}
+                    Directive: {Boolean(formData.robotsIndex) ? 'index' : 'noindex'},{' '}
+                    {Boolean(formData.robotsFollow) ? 'follow' : 'nofollow'}
                   </span>
                 </div>
               </div>
@@ -622,22 +649,31 @@ function SeoSettingsContent() {
               </div>
 
               <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
-                <span className="text-[10px] font-mono text-zinc-400 block mb-2">LIVE OPEN GRAPH SHARE PREVIEW:</span>
+                <span className="text-[10px] font-mono text-zinc-400 block mb-2">
+                  LIVE OPEN GRAPH SHARE PREVIEW:
+                </span>
                 <div className="rounded-xl overflow-hidden bg-[#f6f8fa] dark:bg-[#1a1e27]">
                   <div className="aspect-[1.91/1] w-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
                     {formData.ogImage ? (
-                      <img src={formData.ogImage} alt="OG Preview" className="object-cover w-full h-full" />
+                      <img
+                        src={formData.ogImage}
+                        alt="OG Preview"
+                        className="object-cover w-full h-full"
+                      />
                     ) : (
                       <span className="text-[11px] font-mono text-zinc-400">og:image preview</span>
                     )}
                   </div>
                   <div className="p-3">
-                    <span className="text-[10px] font-mono text-zinc-400 uppercase block">URBANCRUISE.IN</span>
+                    <span className="text-[10px] font-mono text-zinc-400 uppercase block">
+                      URBANCRUISE.IN
+                    </span>
                     <h5 className="font-bold text-zinc-900 dark:text-white truncate mt-0.5">
                       {formData.ogTitle || 'Urban Cruise - Vehicle Rentals'}
                     </h5>
                     <p className="text-[11px] text-zinc-500 line-clamp-2 mt-0.5">
-                      {formData.ogDescription || 'Book luxury tempo travellers, Force Urbania vans, and Volvo coaches.'}
+                      {formData.ogDescription ||
+                        'Book luxury tempo travellers, Force Urbania vans, and Volvo coaches.'}
                     </p>
                   </div>
                 </div>
@@ -692,13 +728,21 @@ function SeoSettingsContent() {
               </div>
 
               <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
-                <span className="text-[10px] font-mono text-zinc-400 block mb-2">LIVE TWITTER SUMMARY CARD:</span>
+                <span className="text-[10px] font-mono text-zinc-400 block mb-2">
+                  LIVE TWITTER SUMMARY CARD:
+                </span>
                 <div className="rounded-xl overflow-hidden bg-[#f6f8fa] dark:bg-[#1a1e27]">
                   <div className="aspect-[2/1] w-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
                     {formData.twitterImage || formData.ogImage ? (
-                      <img src={formData.twitterImage || formData.ogImage} alt="Twitter Preview" className="object-cover w-full h-full" />
+                      <img
+                        src={formData.twitterImage || formData.ogImage}
+                        alt="Twitter Preview"
+                        className="object-cover w-full h-full"
+                      />
                     ) : (
-                      <span className="text-[11px] font-mono text-zinc-400">twitter:image preview</span>
+                      <span className="text-[11px] font-mono text-zinc-400">
+                        twitter:image preview
+                      </span>
                     )}
                   </div>
                   <div className="p-3">
@@ -706,7 +750,9 @@ function SeoSettingsContent() {
                       {formData.twitterTitle || formData.ogTitle || 'Urban Cruise Fleet'}
                     </h5>
                     <p className="text-[11px] text-zinc-500 line-clamp-2 mt-0.5">
-                      {formData.twitterDescription || formData.ogDescription || 'Commercial chauffeur services across India.'}
+                      {formData.twitterDescription ||
+                        formData.ogDescription ||
+                        'Commercial chauffeur services across India.'}
                     </p>
                   </div>
                 </div>
@@ -806,7 +852,7 @@ function SeoSettingsContent() {
                   <span className="font-mono text-xs uppercase font-bold text-teal-600 dark:text-teal-400">
                     {selectedSchema?.schemaType?.replace('_', ' ') || 'Schema'} JSON-LD Markup
                   </span>
-                  
+
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
@@ -861,15 +907,15 @@ function SeoSettingsContent() {
                   Forms auto-compile to valid Schema.org structure
                 </span>
               </div>
-              <button 
+              <button
                 type="button"
-                onClick={() => setIsSchemaModalOpen(false)} 
+                onClick={() => setIsSchemaModalOpen(false)}
                 className="p-1 rounded-md text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5 stroke-[1.75]" />
               </button>
             </div>
-            
+
             <form onSubmit={handleSaveSchema} className="space-y-4 text-xs">
               <div>
                 <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
@@ -1016,7 +1062,9 @@ function SeoSettingsContent() {
               {schemaType === 'faq' && (
                 <div className="space-y-3 pt-2">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="font-mono uppercase font-bold text-zinc-500 text-[11px]">FAQ Question Items</span>
+                    <span className="font-mono uppercase font-bold text-zinc-500 text-[11px]">
+                      FAQ Question Items
+                    </span>
                     <button
                       type="button"
                       onClick={() => setFaqItems([...faqItems, { question: '', answer: '' }])}
@@ -1027,7 +1075,10 @@ function SeoSettingsContent() {
                   </div>
 
                   {faqItems.map((item, idx) => (
-                    <div key={idx} className="p-3 rounded-lg space-y-2 bg-[#f6f8fa] dark:bg-[#1a1e27]">
+                    <div
+                      key={idx}
+                      className="p-3 rounded-lg space-y-2 bg-[#f6f8fa] dark:bg-[#1a1e27]"
+                    >
                       <div className="flex justify-between items-center">
                         <span className="font-mono text-[11px] text-zinc-400">Q#{idx + 1}</span>
                         {faqItems.length > 1 && (
@@ -1072,10 +1123,14 @@ function SeoSettingsContent() {
               {schemaType === 'breadcrumb' && (
                 <div className="space-y-3 pt-2">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="font-mono uppercase font-bold text-zinc-500 text-[11px]">Breadcrumb Navigation Steps</span>
+                    <span className="font-mono uppercase font-bold text-zinc-500 text-[11px]">
+                      Breadcrumb Navigation Steps
+                    </span>
                     <button
                       type="button"
-                      onClick={() => setBreadcrumbItems([...breadcrumbItems, { name: '', url: '' }])}
+                      onClick={() =>
+                        setBreadcrumbItems([...breadcrumbItems, { name: '', url: '' }])
+                      }
                       className="text-xs text-teal-600 dark:text-teal-400 hover:underline font-mono cursor-pointer"
                     >
                       + Add Step
@@ -1112,7 +1167,9 @@ function SeoSettingsContent() {
                       {breadcrumbItems.length > 1 && (
                         <button
                           type="button"
-                          onClick={() => setBreadcrumbItems(breadcrumbItems.filter((_, i) => i !== idx))}
+                          onClick={() =>
+                            setBreadcrumbItems(breadcrumbItems.filter((_, i) => i !== idx))
+                          }
                           className="text-red-500 hover:text-red-600 text-xs px-1 cursor-pointer"
                         >
                           ✕

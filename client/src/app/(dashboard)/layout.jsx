@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -7,7 +7,7 @@ import Header from '../../components/layout/Header';
 import { useAuth } from '../../context/AuthContext';
 
 export default function DashboardLayout({ children }) {
-  const auth = useAuth() || { user: true, loading: false }; 
+  const auth = useAuth() || { user: true, loading: false };
   const { user, loading } = auth;
   const router = useRouter();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -38,7 +38,7 @@ export default function DashboardLayout({ children }) {
 
       {mobileSidebarOpen && (
         <div className="fixed inset-0 z-50 md:hidden flex">
-          <div 
+          <div
             className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
             onClick={() => setMobileSidebarOpen(false)}
             aria-hidden="true"
@@ -51,9 +51,7 @@ export default function DashboardLayout({ children }) {
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header onMenuClick={() => setMobileSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-5">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-5">{children}</main>
       </div>
     </div>
   );

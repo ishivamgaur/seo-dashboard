@@ -66,7 +66,7 @@ const createCrudController = (Model, resourceName = 'Resource') => ({
     await record.destroy();
 
     new ApiResponse(200, `${resourceName} deleted successfully`).send(res);
-  })
+  }),
 });
 
 export { createCrudController };

@@ -23,7 +23,11 @@ const fileFilter = (req, file, cb) => {
   if (isValidExt && isValidMime) {
     cb(null, true);
   } else {
-    cb(ApiError.badRequest('Invalid file type. Only JPG, JPEG, PNG, GIF, and WEBP images are allowed.'));
+    cb(
+      ApiError.badRequest(
+        'Invalid file type. Only JPG, JPEG, PNG, GIF, and WEBP images are allowed.'
+      )
+    );
   }
 };
 
@@ -52,7 +56,6 @@ const vehicleUpload = createUploader('vehicles');
 const occasionUpload = createUploader('occasions');
 const testimonialUpload = createUploader('testimonials');
 const galleryUpload = createUploader('gallery');
-const generalUpload = createUploader('general');
 
 export {
   createUploader,
@@ -61,6 +64,5 @@ export {
   occasionUpload,
   testimonialUpload,
   galleryUpload,
-  generalUpload,
 };
 export default createUploader;

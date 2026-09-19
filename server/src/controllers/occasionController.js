@@ -43,7 +43,7 @@ export const remove = catchAsync(async (req, res) => {
   if (occasion.image) {
     deleteFile(occasion.image);
   }
-  
+
   await occasion.destroy();
   res.status(200).json(new ApiResponse(200, 'Occasion deleted successfully', null));
 });

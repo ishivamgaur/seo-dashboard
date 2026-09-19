@@ -43,7 +43,7 @@ export const remove = catchAsync(async (req, res) => {
   if (testimonial.customerImage) {
     deleteFile(testimonial.customerImage);
   }
-  
+
   await testimonial.destroy();
   res.status(200).json(new ApiResponse(200, 'Testimonial deleted successfully', null));
 });

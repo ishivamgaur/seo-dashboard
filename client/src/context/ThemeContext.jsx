@@ -25,7 +25,7 @@ export function useTheme() {
     setMounted(true);
   }, []);
 
-  const activeTheme = mounted ? (nextTheme.resolvedTheme || nextTheme.theme || 'dark') : 'dark';
+  const activeTheme = mounted ? nextTheme.resolvedTheme || nextTheme.theme || 'dark' : 'dark';
 
   return {
     theme: activeTheme,

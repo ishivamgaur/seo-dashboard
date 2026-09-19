@@ -1,7 +1,17 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Edit2, Trash2, Plus, X, Compass, ArrowUp, ArrowDown, GripVertical, Search } from 'lucide-react';
+import {
+  Edit2,
+  Trash2,
+  Plus,
+  X,
+  Compass,
+  ArrowUp,
+  ArrowDown,
+  GripVertical,
+  Search,
+} from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import api from '@/lib/api';
 
@@ -12,7 +22,7 @@ export default function OccasionsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingOccasion, setEditingOccasion] = useState(null);
   const [statusMsg, setStatusMsg] = useState('');
-  
+
   const [searchQuery, setSearchQuery] = useState('');
 
   const [title, setTitle] = useState('');
@@ -135,7 +145,9 @@ export default function OccasionsPage() {
         setIsModalOpen(false);
         resetForm();
         fetchOccasions();
-        showToast(editingOccasion ? 'Occasion updated successfully.' : 'Occasion created successfully.');
+        showToast(
+          editingOccasion ? 'Occasion updated successfully.' : 'Occasion created successfully.'
+        );
       }
     } catch (error) {
       console.error('Failed to save occasion:', error);
@@ -241,15 +253,19 @@ export default function OccasionsPage() {
               <div className="px-5 py-12 text-center text-zinc-500 font-mono text-xs">
                 <div className="max-w-sm mx-auto space-y-2">
                   <Compass className="w-8 h-8 text-zinc-400 mx-auto" />
-                  <p className="font-semibold text-zinc-700 dark:text-zinc-300">No occasions match criteria</p>
-                  <p className="text-xs text-zinc-500">Click Add Occasion to register a new travel service.</p>
+                  <p className="font-semibold text-zinc-700 dark:text-zinc-300">
+                    No occasions match criteria
+                  </p>
+                  <p className="text-xs text-zinc-500">
+                    Click Add Occasion to register a new travel service.
+                  </p>
                 </div>
               </div>
             ) : !isMounted ? (
               <div className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
                 {filteredOccasions.map((o, index) => (
-                  <div 
-                    key={o.id} 
+                  <div
+                    key={o.id}
                     className="grid grid-cols-[144px_144px_200px_minmax(0,1fr)_100px] items-center text-xs text-zinc-900 dark:text-zinc-100 hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80 transition-colors"
                   >
                     <div className="px-5 py-3.5 whitespace-nowrap">
@@ -258,8 +274,12 @@ export default function OccasionsPage() {
                           <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
                         </div>
                         <div className="flex flex-col -space-y-0.5 opacity-25">
-                          <span className="p-0.5 text-zinc-400"><ArrowUp className="w-2.5 h-2.5 stroke-[2]" /></span>
-                          <span className="p-0.5 text-zinc-400"><ArrowDown className="w-2.5 h-2.5 stroke-[2]" /></span>
+                          <span className="p-0.5 text-zinc-400">
+                            <ArrowUp className="w-2.5 h-2.5 stroke-[2]" />
+                          </span>
+                          <span className="p-0.5 text-zinc-400">
+                            <ArrowDown className="w-2.5 h-2.5 stroke-[2]" />
+                          </span>
                         </div>
                         <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
                           {index + 1}
@@ -279,7 +299,10 @@ export default function OccasionsPage() {
                       <span title={o.title}>{o.title}</span>
                     </div>
                     <div className="px-5 py-3.5 min-w-0 overflow-hidden">
-                      <p className="text-zinc-600 dark:text-zinc-300 line-clamp-2 leading-relaxed text-xs break-words overflow-hidden" title={o.description}>
+                      <p
+                        className="text-zinc-600 dark:text-zinc-300 line-clamp-2 leading-relaxed text-xs break-words overflow-hidden"
+                        title={o.description}
+                      >
                         {o.description}
                       </p>
                     </div>
@@ -316,7 +339,12 @@ export default function OccasionsPage() {
                       {filteredOccasions.map((o, index) => {
                         const id = o.id.toString();
                         return (
-                          <Draggable key={id} draggableId={id} index={index} isDragDisabled={isFilterActive}>
+                          <Draggable
+                            key={id}
+                            draggableId={id}
+                            index={index}
+                            isDragDisabled={isFilterActive}
+                          >
                             {(providedDrag, snapshot) => (
                               <div
                                 ref={providedDrag.innerRef}
@@ -339,7 +367,11 @@ export default function OccasionsPage() {
                                           ? 'opacity-30 cursor-not-allowed text-zinc-400'
                                           : 'hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-grab active:cursor-grabbing'
                                       }`}
-                                      title={isFilterActive ? 'Clear search to reorder' : 'Drag to reorder occasion position'}
+                                      title={
+                                        isFilterActive
+                                          ? 'Clear search to reorder'
+                                          : 'Drag to reorder occasion position'
+                                      }
                                     >
                                       <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
                                     </button>
@@ -356,7 +388,9 @@ export default function OccasionsPage() {
                                       </button>
                                       <button
                                         type="button"
-                                        disabled={index === filteredOccasions.length - 1 || isFilterActive}
+                                        disabled={
+                                          index === filteredOccasions.length - 1 || isFilterActive
+                                        }
                                         onClick={() => handleMove(index, 1)}
                                         className="p-0.5 rounded hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] disabled:opacity-20 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
                                         title="Move Down"
@@ -374,7 +408,11 @@ export default function OccasionsPage() {
                                 <div className="px-5 py-3.5">
                                   <div className="relative w-28 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                                     {o.image ? (
-                                      <img src={o.image} alt={o.title} className="object-cover w-full h-full" />
+                                      <img
+                                        src={o.image}
+                                        alt={o.title}
+                                        className="object-cover w-full h-full"
+                                      />
                                     ) : (
                                       <Compass className="w-5 h-5 text-zinc-400" />
                                     )}
@@ -386,7 +424,10 @@ export default function OccasionsPage() {
                                 </div>
 
                                 <div className="px-5 py-3.5 min-w-0 overflow-hidden">
-                                  <p className="text-zinc-600 dark:text-zinc-300 line-clamp-2 leading-relaxed text-xs break-words overflow-hidden" title={o.description}>
+                                  <p
+                                    className="text-zinc-600 dark:text-zinc-300 line-clamp-2 leading-relaxed text-xs break-words overflow-hidden"
+                                    title={o.description}
+                                  >
                                     {o.description}
                                   </p>
                                 </div>
@@ -436,15 +477,15 @@ export default function OccasionsPage() {
                   Widescreen 16:9 banner displays without cropping
                 </span>
               </div>
-              <button 
+              <button
                 type="button"
-                onClick={() => setIsModalOpen(false)} 
+                onClick={() => setIsModalOpen(false)}
                 className="p-1 rounded-md text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5 stroke-[1.75]" />
               </button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
                 <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
@@ -482,7 +523,11 @@ export default function OccasionsPage() {
                 {imagePreviewUrl && (
                   <div className="mb-3 p-2.5 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] flex items-center gap-3">
                     <div className="w-24 h-14 bg-white dark:bg-[#13161c] rounded-lg overflow-hidden flex items-center justify-center shrink-0">
-                      <img src={imagePreviewUrl} alt="Preview" className="object-cover w-full h-full" />
+                      <img
+                        src={imagePreviewUrl}
+                        alt="Preview"
+                        className="object-cover w-full h-full"
+                      />
                     </div>
                     <div className="min-w-0">
                       <span className="text-[10px] font-mono uppercase text-teal-600 dark:text-teal-400 font-bold block">

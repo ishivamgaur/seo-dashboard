@@ -3,7 +3,15 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { CheckCircle2, AlertCircle, Save, LayoutTemplate, Building2, PhoneCall, ExternalLink } from 'lucide-react';
+import {
+  CheckCircle2,
+  AlertCircle,
+  Save,
+  LayoutTemplate,
+  Building2,
+  PhoneCall,
+  ExternalLink,
+} from 'lucide-react';
 import api from '@/lib/api';
 
 const VALID_CONTENT_TABS = ['hero', 'about', 'contact'];
@@ -35,29 +43,39 @@ function ContentManagementContent() {
     router.replace(`${pathname}?tab=${tabId}`, { scroll: false });
   };
 
-  const [heroForm, setHeroForm] = useState({ 
-    heading: '', 
-    subHeading: '', 
-    ctaText: '', 
-    ctaUrl: '', 
-    bannerImage: '' 
+  const [heroForm, setHeroForm] = useState({
+    heading: '',
+    subHeading: '',
+    ctaText: '',
+    ctaUrl: '',
+    bannerImage: '',
   });
   const [heroFile, setHeroFile] = useState(null);
   const [heroPreview, setHeroPreview] = useState('');
 
-  const [aboutForm, setAboutForm] = useState({ 
-    sectionTitle: '', 
-    description: '', 
-    featuredImage: '' 
+  const [aboutForm, setAboutForm] = useState({
+    sectionTitle: '',
+    eyebrow: '',
+    subtitle: '',
+    description: '',
+    highlights: '',
+    yearsExperience: '',
+    citiesCovered: '',
+    fleetSize: '',
+    tripsCompleted: '',
+    badgeText: '',
+    ctaText: '',
+    ctaUrl: '',
+    featuredImage: '',
   });
   const [aboutFile, setAboutFile] = useState(null);
   const [aboutPreview, setAboutPreview] = useState('');
 
-  const [contactForm, setContactForm] = useState({ 
-    phone: '', 
-    email: '', 
-    address: '', 
-    mapEmbed: '' 
+  const [contactForm, setContactForm] = useState({
+    phone: '',
+    email: '',
+    address: '',
+    mapEmbed: '',
   });
 
   useEffect(() => {
@@ -85,7 +103,30 @@ function ContentManagementContent() {
           const a = aboutRes.data.data;
           setAboutForm({
             sectionTitle: a.sectionTitle || '',
+            eyebrow: a.eyebrow || '',
+            subtitle: a.subtitle || '',
             description: a.description || '',
+            highlights: (() => {
+              const h = a.highlights;
+              if (Array.isArray(h)) return h.join('\n');
+              if (typeof h === 'string') {
+                try {
+                  const parsed = JSON.parse(h);
+                  if (Array.isArray(parsed)) return parsed.join('\n');
+                } catch {
+                  /* plain newline text */
+                }
+                return h;
+              }
+              return '';
+            })(),
+            yearsExperience: a.yearsExperience ?? '',
+            citiesCovered: a.citiesCovered ?? '',
+            fleetSize: a.fleetSize ?? '',
+            tripsCompleted: a.tripsCompleted ?? '',
+            badgeText: a.badgeText || '',
+            ctaText: a.ctaText || '',
+            ctaUrl: a.ctaUrl || '',
             featuredImage: a.featuredImage || '',
           });
           setAboutPreview(a.featuredImage || '');
@@ -161,7 +202,17 @@ function ContentManagementContent() {
     try {
       const formData = new FormData();
       formData.append('sectionTitle', aboutForm.sectionTitle);
+      formData.append('eyebrow', aboutForm.eyebrow);
+      formData.append('subtitle', aboutForm.subtitle);
       formData.append('description', aboutForm.description);
+      formData.append('highlights', aboutForm.highlights);
+      formData.append('yearsExperience', aboutForm.yearsExperience);
+      formData.append('citiesCovered', aboutForm.citiesCovered);
+      formData.append('fleetSize', aboutForm.fleetSize);
+      formData.append('tripsCompleted', aboutForm.tripsCompleted);
+      formData.append('badgeText', aboutForm.badgeText);
+      formData.append('ctaText', aboutForm.ctaText);
+      formData.append('ctaUrl', aboutForm.ctaUrl);
       if (aboutFile) {
         formData.append('featuredImage', aboutFile);
       } else if (aboutForm.featuredImage) {
@@ -213,11 +264,13 @@ function ContentManagementContent() {
         </div>
 
         {statusMsg.text && (
-          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium ${
-            statusMsg.type === 'success'
-              ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300'
-              : 'bg-red-50 dark:bg-red-950/40 text-red-800 dark:text-red-300'
-          }`}>
+          <div
+            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium ${
+              statusMsg.type === 'success'
+                ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300'
+                : 'bg-red-50 dark:bg-red-950/40 text-red-800 dark:text-red-300'
+            }`}
+          >
             {statusMsg.type === 'success' ? (
               <CheckCircle2 className="w-4 h-4 text-teal-600 dark:text-teal-400 stroke-[2]" />
             ) : (
@@ -345,7 +398,11 @@ function ContentManagementContent() {
               {heroPreview && (
                 <div className="mb-3 p-2.5 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] flex items-center gap-3">
                   <div className="w-24 h-14 bg-white dark:bg-black rounded-lg overflow-hidden flex items-center justify-center shrink-0">
-                    <img src={heroPreview} alt="Hero Banner Preview" className="object-cover w-full h-full" />
+                    <img
+                      src={heroPreview}
+                      alt="Hero Banner Preview"
+                      className="object-cover w-full h-full"
+                    />
                   </div>
                   <div className="min-w-0">
                     <span className="text-[10px] font-mono uppercase text-teal-600 dark:text-teal-400 font-bold block">
@@ -426,6 +483,46 @@ function ContentManagementContent() {
               />
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  Eyebrow Label
+                </label>
+                <input
+                  type="text"
+                  value={aboutForm.eyebrow}
+                  onChange={(e) => setAboutForm({ ...aboutForm, eyebrow: e.target.value })}
+                  placeholder="Who we are (keep different from the title)"
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+                />
+              </div>
+              <div>
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  Badge Text
+                </label>
+                <input
+                  type="text"
+                  value={aboutForm.badgeText}
+                  onChange={(e) => setAboutForm({ ...aboutForm, badgeText: e.target.value })}
+                  placeholder="Since 2015"
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                Subtitle Hook
+              </label>
+              <input
+                type="text"
+                value={aboutForm.subtitle}
+                onChange={(e) => setAboutForm({ ...aboutForm, subtitle: e.target.value })}
+                placeholder="Pan-India chauffeur-driven fleet for weddings, corporate travel and outstation trips."
+                className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+              />
+            </div>
+
             <div>
               <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
                 Company Story & Capabilities
@@ -442,13 +539,114 @@ function ContentManagementContent() {
 
             <div>
               <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                Trust Highlights (one per line)
+              </label>
+              <textarea
+                rows={4}
+                value={aboutForm.highlights}
+                onChange={(e) => setAboutForm({ ...aboutForm, highlights: e.target.value })}
+                placeholder={
+                  'Verified chauffeurs with commercial licences\nAll-India tourist permits on every vehicle\n24/7 live dispatch and trip support'
+                }
+                className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium leading-relaxed border-0"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div>
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  Years
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={aboutForm.yearsExperience}
+                  onChange={(e) => setAboutForm({ ...aboutForm, yearsExperience: e.target.value })}
+                  placeholder="10"
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
+                />
+              </div>
+              <div>
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  Cities
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={aboutForm.citiesCovered}
+                  onChange={(e) => setAboutForm({ ...aboutForm, citiesCovered: e.target.value })}
+                  placeholder="15"
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
+                />
+              </div>
+              <div>
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  Fleet Size
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={aboutForm.fleetSize}
+                  onChange={(e) => setAboutForm({ ...aboutForm, fleetSize: e.target.value })}
+                  placeholder="40"
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
+                />
+              </div>
+              <div>
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  Trips Done
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={aboutForm.tripsCompleted}
+                  onChange={(e) => setAboutForm({ ...aboutForm, tripsCompleted: e.target.value })}
+                  placeholder="25000"
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  CTA Button Text
+                </label>
+                <input
+                  type="text"
+                  value={aboutForm.ctaText}
+                  onChange={(e) => setAboutForm({ ...aboutForm, ctaText: e.target.value })}
+                  placeholder="Explore our fleet"
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+                />
+              </div>
+              <div>
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  CTA Target Link
+                </label>
+                <input
+                  type="text"
+                  value={aboutForm.ctaUrl}
+                  onChange={(e) => setAboutForm({ ...aboutForm, ctaUrl: e.target.value })}
+                  placeholder="#vehicles"
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
                 Featured Fleet Photograph
               </label>
 
               {aboutPreview && (
                 <div className="mb-3 p-2.5 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] flex items-center gap-3">
                   <div className="w-24 h-14 bg-white dark:bg-black rounded-lg overflow-hidden flex items-center justify-center shrink-0">
-                    <img src={aboutPreview} alt="About Featured Preview" className="object-cover w-full h-full" />
+                    <img
+                      src={aboutPreview}
+                      alt="About Featured Preview"
+                      className="object-cover w-full h-full"
+                    />
                   </div>
                   <div className="min-w-0">
                     <span className="text-[10px] font-mono uppercase text-teal-600 dark:text-teal-400 font-bold block">
@@ -474,7 +672,7 @@ function ContentManagementContent() {
                   setAboutForm({ ...aboutForm, featuredImage: e.target.value });
                   if (!aboutFile) setAboutPreview(e.target.value);
                 }}
-                placeholder="Or paste Cloudinary / WebP Image URL"
+                placeholder="Or paste Unsplash / Cloudinary image URL"
                 className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
               />
             </div>

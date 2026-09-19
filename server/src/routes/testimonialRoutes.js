@@ -6,8 +6,18 @@ import * as testimonialController from '../controllers/testimonialController.js'
 const router = Router();
 
 router.get('/', testimonialController.getAll);
-router.post('/', authenticate, testimonialUpload.single('customerImage'), testimonialController.create);
-router.put('/:id', authenticate, testimonialUpload.single('customerImage'), testimonialController.update);
+router.post(
+  '/',
+  authenticate,
+  testimonialUpload.single('customerImage'),
+  testimonialController.create
+);
+router.put(
+  '/:id',
+  authenticate,
+  testimonialUpload.single('customerImage'),
+  testimonialController.update
+);
 router.delete('/:id', authenticate, testimonialController.remove);
 
 export default router;

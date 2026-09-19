@@ -2,15 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  CarFront, 
-  Compass, 
-  Star, 
-  Images, 
-  ArrowRight
-} from 'lucide-react';
-
-const API_BASE = 'http://localhost:5000/api';
+import { CarFront, Compass, Star, Images, ArrowRight } from 'lucide-react';
+import api from '@/lib/api';
 
 export default function DashboardOverview() {
   const [counts, setCounts] = useState({
@@ -26,20 +19,27 @@ export default function DashboardOverview() {
   useEffect(() => {
     async function loadDashboardData() {
       try {
-        const [vRes, oRes, tRes, gRes, sRes] = await Promise.all([
-          fetch(`${API_BASE}/vehicles`).catch(() => ({ ok: false })),
-          fetch(`${API_BASE}/occasions`).catch(() => ({ ok: false })),
-          fetch(`${API_BASE}/testimonials`).catch(() => ({ ok: false })),
-          fetch(`${API_BASE}/gallery`).catch(() => ({ ok: false })),
-          fetch(`${API_BASE}/seo`).catch(() => ({ ok: false })),
-        ]);
-
         const [vData, oData, tData, gData, sData] = await Promise.all([
-          vRes.ok ? vRes.json() : { data: [] },
-          oRes.ok ? oRes.json() : { data: [] },
-          tRes.ok ? tRes.json() : { data: [] },
-          gRes.ok ? gRes.json() : { data: [] },
-          sRes.ok ? sRes.json() : { data: null },
+          api
+            .get('/vehicles')
+            .then((r) => r.data)
+            .catch(() => ({ data: [] })),
+          api
+            .get('/occasions')
+            .then((r) => r.data)
+            .catch(() => ({ data: [] })),
+          api
+            .get('/testimonials')
+            .then((r) => r.data)
+            .catch(() => ({ data: [] })),
+          api
+            .get('/gallery')
+            .then((r) => r.data)
+            .catch(() => ({ data: [] })),
+          api
+            .get('/seo')
+            .then((r) => r.data)
+            .catch(() => ({ data: null })),
         ]);
 
         const vehiclesList = Array.isArray(vData.data) ? vData.data : [];
@@ -151,7 +151,7 @@ export default function DashboardOverview() {
                 href="/admin/seo"
                 className="group p-4 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] hover:bg-teal-50/50 dark:hover:bg-[#202531] transition-all cursor-pointer block"
               >
-                <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 font-mono group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-mono group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                   SEO & Meta Tags
                 </h4>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">
@@ -163,7 +163,7 @@ export default function DashboardOverview() {
                 href="/admin/content"
                 className="group p-4 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] hover:bg-teal-50/50 dark:hover:bg-[#202531] transition-all cursor-pointer block"
               >
-                <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 font-mono group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-mono group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                   Homepage Content
                 </h4>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">
@@ -175,7 +175,7 @@ export default function DashboardOverview() {
                 href="/admin/vehicles"
                 className="group p-4 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] hover:bg-teal-50/50 dark:hover:bg-[#202531] transition-all cursor-pointer block"
               >
-                <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 font-mono group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-mono group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                   Vehicle Showroom
                 </h4>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">
@@ -187,7 +187,7 @@ export default function DashboardOverview() {
                 href="/admin/occasions"
                 className="group p-4 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] hover:bg-teal-50/50 dark:hover:bg-[#202531] transition-all cursor-pointer block"
               >
-                <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 font-mono group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-mono group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                   Services & Occasions
                 </h4>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">
@@ -214,28 +214,41 @@ export default function DashboardOverview() {
             {loading ? (
               <div className="space-y-2">
                 {[1, 2, 3].map((n) => (
-                  <div key={n} className="h-10 bg-zinc-100 dark:bg-zinc-800 rounded-lg animate-pulse" />
+                  <div
+                    key={n}
+                    className="h-10 bg-zinc-100 dark:bg-zinc-800 rounded-lg animate-pulse"
+                  />
                 ))}
               </div>
             ) : recentVehicles.length === 0 ? (
-              <p className="text-xs font-mono text-zinc-500 py-4 text-center">No vehicles in inventory.</p>
+              <p className="text-xs font-mono text-zinc-500 py-4 text-center">
+                No vehicles in inventory.
+              </p>
             ) : (
               <div className="space-y-2 text-xs">
                 {recentVehicles.map((v, idx) => (
-                  <div 
-                    key={v.id} 
+                  <div
+                    key={v.id}
                     className="px-3.5 py-2.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27] hover:bg-teal-50/50 dark:hover:bg-[#202531] flex items-center justify-between transition-all"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className="font-mono text-zinc-400 text-xs w-5 shrink-0">#{idx + 1}</span>
+                      <span className="font-mono text-zinc-400 text-xs w-5 shrink-0">
+                        #{idx + 1}
+                      </span>
                       <div className="w-10 h-7 bg-zinc-200/60 dark:bg-[#13161c] rounded overflow-hidden flex items-center justify-center shrink-0">
                         {v.image ? (
-                          <img src={v.image} alt={v.vehicleName} className="object-contain w-full h-full" />
+                          <img
+                            src={v.image}
+                            alt={v.vehicleName}
+                            className="object-contain w-full h-full"
+                          />
                         ) : (
                           <CarFront className="w-3.5 h-3.5 text-zinc-400" />
                         )}
                       </div>
-                      <span className="font-semibold text-zinc-900 dark:text-zinc-100 truncate">{v.vehicleName}</span>
+                      <span className="font-semibold text-zinc-900 dark:text-zinc-100 truncate">
+                        {v.vehicleName}
+                      </span>
                     </div>
                     <span className="font-mono tabular-nums text-zinc-500 dark:text-zinc-400 font-medium shrink-0 ml-2">
                       {v.seatingCapacity} Seats
@@ -257,23 +270,33 @@ export default function DashboardOverview() {
 
             <div className="space-y-2.5 text-xs font-sans">
               <div className="p-3.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27]">
-                <span className="text-zinc-400 dark:text-zinc-500 block text-[11px] font-mono uppercase tracking-wider font-medium">Page Title</span>
-                <p className="font-medium text-zinc-900 dark:text-zinc-100 mt-1.5 truncate" title={seoSnapshot?.metaTitle || 'Urban Cruise'}>
+                <span className="text-zinc-400 dark:text-zinc-500 block text-[11px] font-mono uppercase tracking-wider font-medium">
+                  Page Title
+                </span>
+                <p
+                  className="font-medium text-zinc-900 dark:text-zinc-100 mt-1.5 truncate"
+                  title={seoSnapshot?.metaTitle || 'Urban Cruise'}
+                >
                   {seoSnapshot?.metaTitle || 'Urban Cruise - Vehicle Rentals'}
                 </p>
               </div>
 
               <div className="p-3.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27]">
-                <span className="text-zinc-400 dark:text-zinc-500 block text-[11px] font-mono uppercase tracking-wider font-medium">Canonical URL</span>
+                <span className="text-zinc-400 dark:text-zinc-500 block text-[11px] font-mono uppercase tracking-wider font-medium">
+                  Canonical URL
+                </span>
                 <p className="font-mono text-zinc-700 dark:text-zinc-300 mt-1.5 truncate text-[11px]">
                   {seoSnapshot?.canonicalUrl || 'https://urbancruise.in'}
                 </p>
               </div>
 
               <div className="p-3.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27] flex items-center justify-between">
-                <span className="text-zinc-400 dark:text-zinc-500 text-[11px] font-mono uppercase tracking-wider font-medium">Search Robots</span>
+                <span className="text-zinc-400 dark:text-zinc-500 text-[11px] font-mono uppercase tracking-wider font-medium">
+                  Search Robots
+                </span>
                 <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold text-[11px] bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded">
-                  {seoSnapshot?.robotsIndex !== false ? 'index' : 'noindex'}, {seoSnapshot?.robotsFollow !== false ? 'follow' : 'nofollow'}
+                  {seoSnapshot?.robotsIndex !== false ? 'index' : 'noindex'},{' '}
+                  {seoSnapshot?.robotsFollow !== false ? 'follow' : 'nofollow'}
                 </span>
               </div>
             </div>
@@ -300,19 +323,29 @@ export default function DashboardOverview() {
               <div className="space-y-2 text-xs">
                 <div className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27]">
                   <span className="text-zinc-600 dark:text-zinc-300 font-medium">API Gateway</span>
-                  <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded text-[11px]">PORT 5000</span>
+                  <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded text-[11px]">
+                    PORT 5000
+                  </span>
                 </div>
                 <div className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27]">
                   <span className="text-zinc-600 dark:text-zinc-300 font-medium">Database</span>
-                  <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded text-[11px]">MySQL</span>
+                  <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded text-[11px]">
+                    MySQL
+                  </span>
                 </div>
                 <div className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27]">
-                  <span className="text-zinc-600 dark:text-zinc-300 font-medium">Client Engine</span>
-                  <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded text-[11px]">Next.js 16</span>
+                  <span className="text-zinc-600 dark:text-zinc-300 font-medium">
+                    Client Engine
+                  </span>
+                  <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded text-[11px]">
+                    Next.js 16
+                  </span>
                 </div>
                 <div className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27]">
                   <span className="text-zinc-600 dark:text-zinc-300 font-medium">Theme Engine</span>
-                  <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded text-[11px]">next-themes</span>
+                  <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded text-[11px]">
+                    next-themes
+                  </span>
                 </div>
               </div>
             </div>

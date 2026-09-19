@@ -21,5 +21,5 @@ export {
   Occasion,
   Testimonial,
   GalleryImage,
-  ContactInfo
+  ContactInfo,
 };

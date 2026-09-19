@@ -9,12 +9,12 @@ export const getSeo = catchAsync(async (req, res) => {
 
 export const updateSeo = catchAsync(async (req, res) => {
   let seo = await SeoSetting.findOne();
-  
+
   if (seo) {
     seo = await seo.update(req.body);
   } else {
     seo = await SeoSetting.create(req.body);
   }
-  
+
   res.status(200).json(new ApiResponse(200, 'SEO settings updated successfully', seo));
 });

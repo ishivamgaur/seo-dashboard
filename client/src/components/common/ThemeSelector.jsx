@@ -9,10 +9,13 @@ export default function ThemeSelector({ minimal = false }) {
 
   if (!mounted) {
     return (
-      <div className={minimal 
-        ? "h-8 w-8 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800" 
-        : "inline-flex items-center p-1 rounded-full bg-zinc-200/60 dark:bg-zinc-900 border border-zinc-300/60 dark:border-zinc-800"
-      }>
+      <div
+        className={
+          minimal
+            ? 'h-8 w-8 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800'
+            : 'inline-flex items-center p-1 rounded-full bg-zinc-200/60 dark:bg-zinc-900 border border-zinc-300/60 dark:border-zinc-800'
+        }
+      >
         {!minimal && <span className="px-3 py-1 text-xs font-medium text-zinc-500">Theme</span>}
       </div>
     );

@@ -3,13 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 
-export default function FilterSelect({
-  label,
-  value,
-  onChange,
-  options = [],
-  className = '',
-}) {
+export default function FilterSelect({ label, value, onChange, options = [], className = '' }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
 

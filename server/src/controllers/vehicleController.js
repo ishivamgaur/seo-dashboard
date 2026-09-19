@@ -44,7 +44,7 @@ export const remove = catchAsync(async (req, res) => {
   if (vehicle.image) {
     deleteFile(vehicle.image);
   }
-  
+
   await vehicle.destroy();
   res.status(200).json(new ApiResponse(200, 'Vehicle deleted successfully', null));
 });

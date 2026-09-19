@@ -2,7 +2,17 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
-import { Edit2, Trash2, Plus, X, CarFront, ArrowUp, ArrowDown, GripVertical, Search } from 'lucide-react';
+import {
+  Edit2,
+  Trash2,
+  Plus,
+  X,
+  CarFront,
+  ArrowUp,
+  ArrowDown,
+  GripVertical,
+  Search,
+} from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import api from '@/lib/api';
 import FilterSelect from '@/components/common/FilterSelect';
@@ -14,7 +24,7 @@ export default function VehiclesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState(null);
   const [statusMsg, setStatusMsg] = useState('');
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [capacityFilter, setCapacityFilter] = useState('all');
 
@@ -49,7 +59,8 @@ export default function VehiclesPage() {
 
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((v) => {
-      const matchesSearch = v.vehicleName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      const matchesSearch =
+        v.vehicleName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         v.description?.toLowerCase().includes(searchQuery.toLowerCase());
 
       if (!matchesSearch) return false;
@@ -130,9 +141,12 @@ export default function VehiclesPage() {
     formData.append('vehicleName', vehicleName);
     formData.append('seatingCapacity', seatingCapacity);
     formData.append('description', description);
-    
+
     const featArray = features
-      ? features.split(',').map((f) => f.trim()).filter(Boolean)
+      ? features
+          .split(',')
+          .map((f) => f.trim())
+          .filter(Boolean)
       : [];
     formData.append('features', JSON.stringify(featArray));
 
@@ -196,8 +210,8 @@ export default function VehiclesPage() {
     const featList = Array.isArray(v.features)
       ? v.features.join(', ')
       : typeof v.features === 'string'
-      ? JSON.parse(v.features || '[]').join(', ')
-      : '';
+        ? JSON.parse(v.features || '[]').join(', ')
+        : '';
     setFeatures(featList);
     setImage(null);
     setImageUrl(v.image || '');
@@ -282,8 +296,12 @@ export default function VehiclesPage() {
               <div className="px-5 py-12 text-center text-zinc-500 font-mono text-xs">
                 <div className="max-w-sm mx-auto space-y-2">
                   <CarFront className="w-8 h-8 text-zinc-400 mx-auto" />
-                  <p className="font-semibold text-zinc-700 dark:text-zinc-300">No vehicles found</p>
-                  <p className="text-xs text-zinc-500">Try adjusting your search terms or add a new vehicle to the fleet.</p>
+                  <p className="font-semibold text-zinc-700 dark:text-zinc-300">
+                    No vehicles found
+                  </p>
+                  <p className="text-xs text-zinc-500">
+                    Try adjusting your search terms or add a new vehicle to the fleet.
+                  </p>
                 </div>
               </div>
             ) : !isMounted ? (
@@ -292,8 +310,8 @@ export default function VehiclesPage() {
                   const featArray = Array.isArray(v.features)
                     ? v.features
                     : typeof v.features === 'string'
-                    ? JSON.parse(v.features || '[]')
-                    : [];
+                      ? JSON.parse(v.features || '[]')
+                      : [];
 
                   return (
                     <div
@@ -306,8 +324,12 @@ export default function VehiclesPage() {
                             <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
                           </div>
                           <div className="flex flex-col -space-y-0.5 opacity-25">
-                            <span className="p-0.5 text-zinc-400"><ArrowUp className="w-2.5 h-2.5 stroke-[2]" /></span>
-                            <span className="p-0.5 text-zinc-400"><ArrowDown className="w-2.5 h-2.5 stroke-[2]" /></span>
+                            <span className="p-0.5 text-zinc-400">
+                              <ArrowUp className="w-2.5 h-2.5 stroke-[2]" />
+                            </span>
+                            <span className="p-0.5 text-zinc-400">
+                              <ArrowDown className="w-2.5 h-2.5 stroke-[2]" />
+                            </span>
                           </div>
                           <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
                             {index + 1}
@@ -317,7 +339,11 @@ export default function VehiclesPage() {
                       <div className="px-5 py-3.5">
                         <div className="relative w-20 h-12 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                           {v.image ? (
-                            <img src={v.image} alt={v.vehicleName} className="object-contain w-full h-full" />
+                            <img
+                              src={v.image}
+                              alt={v.vehicleName}
+                              className="object-contain w-full h-full"
+                            />
                           ) : (
                             <CarFront className="w-5 h-5 text-zinc-400" />
                           )}
@@ -332,12 +358,17 @@ export default function VehiclesPage() {
                       <div className="px-5 py-3.5">
                         <div className="flex flex-wrap gap-1 max-w-sm">
                           {featArray.slice(0, 3).map((feat, idx) => (
-                            <span key={idx} className="px-2 py-0.5 rounded bg-[#f6f8fa] dark:bg-[#1a1e27] text-[10px] font-medium text-zinc-600 dark:text-zinc-300">
+                            <span
+                              key={idx}
+                              className="px-2 py-0.5 rounded bg-[#f6f8fa] dark:bg-[#1a1e27] text-[10px] font-medium text-zinc-600 dark:text-zinc-300"
+                            >
                               {feat}
                             </span>
                           ))}
                           {featArray.length > 3 && (
-                            <span className="text-[10px] font-mono text-zinc-400">+{featArray.length - 3}</span>
+                            <span className="text-[10px] font-mono text-zinc-400">
+                              +{featArray.length - 3}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -377,11 +408,16 @@ export default function VehiclesPage() {
                         const featArray = Array.isArray(v.features)
                           ? v.features
                           : typeof v.features === 'string'
-                          ? JSON.parse(v.features || '[]')
-                          : [];
+                            ? JSON.parse(v.features || '[]')
+                            : [];
 
                         return (
-                          <Draggable key={id} draggableId={id} index={index} isDragDisabled={isFilterActive}>
+                          <Draggable
+                            key={id}
+                            draggableId={id}
+                            index={index}
+                            isDragDisabled={isFilterActive}
+                          >
                             {(providedDrag, snapshot) => (
                               <div
                                 ref={providedDrag.innerRef}
@@ -404,7 +440,11 @@ export default function VehiclesPage() {
                                           ? 'opacity-30 cursor-not-allowed text-zinc-400'
                                           : 'hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-grab active:cursor-grabbing'
                                       }`}
-                                      title={isFilterActive ? 'Clear filters to reorder' : 'Drag to reorder showroom position'}
+                                      title={
+                                        isFilterActive
+                                          ? 'Clear filters to reorder'
+                                          : 'Drag to reorder showroom position'
+                                      }
                                     >
                                       <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
                                     </button>
@@ -421,7 +461,9 @@ export default function VehiclesPage() {
                                       </button>
                                       <button
                                         type="button"
-                                        disabled={index === filteredVehicles.length - 1 || isFilterActive}
+                                        disabled={
+                                          index === filteredVehicles.length - 1 || isFilterActive
+                                        }
                                         onClick={() => handleMove(index, 1)}
                                         className="p-0.5 rounded hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] disabled:opacity-20 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
                                         title="Move Down"
@@ -439,7 +481,11 @@ export default function VehiclesPage() {
                                 <div className="px-5 py-3.5">
                                   <div className="relative w-20 h-12 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                                     {v.image ? (
-                                      <img src={v.image} alt={v.vehicleName} className="object-contain w-full h-full" />
+                                      <img
+                                        src={v.image}
+                                        alt={v.vehicleName}
+                                        className="object-contain w-full h-full"
+                                      />
                                     ) : (
                                       <CarFront className="w-5 h-5 text-zinc-400" />
                                     )}
@@ -462,12 +508,17 @@ export default function VehiclesPage() {
                                 <div className="px-5 py-3.5">
                                   <div className="flex flex-wrap gap-1 max-w-sm">
                                     {featArray.slice(0, 3).map((feat, idx) => (
-                                      <span key={idx} className="px-2 py-0.5 rounded bg-[#f6f8fa] dark:bg-[#1a1e27] text-[10px] font-medium text-zinc-600 dark:text-zinc-300">
+                                      <span
+                                        key={idx}
+                                        className="px-2 py-0.5 rounded bg-[#f6f8fa] dark:bg-[#1a1e27] text-[10px] font-medium text-zinc-600 dark:text-zinc-300"
+                                      >
                                         {feat}
                                       </span>
                                     ))}
                                     {featArray.length > 3 && (
-                                      <span className="text-[10px] font-mono text-zinc-400">+{featArray.length - 3}</span>
+                                      <span className="text-[10px] font-mono text-zinc-400">
+                                        +{featArray.length - 3}
+                                      </span>
                                     )}
                                   </div>
                                 </div>
@@ -517,15 +568,15 @@ export default function VehiclesPage() {
                   Fill details and upload high-res photo for the showroom
                 </span>
               </div>
-              <button 
+              <button
                 type="button"
-                onClick={() => setIsModalOpen(false)} 
+                onClick={() => setIsModalOpen(false)}
                 className="p-1 rounded-md text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5 stroke-[1.75]" />
               </button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
                 <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
@@ -601,11 +652,15 @@ export default function VehiclesPage() {
                 <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
                   Vehicle Image
                 </label>
-                
+
                 {imagePreviewUrl && (
                   <div className="mb-3 p-2.5 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] flex items-center gap-3">
                     <div className="w-20 h-14 bg-white dark:bg-[#13161c] rounded-lg overflow-hidden flex items-center justify-center shrink-0">
-                      <img src={imagePreviewUrl} alt="Preview" className="object-contain w-full h-full" />
+                      <img
+                        src={imagePreviewUrl}
+                        alt="Preview"
+                        className="object-contain w-full h-full"
+                      />
                     </div>
                     <div className="min-w-0">
                       <span className="text-[10px] font-mono uppercase text-teal-600 dark:text-teal-400 font-bold block">

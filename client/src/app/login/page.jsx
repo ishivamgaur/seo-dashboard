@@ -57,9 +57,12 @@ export default function LoginPage() {
                 {error}
               </div>
             )}
-            
+
             <div>
-              <label htmlFor="email" className="block uppercase font-mono font-semibold text-zinc-500 mb-1">
+              <label
+                htmlFor="email"
+                className="block uppercase font-mono font-semibold text-zinc-500 mb-1"
+              >
                 Email Address
               </label>
               <div className="relative">
@@ -81,7 +84,10 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block uppercase font-mono font-semibold text-zinc-500 mb-1">
+              <label
+                htmlFor="password"
+                className="block uppercase font-mono font-semibold text-zinc-500 mb-1"
+              >
                 Password
               </label>
               <div className="relative">
@@ -122,7 +128,10 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-6 text-center">
-          <Link href="/" className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-white font-mono transition-colors">
+          <Link
+            href="/"
+            className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-white font-mono transition-colors"
+          >
             Back to Public Website
           </Link>
         </div>

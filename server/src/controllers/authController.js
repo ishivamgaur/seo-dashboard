@@ -19,11 +19,9 @@ export const login = catchAsync(async (req, res) => {
     throw ApiError.unauthorized('Invalid credentials');
   }
 
-  const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
-    config.jwt.secret,
-    { expiresIn: config.jwt.expiresIn }
-  );
+  const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, config.jwt.secret, {
+    expiresIn: config.jwt.expiresIn,
+  });
 
   const userData = user.toJSON();
   delete userData.password;

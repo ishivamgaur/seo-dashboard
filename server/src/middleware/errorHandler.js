@@ -16,15 +16,15 @@ const errorHandler = (err, req, res, next) => {
   } else if (err instanceof ValidationError || err.name?.startsWith('Sequelize')) {
     statusCode = 400;
     message = 'Database validation error';
-    errors = err.errors?.map((item) => ({
-      field: item.path,
-      message: item.message,
-    })) || [];
+    errors =
+      err.errors?.map((item) => ({
+        field: item.path,
+        message: item.message,
+      })) || [];
   } else if (err instanceof multer.MulterError) {
     statusCode = 400;
-    message = err.code === 'LIMIT_FILE_SIZE'
-      ? 'File too large. Maximum allowed size is 5MB.'
-      : err.message;
+    message =
+      err.code === 'LIMIT_FILE_SIZE' ? 'File too large. Maximum allowed size is 5MB.' : err.message;
     errors = [{ field: err.field || 'file', message: err.message }];
   } else if (config.env === 'development') {
     message = err.message || message;

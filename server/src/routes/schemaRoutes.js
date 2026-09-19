@@ -1,5 +1,12 @@
 import { Router } from 'express';
-import { getAll, getOne, create, update, remove, toggleActive } from '../controllers/schemaController.js';
+import {
+  getAll,
+  getOne,
+  create,
+  update,
+  remove,
+  toggleActive,
+} from '../controllers/schemaController.js';
 import { authenticate } from '../middleware/authenticate.js';
 
 const router = Router();

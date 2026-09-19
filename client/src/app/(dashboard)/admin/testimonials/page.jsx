@@ -1,18 +1,18 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Star, 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  X, 
-  Search, 
-  CheckCircle2, 
-  LayoutList, 
+import {
+  Star,
+  Plus,
+  Edit2,
+  Trash2,
+  X,
+  Search,
+  CheckCircle2,
+  LayoutList,
   LayoutGrid,
   MessageSquare,
-  Upload
+  Upload,
 } from 'lucide-react';
 import api from '@/lib/api';
 import FilterSelect from '@/components/common/FilterSelect';
@@ -23,16 +23,16 @@ export default function TestimonialsAdminPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
   const [viewMode, setViewMode] = useState('table');
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [ratingFilter, setRatingFilter] = useState('all');
 
-  const [formData, setFormData] = useState({ 
-    id: null, 
-    customerName: '', 
-    review: '', 
-    rating: 5, 
-    customerImage: '' 
+  const [formData, setFormData] = useState({
+    id: null,
+    customerName: '',
+    review: '',
+    rating: 5,
+    customerImage: '',
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState('');
@@ -59,7 +59,7 @@ export default function TestimonialsAdminPage() {
 
   const filteredTestimonials = useMemo(() => {
     return testimonials.filter((t) => {
-      const matchesSearch = 
+      const matchesSearch =
         t.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         t.review?.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -75,19 +75,23 @@ export default function TestimonialsAdminPage() {
   const isFilterActive = searchQuery !== '' || ratingFilter !== 'all';
 
   const openModal = (t = null) => {
-    setFormData(t ? { 
-      id: t.id, 
-      customerName: t.customerName || '', 
-      review: t.review || '', 
-      rating: t.rating || 5, 
-      customerImage: t.customerImage || '' 
-    } : { 
-      id: null, 
-      customerName: '', 
-      review: '', 
-      rating: 5, 
-      customerImage: '' 
-    });
+    setFormData(
+      t
+        ? {
+            id: t.id,
+            customerName: t.customerName || '',
+            review: t.review || '',
+            rating: t.rating || 5,
+            customerImage: t.customerImage || '',
+          }
+        : {
+            id: null,
+            customerName: '',
+            review: '',
+            rating: 5,
+            customerImage: '',
+          }
+    );
     setImageFile(null);
     setImagePreviewUrl(t?.customerImage || '');
     setModalOpen(true);
@@ -159,7 +163,8 @@ export default function TestimonialsAdminPage() {
             Client Testimonials
           </h1>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-            Manage verified client reviews and star ratings displayed across the public booking showroom.
+            Manage verified client reviews and star ratings displayed across the public booking
+            showroom.
           </p>
         </div>
 
@@ -170,9 +175,9 @@ export default function TestimonialsAdminPage() {
             </span>
           )}
 
-          <button 
+          <button
             type="button"
-            onClick={() => openModal()} 
+            onClick={() => openModal()}
             className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
           >
             <Plus className="w-4 h-4 stroke-[2]" />
@@ -247,7 +252,9 @@ export default function TestimonialsAdminPage() {
         <div className="bg-white dark:bg-[#13161c] rounded-xl p-12 text-center shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
           <MessageSquare className="w-10 h-10 text-zinc-400 mx-auto mb-2 opacity-60" />
           <p className="font-semibold text-zinc-700 dark:text-zinc-300 text-xs">
-            {isFilterActive ? 'No testimonials match your filter criteria.' : 'No reviews published yet.'}
+            {isFilterActive
+              ? 'No testimonials match your filter criteria.'
+              : 'No reviews published yet.'}
           </p>
           <p className="text-[11px] text-zinc-400 mt-1 font-mono">
             Click Add Testimonial to publish verified client reviews.
@@ -273,18 +280,18 @@ export default function TestimonialsAdminPage() {
                   const ratingVal = Number(t.rating) || 5;
 
                   return (
-                    <tr 
-                      key={t.id} 
+                    <tr
+                      key={t.id}
                       className="text-zinc-900 dark:text-zinc-100 hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80 transition-colors"
                     >
                       <td className="px-5 py-3.5 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           <div className="relative w-9 h-9 rounded-full bg-[#f6f8fa] dark:bg-[#1a1e27] overflow-hidden flex items-center justify-center shrink-0 ring-1 ring-zinc-200/80 dark:ring-zinc-800">
                             {avatarSrc ? (
-                              <img 
-                                src={avatarSrc} 
-                                alt={t.customerName} 
-                                className="object-cover w-full h-full" 
+                              <img
+                                src={avatarSrc}
+                                alt={t.customerName}
+                                className="object-cover w-full h-full"
                               />
                             ) : (
                               <span className="font-mono text-xs font-bold text-zinc-700 dark:text-zinc-300 select-none">
@@ -325,8 +332,8 @@ export default function TestimonialsAdminPage() {
                       </td>
 
                       <td className="px-5 py-3.5 text-zinc-600 dark:text-zinc-300 max-w-xl">
-                        <p 
-                          className="line-clamp-2 leading-relaxed text-xs font-normal" 
+                        <p
+                          className="line-clamp-2 leading-relaxed text-xs font-normal"
                           title={t.review}
                         >
                           &ldquo;{t.review}&rdquo;
@@ -412,10 +419,10 @@ export default function TestimonialsAdminPage() {
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className="relative w-8 h-8 rounded-full bg-[#f6f8fa] dark:bg-[#1a1e27] overflow-hidden flex items-center justify-center shrink-0 ring-1 ring-zinc-200/80 dark:ring-zinc-800">
                       {avatarSrc ? (
-                        <img 
-                          src={avatarSrc} 
-                          alt={t.customerName} 
-                          className="object-cover w-full h-full" 
+                        <img
+                          src={avatarSrc}
+                          alt={t.customerName}
+                          className="object-cover w-full h-full"
                         />
                       ) : (
                         <span className="font-mono text-[11px] font-bold text-zinc-700 dark:text-zinc-300 select-none">
@@ -471,15 +478,15 @@ export default function TestimonialsAdminPage() {
                   Featured in verified social proof section on homepage
                 </span>
               </div>
-              <button 
+              <button
                 type="button"
-                onClick={closeModal} 
+                onClick={closeModal}
                 className="p-1 rounded-md text-zinc-400 hover:text-zinc-950 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5 stroke-[1.75]" />
               </button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
                 <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
@@ -541,13 +548,13 @@ export default function TestimonialsAdminPage() {
                 <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
                   Client Photo (Optional)
                 </label>
-                
+
                 {imagePreviewUrl && (
                   <div className="mb-2.5 flex items-center gap-3 p-2 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg">
-                    <img 
-                      src={imagePreviewUrl} 
-                      alt="Preview" 
-                      className="w-10 h-10 rounded-full object-cover shrink-0" 
+                    <img
+                      src={imagePreviewUrl}
+                      alt="Preview"
+                      className="w-10 h-10 rounded-full object-cover shrink-0"
                     />
                     <div className="min-w-0">
                       <span className="text-[10px] font-mono text-teal-600 dark:text-teal-400 font-semibold block">

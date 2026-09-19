@@ -1,22 +1,22 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Plus, 
-  Trash2, 
-  X, 
-  Images, 
-  Edit2, 
+import {
+  Plus,
+  Trash2,
+  X,
+  Images,
+  Edit2,
   Upload,
   RotateCcw,
-  ArrowUp, 
-  ArrowDown, 
+  ArrowUp,
+  ArrowDown,
   ArrowLeft,
   ArrowRight,
-  GripVertical, 
-  Search, 
-  LayoutList, 
-  LayoutGrid 
+  GripVertical,
+  Search,
+  LayoutList,
+  LayoutGrid,
 } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import api from '@/lib/api';
@@ -32,7 +32,7 @@ export default function GalleryAdminPage() {
   const [editPreviewUrl, setEditPreviewUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [viewMode, setViewMode] = useState('table');
-  
+
   const [searchQuery, setSearchQuery] = useState('');
 
   const [formData, setFormData] = useState({ file: null, altTag: '' });
@@ -159,7 +159,9 @@ export default function GalleryAdminPage() {
       if (res.status === 200) {
         closeEditModal();
         fetchGallery();
-        showToast(editImageFile ? 'Gallery photo and alt tag updated.' : 'Alt tag description updated.');
+        showToast(
+          editImageFile ? 'Gallery photo and alt tag updated.' : 'Alt tag description updated.'
+        );
       }
     } catch (err) {
       console.error('Failed to update gallery photo:', err);
@@ -242,7 +244,8 @@ export default function GalleryAdminPage() {
             Fleet Gallery Management
           </h1>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-            Reorder photos with drag and drop to customize the public homepage showroom presentation.
+            Reorder photos with drag and drop to customize the public homepage showroom
+            presentation.
           </p>
         </div>
 
@@ -253,9 +256,9 @@ export default function GalleryAdminPage() {
             </span>
           )}
 
-          <button 
+          <button
             type="button"
-            onClick={openModal} 
+            onClick={openModal}
             className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
           >
             <Plus className="w-4 h-4 stroke-[2]" />
@@ -316,7 +319,9 @@ export default function GalleryAdminPage() {
         <div className="bg-white dark:bg-[#13161c] rounded-xl p-12 text-center shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
           <Images className="w-10 h-10 text-zinc-400 mx-auto mb-2" />
           <p className="text-xs font-mono text-zinc-500">
-            {isFilterActive ? 'No photos match your search query.' : 'No images in gallery yet. Click Upload Image to add one.'}
+            {isFilterActive
+              ? 'No photos match your search query.'
+              : 'No images in gallery yet. Click Upload Image to add one.'}
           </p>
         </div>
       ) : viewMode === 'table' ? (
@@ -347,8 +352,12 @@ export default function GalleryAdminPage() {
                               <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
                             </div>
                             <div className="flex flex-col -space-y-0.5 opacity-25">
-                              <span className="p-0.5 text-zinc-400"><ArrowUp className="w-2.5 h-2.5 stroke-[2]" /></span>
-                              <span className="p-0.5 text-zinc-400"><ArrowDown className="w-2.5 h-2.5 stroke-[2]" /></span>
+                              <span className="p-0.5 text-zinc-400">
+                                <ArrowUp className="w-2.5 h-2.5 stroke-[2]" />
+                              </span>
+                              <span className="p-0.5 text-zinc-400">
+                                <ArrowDown className="w-2.5 h-2.5 stroke-[2]" />
+                              </span>
                             </div>
                             <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
                               {index + 1}
@@ -365,7 +374,9 @@ export default function GalleryAdminPage() {
                           </div>
                         </div>
                         <div className="px-5 py-3.5 font-medium text-zinc-950 dark:text-white min-w-0 pr-4">
-                          <span className="truncate block" title={alt}>{alt}</span>
+                          <span className="truncate block" title={alt}>
+                            {alt}
+                          </span>
                         </div>
                         <div className="px-5 py-3.5 text-right whitespace-nowrap">
                           <button
@@ -400,11 +411,21 @@ export default function GalleryAdminPage() {
                       >
                         {filteredImages.map((img, index) => {
                           const id = img.id.toString();
-                          const src = img.imagePath || img.image_path || img.image_url || img.image || img.url;
+                          const src =
+                            img.imagePath ||
+                            img.image_path ||
+                            img.image_url ||
+                            img.image ||
+                            img.url;
                           const alt = img.altTag || img.alt_tag || 'Fleet Showcase Photo';
 
                           return (
-                            <Draggable key={id} draggableId={id} index={index} isDragDisabled={isFilterActive}>
+                            <Draggable
+                              key={id}
+                              draggableId={id}
+                              index={index}
+                              isDragDisabled={isFilterActive}
+                            >
                               {(providedDrag, snapshot) => (
                                 <div
                                   ref={providedDrag.innerRef}
@@ -427,7 +448,11 @@ export default function GalleryAdminPage() {
                                             ? 'opacity-30 cursor-not-allowed text-zinc-400'
                                             : 'hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-grab active:cursor-grabbing'
                                         }`}
-                                        title={isFilterActive ? 'Clear search to reorder' : 'Drag to reorder showroom position'}
+                                        title={
+                                          isFilterActive
+                                            ? 'Clear search to reorder'
+                                            : 'Drag to reorder showroom position'
+                                        }
                                       >
                                         <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
                                       </button>
@@ -444,7 +469,9 @@ export default function GalleryAdminPage() {
                                         </button>
                                         <button
                                           type="button"
-                                          disabled={index === filteredImages.length - 1 || isFilterActive}
+                                          disabled={
+                                            index === filteredImages.length - 1 || isFilterActive
+                                          }
                                           onClick={() => handleMove(index, 1)}
                                           className="p-0.5 rounded hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] disabled:opacity-20 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
                                           title="Move Down"
@@ -462,7 +489,11 @@ export default function GalleryAdminPage() {
                                   <div className="px-5 py-3.5">
                                     <div className="relative w-24 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                                       {src ? (
-                                        <img src={src} alt={alt} className="object-contain w-full h-full" />
+                                        <img
+                                          src={src}
+                                          alt={alt}
+                                          className="object-contain w-full h-full"
+                                        />
                                       ) : (
                                         <Images className="w-5 h-5 text-zinc-400" />
                                       )}
@@ -470,7 +501,9 @@ export default function GalleryAdminPage() {
                                   </div>
 
                                   <div className="px-5 py-3.5 font-medium text-zinc-950 dark:text-white min-w-0 pr-4">
-                                    <span className="truncate block" title={alt}>{alt}</span>
+                                    <span className="truncate block" title={alt}>
+                                      {alt}
+                                    </span>
                                   </div>
 
                                   <div className="px-5 py-3.5 text-right whitespace-nowrap">
@@ -512,16 +545,16 @@ export default function GalleryAdminPage() {
             const alt = img.altTag || img.alt_tag || 'Fleet Showcase Photo';
 
             return (
-              <div 
-                key={img.id} 
+              <div
+                key={img.id}
                 className="group bg-white dark:bg-[#13161c] rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] hover:shadow-lg transition-all duration-200 flex flex-col justify-between"
               >
                 <div className="relative aspect-[16/10] w-full bg-[#f6f8fa] dark:bg-[#1a1e27] overflow-hidden">
                   {src ? (
-                    <img 
-                      src={src} 
-                      alt={alt} 
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300 ease-out" 
+                    <img
+                      src={src}
+                      alt={alt}
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300 ease-out"
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-zinc-400">
@@ -540,7 +573,10 @@ export default function GalleryAdminPage() {
                     <span className="text-[10px] font-mono uppercase tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 block mb-1">
                       Alt Tag SEO
                     </span>
-                    <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200 line-clamp-2 leading-relaxed" title={alt}>
+                    <p
+                      className="text-xs font-medium text-zinc-800 dark:text-zinc-200 line-clamp-2 leading-relaxed"
+                      title={alt}
+                    >
                       {alt}
                     </p>
                   </div>
@@ -608,9 +644,9 @@ export default function GalleryAdminPage() {
                   PNG, JPG, or WebP photo for showroom grid
                 </span>
               </div>
-              <button 
+              <button
                 type="button"
-                onClick={closeModal} 
+                onClick={closeModal}
                 className="p-1 rounded-md text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5 stroke-[1.75]" />
@@ -622,19 +658,19 @@ export default function GalleryAdminPage() {
                 {error}
               </div>
             )}
-            
+
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
                 <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
                   SEO Alt Tag Description
                 </label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. Force Urbania Luxury Van Rear View" 
-                  value={formData.altTag} 
-                  onChange={(e) => setFormData({ ...formData, altTag: e.target.value })} 
-                  required 
-                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white border-0 rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium" 
+                <input
+                  type="text"
+                  placeholder="e.g. Force Urbania Luxury Van Rear View"
+                  value={formData.altTag}
+                  onChange={(e) => setFormData({ ...formData, altTag: e.target.value })}
+                  required
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white border-0 rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium"
                 />
               </div>
 
@@ -642,29 +678,31 @@ export default function GalleryAdminPage() {
                 <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
                   Image File
                 </label>
-                
+
                 {uploadPreviewUrl && (
                   <div className="mb-3 p-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 flex items-center gap-3">
                     <div className="w-20 h-14 bg-white dark:bg-black rounded-lg overflow-hidden flex items-center justify-center shrink-0 border border-zinc-200/80 dark:border-zinc-800">
-                      <img src={uploadPreviewUrl} alt="Preview" className="object-contain w-full h-full" />
+                      <img
+                        src={uploadPreviewUrl}
+                        alt="Preview"
+                        className="object-contain w-full h-full"
+                      />
                     </div>
                     <div className="min-w-0">
                       <span className="text-[10px] font-mono uppercase text-teal-600 dark:text-teal-400 font-bold block">
                         File Selected
                       </span>
-                      <p className="text-[11px] text-zinc-500 truncate">
-                        {formData.file?.name}
-                      </p>
+                      <p className="text-[11px] text-zinc-500 truncate">{formData.file?.name}</p>
                     </div>
                   </div>
                 )}
 
                 <div className="border border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl p-4 text-center bg-zinc-50 dark:bg-zinc-900/60">
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={handleFileSelect} 
-                    className="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer" 
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer"
                   />
                 </div>
               </div>
@@ -677,9 +715,9 @@ export default function GalleryAdminPage() {
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
-                  disabled={loading} 
+                <button
+                  type="submit"
+                  disabled={loading}
                   className="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-lg text-xs uppercase tracking-wider active:scale-[0.98] shadow-xs cursor-pointer"
                 >
                   {loading ? 'Uploading...' : 'Upload Image'}
@@ -702,15 +740,15 @@ export default function GalleryAdminPage() {
                   Replace image file and update Google SEO alt tag
                 </span>
               </div>
-              <button 
+              <button
                 type="button"
-                onClick={closeEditModal} 
+                onClick={closeEditModal}
                 className="p-1 rounded-md text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5 stroke-[1.75]" />
               </button>
             </div>
-            
+
             <form onSubmit={handleUpdateImage} className="space-y-4 text-xs">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
@@ -726,15 +764,25 @@ export default function GalleryAdminPage() {
 
                 <div className="relative aspect-[16/10] w-full bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-xl overflow-hidden flex items-center justify-center border border-zinc-200/60 dark:border-zinc-800">
                   {editPreviewUrl ? (
-                    <img 
-                      src={editPreviewUrl} 
-                      alt="New selection preview" 
+                    <img
+                      src={editPreviewUrl}
+                      alt="New selection preview"
                       className="object-cover w-full h-full"
                     />
-                  ) : (editingImage.imagePath || editingImage.image_path || editingImage.image_url || editingImage.image || editingImage.url) ? (
-                    <img 
-                      src={editingImage.imagePath || editingImage.image_path || editingImage.image_url || editingImage.image || editingImage.url} 
-                      alt={editAltTag || 'Fleet Showcase Photo'} 
+                  ) : editingImage.imagePath ||
+                    editingImage.image_path ||
+                    editingImage.image_url ||
+                    editingImage.image ||
+                    editingImage.url ? (
+                    <img
+                      src={
+                        editingImage.imagePath ||
+                        editingImage.image_path ||
+                        editingImage.image_url ||
+                        editingImage.image ||
+                        editingImage.url
+                      }
+                      alt={editAltTag || 'Fleet Showcase Photo'}
                       className="object-cover w-full h-full"
                     />
                   ) : (
@@ -753,11 +801,11 @@ export default function GalleryAdminPage() {
                   <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27] hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium text-xs cursor-pointer transition-colors shadow-2xs">
                     <Upload className="w-3.5 h-3.5 stroke-[1.75] text-zinc-500 dark:text-zinc-400" />
                     <span>{editPreviewUrl ? 'Choose Different Photo' : 'Replace Photo'}</span>
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      onChange={handleEditFileSelect} 
-                      className="hidden" 
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleEditFileSelect}
+                      className="hidden"
                     />
                   </label>
 
@@ -781,13 +829,13 @@ export default function GalleryAdminPage() {
                 <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
                   Alt Tag Description
                 </label>
-                <textarea 
+                <textarea
                   rows={3}
-                  value={editAltTag} 
-                  onChange={(e) => setEditAltTag(e.target.value)} 
-                  required 
+                  value={editAltTag}
+                  onChange={(e) => setEditAltTag(e.target.value)}
+                  required
                   placeholder="Describe this fleet photo for search engine ranking..."
-                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white border-0 rounded-lg p-3 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium resize-none leading-relaxed" 
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white border-0 rounded-lg p-3 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium resize-none leading-relaxed"
                 />
               </div>
 
@@ -799,8 +847,8 @@ export default function GalleryAdminPage() {
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={isSubmitting}
                   className="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-lg text-xs uppercase tracking-wider active:scale-[0.98] shadow-xs cursor-pointer disabled:opacity-50"
                 >

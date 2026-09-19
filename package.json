@@ -1,0 +1,13 @@
+{
+  "name": "seo-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Root tooling for the SEO Dashboard monorepo (client + server)",
+  "scripts": {
+    "format": "prettier --write \"client/src/**/*.{js,jsx,json,css}\" \"server/src/**/*.js\" \"server/*.js\" \"*.json\" \".prettierrc\"",
+    "format:check": "prettier --check \"client/src/**/*.{js,jsx,json,css}\" \"server/src/**/*.js\" \"server/*.js\" \"*.json\" \".prettierrc\""
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  }
+}
