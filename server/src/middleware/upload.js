@@ -16,25 +16,36 @@ cloudinary.config({
 // showcase photos keep enough pixels for full-width display.
 const PRESETS = {
   avatar: { width: 256, height: 256, fit: "cover", quality: 80 },
+  social: {
+    width: 1200,
+    height: 630,
+    fit: "cover",
+    quality: 82,
+    withoutEnlargement: false,
+    formats: ["jpg", "jpeg", "png", "webp"],
+  },
   standard: { width: 1600, height: 1600, fit: "inside", quality: 82 },
 };
 
-const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webp"];
-const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+const DEFAULT_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webp"];
+const EXT_TO_MIME = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  gif: "image/gif",
+  webp: "image/webp",
+};
 
-const fileFilter = (req, file, cb) => {
+const fileFilterFor = (formats) => (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase().replace(".", "");
-  const isValidExt = ALLOWED_EXTENSIONS.includes(ext);
-  const isValidMime = ALLOWED_MIME_TYPES.includes(file.mimetype);
+  const allowed = formats || DEFAULT_EXTENSIONS;
+  const isValidExt = allowed.includes(ext);
+  const isValidMime = file.mimetype === EXT_TO_MIME[ext] && allowed.includes(ext);
 
   if (isValidExt && isValidMime) {
     cb(null, true);
   } else {
-    cb(
-      ApiError.badRequest(
-        "Invalid file type. Only JPG, JPEG, PNG, GIF, and WEBP images are allowed."
-      )
-    );
+    cb(ApiError.badRequest(`Invalid file type. Allowed: ${allowed.join(", ").toUpperCase()}.`));
   }
 };
 
@@ -45,7 +56,7 @@ const optimizeBuffer = async (buffer, mimetype, preset) => {
     width: preset.width,
     height: preset.height,
     fit: preset.fit,
-    withoutEnlargement: true,
+    withoutEnlargement: preset.withoutEnlargement ?? true,
   });
   if (mimetype === "image/png") return image.png({ compressionLevel: 8 }).toBuffer();
   if (mimetype === "image/webp") return image.webp({ quality: preset.quality }).toBuffer();
@@ -95,9 +106,10 @@ const createOptimizedStorage = (subfolder, presetName = "standard") => ({
 });
 
 const createUploader = (subfolder = "", preset = "standard") => {
+  const presetDef = PRESETS[preset] || PRESETS.standard;
   return multer({
     storage: createOptimizedStorage(subfolder, preset),
-    fileFilter,
+    fileFilter: fileFilterFor(presetDef.formats),
     limits: {
       fileSize: 5 * 1024 * 1024,
     },

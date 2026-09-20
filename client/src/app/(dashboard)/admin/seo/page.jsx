@@ -22,6 +22,10 @@ function SeoSettingsContent() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [ogFile, setOgFile] = useState(null);
+  const [twitterFile, setTwitterFile] = useState(null);
+  const [ogPreviewUrl, setOgPreviewUrl] = useState("");
+  const [twitterPreviewUrl, setTwitterPreviewUrl] = useState("");
   const [schemaSaving, setSchemaSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [savedMeta, setSavedMeta] = useState(null);
@@ -56,7 +60,11 @@ function SeoSettingsContent() {
     twitterDescription: "",
     twitterImage: "",
   });
-  const metaDirty = !savedMeta || JSON.stringify(formData) !== JSON.stringify(savedMeta);
+  const metaDirty =
+    !!ogFile ||
+    !!twitterFile ||
+    !savedMeta ||
+    JSON.stringify(formData) !== JSON.stringify(savedMeta);
 
   const [schemas, setSchemas] = useState([]);
   const [selectedSchema, setSelectedSchema] = useState(null);
@@ -109,6 +117,8 @@ function SeoSettingsContent() {
           ...seoRes.data.data,
         }));
         setSavedMeta({ ...seoRes.data.data });
+        setOgPreviewUrl(seoRes.data.data.ogImage || "");
+        setTwitterPreviewUrl(seoRes.data.data.twitterImage || "");
       }
 
       if (schemaRes.data?.data) {
@@ -147,9 +157,22 @@ function SeoSettingsContent() {
     setSaving(true);
 
     try {
-      const response = await api.put("/seo", formData);
+      const payload = new FormData();
+      for (const [key, value] of Object.entries(formData)) {
+        if (value !== undefined && value !== null) payload.append(key, value);
+      }
+      if (ogFile) payload.append("ogImageFile", ogFile);
+      if (twitterFile) payload.append("twitterImageFile", twitterFile);
+
+      const response = await api.put("/seo", payload);
       if (response.status === 200) {
-        setSavedMeta({ ...formData });
+        const saved = response.data?.data || {};
+        setFormData((prev) => ({ ...prev, ...saved }));
+        setSavedMeta({ ...formData, ...saved });
+        setOgPreviewUrl(saved.ogImage || formData.ogImage || "");
+        setTwitterPreviewUrl(saved.twitterImage || formData.twitterImage || "");
+        setOgFile(null);
+        setTwitterFile(null);
         showToast("success", "SEO configurations saved. Live <head> tags updated.");
       } else {
         showToast("error", response.data?.message || "Failed to save settings.");
@@ -654,6 +677,24 @@ function SeoSettingsContent() {
                   placeholder="https://res.cloudinary.com/..."
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
                 />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files[0] || null;
+                    setOgFile(file);
+                    setOgPreviewUrl((prev) => {
+                      if (prev && prev.startsWith("blob:")) URL.revokeObjectURL(prev);
+                      return file ? URL.createObjectURL(file) : formData.ogImage || "";
+                    });
+                  }}
+                  className="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer mt-2"
+                />
+                {ogFile && (
+                  <p className="text-[11px] font-mono text-teal-600 dark:text-teal-400 mt-1">
+                    New upload: {ogFile.name} (replaces the URL above on save)
+                  </p>
+                )}
               </div>
 
               <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
@@ -662,9 +703,9 @@ function SeoSettingsContent() {
                 </span>
                 <div className="rounded-xl overflow-hidden bg-[#f6f8fa] dark:bg-[#1a1e27]">
                   <div className="relative aspect-[1.91/1] w-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
-                    {formData.ogImage ? (
+                    {ogPreviewUrl ? (
                       <SafeImage
-                        src={formData.ogImage}
+                        src={ogPreviewUrl}
                         alt="OG Preview"
                         fill
                         sizes="(max-width: 768px) 90vw, 640px"
@@ -735,6 +776,24 @@ function SeoSettingsContent() {
                   placeholder="https://res.cloudinary.com/..."
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
                 />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files[0] || null;
+                    setTwitterFile(file);
+                    setTwitterPreviewUrl((prev) => {
+                      if (prev && prev.startsWith("blob:")) URL.revokeObjectURL(prev);
+                      return file ? URL.createObjectURL(file) : formData.twitterImage || "";
+                    });
+                  }}
+                  className="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer mt-2"
+                />
+                {twitterFile && (
+                  <p className="text-[11px] font-mono text-teal-600 dark:text-teal-400 mt-1">
+                    New upload: {twitterFile.name} (replaces the URL above on save)
+                  </p>
+                )}
               </div>
 
               <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
@@ -743,9 +802,9 @@ function SeoSettingsContent() {
                 </span>
                 <div className="rounded-xl overflow-hidden bg-[#f6f8fa] dark:bg-[#1a1e27]">
                   <div className="relative aspect-[2/1] w-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
-                    {formData.twitterImage || formData.ogImage ? (
+                    {twitterPreviewUrl || formData.ogImage ? (
                       <SafeImage
-                        src={formData.twitterImage || formData.ogImage}
+                        src={twitterPreviewUrl || formData.ogImage}
                         alt="Twitter Preview"
                         fill
                         sizes="(max-width: 768px) 90vw, 640px"
