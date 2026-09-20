@@ -303,7 +303,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5"
+                className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5"
               >
                 Email Address
               </label>
@@ -328,7 +328,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5"
+                className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5"
               >
                 Password
               </label>
@@ -380,10 +380,10 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-8 pt-4 border-t border-zinc-200/70 dark:border-zinc-800/60 space-y-1.5">
-            <p className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
+            <p className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
               Demo admin: admin@seodashboard.com / admin123
             </p>
-            <p className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
+            <p className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
               Demo editor: editor@seodashboard.com / editor123
             </p>
             <Link

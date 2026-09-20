@@ -48,6 +48,7 @@ function ContentManagementContent() {
   });
   const [heroFile, setHeroFile] = useState(null);
   const [heroPreview, setHeroPreview] = useState("");
+  const [savedHero, setSavedHero] = useState(null);
 
   const [aboutForm, setAboutForm] = useState({
     sectionTitle: "",
@@ -56,6 +57,7 @@ function ContentManagementContent() {
   });
   const [aboutFile, setAboutFile] = useState(null);
   const [aboutPreview, setAboutPreview] = useState("");
+  const [savedAbout, setSavedAbout] = useState(null);
 
   const [contactForm, setContactForm] = useState({
     phone: "",
@@ -63,6 +65,7 @@ function ContentManagementContent() {
     address: "",
     mapEmbed: "",
   });
+  const [savedContact, setSavedContact] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -86,6 +89,16 @@ function ContentManagementContent() {
             bannerImage: h.bannerImage || "",
           });
           setHeroPreview(h.bannerImage || "");
+          setSavedHero({
+            heading: h.heading || "",
+            subHeading: h.subHeading || "",
+            ctaText: h.ctaText || "",
+            ctaUrl: h.ctaUrl || "",
+            secondaryCtaText: h.secondaryCtaText || "",
+            secondaryCtaUrl: h.secondaryCtaUrl || "",
+            badgeText: h.badgeText || "",
+            bannerImage: h.bannerImage || "",
+          });
         }
 
         if (aboutRes.data?.data) {
@@ -96,11 +109,22 @@ function ContentManagementContent() {
             featuredImage: a.featuredImage || "",
           });
           setAboutPreview(a.featuredImage || "");
+          setSavedAbout({
+            sectionTitle: a.sectionTitle || "",
+            description: a.description || "",
+            featuredImage: a.featuredImage || "",
+          });
         }
 
         if (contactRes.data?.data) {
           const c = contactRes.data.data;
           setContactForm({
+            phone: c.phone || "",
+            email: c.email || "",
+            address: c.address || "",
+            mapEmbed: c.mapEmbed || "",
+          });
+          setSavedContact({
             phone: c.phone || "",
             email: c.email || "",
             address: c.address || "",
@@ -154,6 +178,11 @@ function ContentManagementContent() {
 
       const res = await api.put("/hero", formData);
       if (res.status === 200) {
+        setSavedHero({
+          ...heroForm,
+          bannerImage: heroFile ? res.data?.data?.bannerImage || heroForm.bannerImage : heroForm.bannerImage,
+        });
+        setHeroFile(null);
         showToast("success", "Hero section updated successfully.");
       }
     } catch (err) {
@@ -178,6 +207,13 @@ function ContentManagementContent() {
 
       const res = await api.put("/about", formData);
       if (res.status === 200) {
+        setSavedAbout({
+          ...aboutForm,
+          featuredImage: aboutFile
+            ? res.data?.data?.featuredImage || aboutForm.featuredImage
+            : aboutForm.featuredImage,
+        });
+        setAboutFile(null);
         showToast("success", "About section updated successfully.");
       }
     } catch (err) {
@@ -193,6 +229,7 @@ function ContentManagementContent() {
     try {
       const res = await api.put("/contact", contactForm);
       if (res.status === 200) {
+        setSavedContact({ ...contactForm });
         showToast("success", "Contact info updated successfully.");
       }
     } catch (err) {
@@ -201,6 +238,11 @@ function ContentManagementContent() {
       setLoading(false);
     }
   };
+
+  const isDirty = (current, saved) => !saved || JSON.stringify(current) !== JSON.stringify(saved);
+  const heroDirty = !!heroFile || isDirty(heroForm, savedHero);
+  const aboutDirty = !!aboutFile || isDirty(aboutForm, savedAbout);
+  const contactDirty = isDirty(contactForm, savedContact);
 
   const tabs = [
     { id: "hero", label: "Hero Section", icon: LayoutTemplate },
@@ -267,7 +309,7 @@ function ContentManagementContent() {
           <form onSubmit={handleHeroSubmit} className="space-y-4 text-xs">
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400">
                   Main Headline
                 </label>
                 <span className="text-[10px] font-mono text-zinc-400">
@@ -286,7 +328,7 @@ function ContentManagementContent() {
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400">
                   Sub Heading
                 </label>
                 <span className="text-[10px] font-mono text-zinc-400">
@@ -304,7 +346,7 @@ function ContentManagementContent() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   CTA Button Text
                 </label>
                 <input
@@ -317,7 +359,7 @@ function ContentManagementContent() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   CTA Target Link
                 </label>
                 <input
@@ -332,7 +374,7 @@ function ContentManagementContent() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Secondary Button Text
                 </label>
                 <input
@@ -345,7 +387,7 @@ function ContentManagementContent() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Secondary Target Link
                 </label>
                 <input
@@ -359,7 +401,7 @@ function ContentManagementContent() {
             </div>
 
             <div>
-              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                 Pill Badge Text
               </label>
               <input
@@ -372,7 +414,7 @@ function ContentManagementContent() {
             </div>
 
             <div>
-              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                 Banner Studio Photograph
               </label>
 
@@ -418,8 +460,8 @@ function ContentManagementContent() {
             <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/60 flex justify-end">
               <button
                 type="submit"
-                disabled={loading}
-                className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
+                disabled={loading || !heroDirty}
+                className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -456,7 +498,7 @@ function ContentManagementContent() {
 
           <form onSubmit={handleAboutSubmit} className="space-y-4 text-xs">
             <div>
-              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                 Section Title
               </label>
               <input
@@ -470,7 +512,7 @@ function ContentManagementContent() {
             </div>
 
             <div>
-              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                 Description
               </label>
               <textarea
@@ -484,7 +526,7 @@ function ContentManagementContent() {
             </div>
 
             <div>
-              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                 Featured Image
               </label>
 
@@ -530,8 +572,8 @@ function ContentManagementContent() {
             <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/60 flex justify-end">
               <button
                 type="submit"
-                disabled={loading}
-                className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
+                disabled={loading || !aboutDirty}
+                className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -569,7 +611,7 @@ function ContentManagementContent() {
           <form onSubmit={handleContactSubmit} className="space-y-4 text-xs">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Direct Phone / WhatsApp
                 </label>
                 <input
@@ -583,7 +625,7 @@ function ContentManagementContent() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Operations Email
                 </label>
                 <input
@@ -598,7 +640,7 @@ function ContentManagementContent() {
             </div>
 
             <div>
-              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                 Corporate Address
               </label>
               <textarea
@@ -612,7 +654,7 @@ function ContentManagementContent() {
             </div>
 
             <div>
-              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                 Google Map Embed URL / Iframe
               </label>
               <textarea
@@ -627,8 +669,8 @@ function ContentManagementContent() {
             <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/60 flex justify-end">
               <button
                 type="submit"
-                disabled={loading}
-                className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
+                disabled={loading || !contactDirty}
+                className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

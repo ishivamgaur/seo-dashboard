@@ -40,6 +40,15 @@ export default function TestimonialsAdminPage() {
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+  const [savedReview, setSavedReview] = useState(null);
+  const reviewSnapshot = () =>
+    JSON.stringify({
+      customerName: formData.customerName,
+      review: formData.review,
+      rating: formData.rating,
+      customerImage: formData.customerImage,
+    });
+  const reviewDirty = !!imageFile || !savedReview || reviewSnapshot() !== savedReview;
 
   const fetchTestimonials = async () => {
     try {
@@ -98,6 +107,18 @@ export default function TestimonialsAdminPage() {
     );
     setImageFile(null);
     setImagePreviewUrl(t?.customerImage || "");
+    setSavedReview(
+      JSON.stringify(
+        t
+          ? {
+              customerName: t.customerName || "",
+              review: t.review || "",
+              rating: t.rating || 5,
+              customerImage: t.customerImage || "",
+            }
+          : { customerName: "", review: "", rating: 5, customerImage: "" }
+      )
+    );
     setModalOpen(true);
   };
 
@@ -269,11 +290,11 @@ export default function TestimonialsAdminPage() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-500 dark:text-zinc-400 font-mono uppercase tracking-wider text-[11px]">
-                  <th className="px-5 py-3.5 w-60 whitespace-nowrap">Client</th>
-                  <th className="px-5 py-3.5 w-44 whitespace-nowrap">Rating</th>
-                  <th className="px-5 py-3.5">Review Feedback</th>
-                  <th className="px-5 py-3.5 w-28 whitespace-nowrap">Status</th>
-                  <th className="px-5 py-3.5 w-24 text-right whitespace-nowrap">Actions</th>
+                  <th className="px-3 sm:px-5 py-3.5 w-60 whitespace-nowrap">Client</th>
+                  <th className="px-3 sm:px-5 py-3.5 w-44 whitespace-nowrap">Rating</th>
+                  <th className="px-3 sm:px-5 py-3.5">Review Feedback</th>
+                  <th className="px-3 sm:px-5 py-3.5 w-28 whitespace-nowrap">Status</th>
+                  <th className="px-3 sm:px-5 py-3.5 w-24 text-right whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
@@ -287,7 +308,7 @@ export default function TestimonialsAdminPage() {
                       key={t.id}
                       className="text-zinc-900 dark:text-zinc-100 hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80 transition-colors"
                     >
-                      <td className="px-5 py-3.5 whitespace-nowrap">
+                      <td className="px-3 sm:px-5 py-3.5 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           <div className="relative w-9 h-9 rounded-full bg-[#f6f8fa] dark:bg-[#1a1e27] overflow-hidden flex items-center justify-center shrink-0 ring-1 ring-zinc-200/80 dark:ring-zinc-800">
                             {avatarSrc ? (
@@ -308,7 +329,7 @@ export default function TestimonialsAdminPage() {
                             <span className="font-semibold text-zinc-950 dark:text-white text-xs truncate">
                               {t.customerName}
                             </span>
-                            <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-normal flex items-center gap-1 mt-0.5">
+                            <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-normal flex items-center gap-1 mt-0.5">
                               <CheckCircle2 className="w-3 h-3 text-teal-600 dark:text-teal-400 stroke-[2]" />
                               <span>Verified Client</span>
                             </span>
@@ -316,7 +337,7 @@ export default function TestimonialsAdminPage() {
                         </div>
                       </td>
 
-                      <td className="px-5 py-3.5 whitespace-nowrap">
+                      <td className="px-3 sm:px-5 py-3.5 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <div className="flex items-center gap-0.5">
                             {[1, 2, 3, 4, 5].map((star) => (
@@ -336,7 +357,7 @@ export default function TestimonialsAdminPage() {
                         </div>
                       </td>
 
-                      <td className="px-5 py-3.5 text-zinc-600 dark:text-zinc-300 max-w-xl">
+                      <td className="px-3 sm:px-5 py-3.5 text-zinc-600 dark:text-zinc-300 max-w-xl">
                         <p
                           className="line-clamp-2 leading-relaxed text-xs font-normal"
                           title={t.review}
@@ -345,13 +366,13 @@ export default function TestimonialsAdminPage() {
                         </p>
                       </td>
 
-                      <td className="px-5 py-3.5 whitespace-nowrap">
+                      <td className="px-3 sm:px-5 py-3.5 whitespace-nowrap">
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
                           Published
                         </span>
                       </td>
 
-                      <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                      <td className="px-3 sm:px-5 py-3.5 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1">
                           <button
                             type="button"
@@ -436,7 +457,7 @@ export default function TestimonialsAdminPage() {
                       <span className="font-semibold text-zinc-950 dark:text-white text-xs truncate block">
                         {t.customerName}
                       </span>
-                      <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-normal flex items-center gap-1">
+                      <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-normal flex items-center gap-1">
                         <CheckCircle2 className="w-2.5 h-2.5 text-teal-600 dark:text-teal-400 stroke-[2]" />
                         <span>Verified Client</span>
                       </span>
@@ -467,7 +488,7 @@ export default function TestimonialsAdminPage() {
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 shadow-xl w-full max-w-md overflow-y-auto max-h-[90vh]">
+          <div className="bg-white dark:bg-[#13161c] rounded-xl p-4 sm:p-6 shadow-xl w-full max-w-md overflow-y-auto max-h-[90vh]">
             <div className="flex justify-between items-center mb-5 pb-3 border-b border-zinc-100 dark:border-zinc-800">
               <div>
                 <h2 className="text-lg font-bold text-zinc-950 dark:text-white">
@@ -488,7 +509,7 @@ export default function TestimonialsAdminPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Customer Name
                 </label>
                 <input
@@ -502,7 +523,7 @@ export default function TestimonialsAdminPage() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Rating: {formData.rating}.0 Stars
                 </label>
                 <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] w-fit">
@@ -530,7 +551,7 @@ export default function TestimonialsAdminPage() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Client Review Feedback
                 </label>
                 <textarea
@@ -544,7 +565,7 @@ export default function TestimonialsAdminPage() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Client Photo (Optional)
                 </label>
 
@@ -587,7 +608,7 @@ export default function TestimonialsAdminPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={saving}
+                  disabled={saving || !reviewDirty}
                   className="inline-flex items-center gap-2 px-5 py-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-70 text-white font-bold rounded-lg text-xs uppercase tracking-wider active:scale-[0.98] shadow-xs cursor-pointer"
                 >
                   {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}

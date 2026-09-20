@@ -69,7 +69,7 @@ export default function FilterSelect({ label, value, onChange, options = [], cla
       >
         <span className="truncate">{displayLabel}</span>
         <ChevronDown
-          className={`w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 stroke-[1.75] transition-transform duration-150 ${
+          className={`w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400 stroke-[1.75] transition-transform duration-150 ${
             isOpen ? "rotate-180 text-zinc-700 dark:text-zinc-300" : ""
           }`}
         />

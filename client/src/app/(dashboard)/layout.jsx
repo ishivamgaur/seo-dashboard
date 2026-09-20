@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 import Sidebar from "../../components/layout/Sidebar";
 import Header from "../../components/layout/Header";
 import { useAuth } from "../../context/AuthContext";
@@ -37,18 +38,30 @@ export default function DashboardLayout({ children }) {
         <Sidebar />
       </div>
 
-      {mobileSidebarOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex">
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
-            onClick={() => setMobileSidebarOpen(false)}
-            aria-hidden="true"
-          />
-          <div className="relative flex-1 flex flex-col max-w-xs w-full">
-            <Sidebar isOpen={true} onClose={() => setMobileSidebarOpen(false)} />
+      <AnimatePresence>
+        {mobileSidebarOpen && (
+          <div className="fixed inset-0 z-50 md:hidden flex">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs"
+              onClick={() => setMobileSidebarOpen(false)}
+              aria-hidden="true"
+            />
+            <motion.div
+              initial={{ x: "-50%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "-50%", opacity: 0 }}
+              transition={{ type: "tween", duration: 0.25, ease: "easeOut" }}
+              className="relative flex-1 flex flex-col max-w-[85vw] sm:max-w-sm w-full"
+            >
+              <Sidebar isOpen={true} onClose={() => setMobileSidebarOpen(false)} />
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header onMenuClick={() => setMobileSidebarOpen(true)} />

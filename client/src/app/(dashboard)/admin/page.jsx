@@ -142,7 +142,7 @@ export default function DashboardOverview() {
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
-                  <h3 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-medium">
+                  <h3 className="text-xs font-mono uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-medium">
                     {kpi.title}
                   </h3>
                   {loading ? (
@@ -304,7 +304,7 @@ export default function DashboardOverview() {
 
             <div className="space-y-2.5 text-xs font-sans">
               <div className="p-3.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27]">
-                <span className="text-zinc-400 dark:text-zinc-500 block text-[11px] font-mono uppercase tracking-wider font-medium">
+                <span className="text-zinc-500 dark:text-zinc-400 block text-[11px] font-mono uppercase tracking-wider font-medium">
                   Page Title
                 </span>
                 <p
@@ -316,7 +316,7 @@ export default function DashboardOverview() {
               </div>
 
               <div className="p-3.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27]">
-                <span className="text-zinc-400 dark:text-zinc-500 block text-[11px] font-mono uppercase tracking-wider font-medium">
+                <span className="text-zinc-500 dark:text-zinc-400 block text-[11px] font-mono uppercase tracking-wider font-medium">
                   Canonical URL
                 </span>
                 <p className="font-mono text-zinc-700 dark:text-zinc-300 mt-1.5 truncate text-[11px]">
@@ -325,7 +325,7 @@ export default function DashboardOverview() {
               </div>
 
               <div className="p-3.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27] flex items-center justify-between">
-                <span className="text-zinc-400 dark:text-zinc-500 text-[11px] font-mono uppercase tracking-wider font-medium">
+                <span className="text-zinc-500 dark:text-zinc-400 text-[11px] font-mono uppercase tracking-wider font-medium">
                   Search Robots
                 </span>
                 <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold text-[11px] bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded">

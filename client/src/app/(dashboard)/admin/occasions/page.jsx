@@ -34,6 +34,10 @@ export default function OccasionsPage() {
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+  const [savedOccasion, setSavedOccasion] = useState(null);
+  const occasionSnapshot = () =>
+    JSON.stringify({ title, description, imageUrl });
+  const occasionDirty = !!image || !savedOccasion || occasionSnapshot() !== savedOccasion;
 
   const fetchOccasions = async () => {
     try {
@@ -192,6 +196,9 @@ export default function OccasionsPage() {
 
   const openAddModal = () => {
     resetForm();
+    setSavedOccasion(
+      JSON.stringify({ title: "", description: "", imageUrl: "" })
+    );
     setIsModalOpen(true);
   };
 
@@ -202,6 +209,13 @@ export default function OccasionsPage() {
     setImage(null);
     setImageUrl(occasion.image || "");
     setImagePreviewUrl(occasion.image || "");
+    setSavedOccasion(
+      JSON.stringify({
+        title: occasion.title || "",
+        description: occasion.description || "",
+        imageUrl: occasion.image || "",
+      })
+    );
     setIsModalOpen(true);
   };
 
@@ -246,11 +260,11 @@ export default function OccasionsPage() {
         <div className="overflow-x-auto">
           <div className="min-w-[860px] w-full divide-y divide-zinc-100 dark:divide-zinc-800/80">
             <div className="grid grid-cols-[144px_144px_200px_minmax(0,1fr)_100px] items-center bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-500 dark:text-zinc-400 font-mono uppercase tracking-wider text-[11px]">
-              <div className="px-5 py-3.5 whitespace-nowrap">Drag / Order</div>
-              <div className="px-5 py-3.5">16:9 Banner</div>
-              <div className="px-5 py-3.5">Title</div>
-              <div className="px-5 py-3.5">Description</div>
-              <div className="px-5 py-3.5 text-right">Actions</div>
+              <div className="px-3 sm:px-5 py-3.5 whitespace-nowrap">Drag / Order</div>
+              <div className="px-3 sm:px-5 py-3.5">16:9 Banner</div>
+              <div className="px-3 sm:px-5 py-3.5">Title</div>
+              <div className="px-3 sm:px-5 py-3.5">Description</div>
+              <div className="px-3 sm:px-5 py-3.5 text-right">Actions</div>
             </div>
 
             {isLoading ? (
@@ -276,7 +290,7 @@ export default function OccasionsPage() {
                     key={o.id}
                     className="grid grid-cols-[144px_144px_200px_minmax(0,1fr)_100px] items-center text-xs text-zinc-900 dark:text-zinc-100 hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80 transition-colors"
                   >
-                    <div className="px-5 py-3.5 whitespace-nowrap">
+                    <div className="px-3 sm:px-5 py-3.5 whitespace-nowrap">
                       <div className="flex items-center gap-4">
                         <div className="p-1 text-zinc-300 dark:text-zinc-600">
                           <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
@@ -289,12 +303,12 @@ export default function OccasionsPage() {
                             <ArrowDown className="w-2.5 h-2.5 stroke-[2]" />
                           </span>
                         </div>
-                        <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
+                        <span className="font-mono text-xs tabular-nums font-semibold text-zinc-500 dark:text-zinc-400 w-5 text-center select-none">
                           {index + 1}
                         </span>
                       </div>
                     </div>
-                    <div className="px-5 py-3.5">
+                    <div className="px-3 sm:px-5 py-3.5">
                       <div className="relative w-28 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                         {o.image ? (
                           <SafeImage
@@ -309,10 +323,10 @@ export default function OccasionsPage() {
                         )}
                       </div>
                     </div>
-                    <div className="px-5 py-3.5 font-bold text-zinc-950 dark:text-white truncate">
+                    <div className="px-3 sm:px-5 py-3.5 font-bold text-zinc-950 dark:text-white truncate">
                       <span title={o.title}>{o.title}</span>
                     </div>
-                    <div className="px-5 py-3.5 min-w-0 overflow-hidden">
+                    <div className="px-3 sm:px-5 py-3.5 min-w-0 overflow-hidden">
                       <p
                         className="text-zinc-600 dark:text-zinc-300 line-clamp-2 leading-relaxed text-xs break-words overflow-hidden"
                         title={o.description}
@@ -320,7 +334,7 @@ export default function OccasionsPage() {
                         {o.description}
                       </p>
                     </div>
-                    <div className="px-5 py-3.5 text-right whitespace-nowrap">
+                    <div className="px-3 sm:px-5 py-3.5 text-right whitespace-nowrap">
                       <button
                         type="button"
                         onClick={() => openEditModal(o)}
@@ -366,7 +380,7 @@ export default function OccasionsPage() {
                                     : "hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80"
                                 }`}
                               >
-                                <div className="px-5 py-3.5 whitespace-nowrap">
+                                <div className="px-3 sm:px-5 py-3.5 whitespace-nowrap">
                                   <div className="flex items-center gap-4">
                                     <button
                                       type="button"
@@ -409,13 +423,13 @@ export default function OccasionsPage() {
                                       </button>
                                     </div>
 
-                                    <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
+                                    <span className="font-mono text-xs tabular-nums font-semibold text-zinc-500 dark:text-zinc-400 w-5 text-center select-none">
                                       {index + 1}
                                     </span>
                                   </div>
                                 </div>
 
-                                <div className="px-5 py-3.5">
+                                <div className="px-3 sm:px-5 py-3.5">
                                   <div className="relative w-28 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                                     {o.image ? (
                                       <SafeImage
@@ -431,11 +445,11 @@ export default function OccasionsPage() {
                                   </div>
                                 </div>
 
-                                <div className="px-5 py-3.5 font-bold text-zinc-950 dark:text-white truncate">
+                                <div className="px-3 sm:px-5 py-3.5 font-bold text-zinc-950 dark:text-white truncate">
                                   <span title={o.title}>{o.title}</span>
                                 </div>
 
-                                <div className="px-5 py-3.5 min-w-0 overflow-hidden">
+                                <div className="px-3 sm:px-5 py-3.5 min-w-0 overflow-hidden">
                                   <p
                                     className="text-zinc-600 dark:text-zinc-300 line-clamp-2 leading-relaxed text-xs break-words overflow-hidden"
                                     title={o.description}
@@ -444,7 +458,7 @@ export default function OccasionsPage() {
                                   </p>
                                 </div>
 
-                                <div className="px-5 py-3.5 text-right whitespace-nowrap">
+                                <div className="px-3 sm:px-5 py-3.5 text-right whitespace-nowrap">
                                   <button
                                     type="button"
                                     onClick={() => openEditModal(o)}
@@ -475,13 +489,13 @@ export default function OccasionsPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="bg-white dark:bg-[#13161c] rounded-2xl p-6 shadow-2xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
+          <div className="bg-white dark:bg-[#13161c] rounded-2xl p-4 sm:p-6 shadow-2xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
             <div className="flex justify-between items-center mb-5 pb-3">
               <div>
                 <h2 className="text-base font-bold text-zinc-950 dark:text-white">
                   {editingOccasion ? "Edit Service Occasion" : "Add Service Occasion"}
                 </h2>
-                <span className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
+                <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
                   Widescreen 16:9 banner displays without cropping
                 </span>
               </div>
@@ -496,7 +510,7 @@ export default function OccasionsPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Occasion Title
                 </label>
                 <input
@@ -510,7 +524,7 @@ export default function OccasionsPage() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Description
                 </label>
                 <textarea
@@ -524,7 +538,7 @@ export default function OccasionsPage() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Banner Image (16:9 Aspect Ratio)
                 </label>
 
@@ -577,7 +591,7 @@ export default function OccasionsPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={saving}
+                  disabled={saving || !occasionDirty}
                   className="inline-flex items-center gap-2 px-5 py-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-70 text-white font-semibold rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
                 >
                   {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}

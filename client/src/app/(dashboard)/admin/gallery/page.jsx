@@ -42,6 +42,9 @@ export default function GalleryAdminPage() {
   const [uploadPreviewUrl, setUploadPreviewUrl] = useState("");
   const [editAltTag, setEditAltTag] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [savedEdit, setSavedEdit] = useState(null);
+  const editDirty =
+    !!editImageFile || !savedEdit || editAltTag !== savedEdit;
   const [deletingId, setDeletingId] = useState(null);
   const [error, setError] = useState(null);
 
@@ -91,6 +94,7 @@ export default function GalleryAdminPage() {
   const openEditModal = (img) => {
     setEditingImage(img);
     setEditAltTag(img.altTag || img.alt_tag || "");
+    setSavedEdit(img.altTag || img.alt_tag || "");
     setEditImageFile(null);
     setEditPreviewUrl("");
     setEditModalOpen(true);
@@ -334,10 +338,10 @@ export default function GalleryAdminPage() {
           <div className="overflow-x-auto">
             <div className="min-w-[650px]">
               <div className="grid grid-cols-[144px_144px_minmax(0,1fr)_100px] items-center bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-500 dark:text-zinc-400 font-mono uppercase tracking-wider text-[11px] border-b border-zinc-100 dark:border-zinc-800/80">
-                <div className="px-5 py-3.5 whitespace-nowrap">Drag / Order</div>
-                <div className="px-5 py-3.5">Thumbnail</div>
-                <div className="px-5 py-3.5">SEO Alt Tag Description</div>
-                <div className="px-5 py-3.5 text-right">Actions</div>
+                <div className="px-3 sm:px-5 py-3.5 whitespace-nowrap">Drag / Order</div>
+                <div className="px-3 sm:px-5 py-3.5">Thumbnail</div>
+                <div className="px-3 sm:px-5 py-3.5">SEO Alt Tag Description</div>
+                <div className="px-3 sm:px-5 py-3.5 text-right">Actions</div>
               </div>
 
               {!isMounted ? (
@@ -351,7 +355,7 @@ export default function GalleryAdminPage() {
                         key={img.id}
                         className="grid grid-cols-[144px_144px_minmax(0,1fr)_100px] items-center text-xs text-zinc-900 dark:text-zinc-100 hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80 transition-colors"
                       >
-                        <div className="px-5 py-3.5 whitespace-nowrap">
+                        <div className="px-3 sm:px-5 py-3.5 whitespace-nowrap">
                           <div className="flex items-center gap-4">
                             <div className="p-1 text-zinc-300 dark:text-zinc-600">
                               <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
@@ -364,12 +368,12 @@ export default function GalleryAdminPage() {
                                 <ArrowDown className="w-2.5 h-2.5 stroke-[2]" />
                               </span>
                             </div>
-                            <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
+                            <span className="font-mono text-xs tabular-nums font-semibold text-zinc-500 dark:text-zinc-400 w-5 text-center select-none">
                               {index + 1}
                             </span>
                           </div>
                         </div>
-                        <div className="px-5 py-3.5">
+                        <div className="px-3 sm:px-5 py-3.5">
                           <div className="relative w-24 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                             {src ? (
                               <SafeImage
@@ -384,12 +388,12 @@ export default function GalleryAdminPage() {
                             )}
                           </div>
                         </div>
-                        <div className="px-5 py-3.5 font-medium text-zinc-950 dark:text-white min-w-0 pr-4">
+                        <div className="px-3 sm:px-5 py-3.5 font-medium text-zinc-950 dark:text-white min-w-0 pr-4">
                           <span className="truncate block" title={alt}>
                             {alt}
                           </span>
                         </div>
-                        <div className="px-5 py-3.5 text-right whitespace-nowrap">
+                        <div className="px-3 sm:px-5 py-3.5 text-right whitespace-nowrap">
                           <button
                             type="button"
                             onClick={() => openEditModal(img)}
@@ -444,7 +448,7 @@ export default function GalleryAdminPage() {
                                       : "hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80"
                                   }`}
                                 >
-                                  <div className="px-5 py-3.5 whitespace-nowrap">
+                                  <div className="px-3 sm:px-5 py-3.5 whitespace-nowrap">
                                     <div className="flex items-center gap-4">
                                       <button
                                         type="button"
@@ -487,13 +491,13 @@ export default function GalleryAdminPage() {
                                         </button>
                                       </div>
 
-                                      <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
+                                      <span className="font-mono text-xs tabular-nums font-semibold text-zinc-500 dark:text-zinc-400 w-5 text-center select-none">
                                         {index + 1}
                                       </span>
                                     </div>
                                   </div>
 
-                                  <div className="px-5 py-3.5">
+                                  <div className="px-3 sm:px-5 py-3.5">
                                     <div className="relative w-24 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                                       {src ? (
                                         <SafeImage
@@ -509,13 +513,13 @@ export default function GalleryAdminPage() {
                                     </div>
                                   </div>
 
-                                  <div className="px-5 py-3.5 font-medium text-zinc-950 dark:text-white min-w-0 pr-4">
+                                  <div className="px-3 sm:px-5 py-3.5 font-medium text-zinc-950 dark:text-white min-w-0 pr-4">
                                     <span className="truncate block" title={alt}>
                                       {alt}
                                     </span>
                                   </div>
 
-                                  <div className="px-5 py-3.5 text-right whitespace-nowrap">
+                                  <div className="px-3 sm:px-5 py-3.5 text-right whitespace-nowrap">
                                     <button
                                       type="button"
                                       onClick={() => openEditModal(img)}
@@ -577,7 +581,7 @@ export default function GalleryAdminPage() {
 
                 <div className="p-4 flex flex-col gap-3 flex-1 justify-between">
                   <div>
-                    <span className="text-[10px] font-mono uppercase tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 block mb-1">
+                    <span className="text-[10px] font-mono uppercase tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 block mb-1">
                       Alt Tag SEO
                     </span>
                     <p
@@ -638,7 +642,7 @@ export default function GalleryAdminPage() {
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 shadow-xl w-full max-w-md">
+          <div className="bg-white dark:bg-[#13161c] rounded-xl p-4 sm:p-6 shadow-xl w-full max-w-md">
             <div className="flex justify-between items-center mb-5 pb-3 border-b border-zinc-100 dark:border-zinc-800">
               <div>
                 <h2 className="text-lg font-bold text-zinc-950 dark:text-white">
@@ -665,7 +669,7 @@ export default function GalleryAdminPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   SEO Alt Tag Description
                 </label>
                 <input
@@ -679,7 +683,7 @@ export default function GalleryAdminPage() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Image File
                 </label>
 
@@ -722,7 +726,7 @@ export default function GalleryAdminPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={uploading}
+                  disabled={uploading || !formData.file}
                   className="inline-flex items-center gap-2 px-5 py-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-70 text-white font-bold rounded-lg text-xs uppercase tracking-wider active:scale-[0.98] shadow-xs cursor-pointer"
                 >
                   {uploading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
@@ -736,7 +740,7 @@ export default function GalleryAdminPage() {
 
       {editModalOpen && editingImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 shadow-xl w-full max-w-md">
+          <div className="bg-white dark:bg-[#13161c] rounded-xl p-4 sm:p-6 shadow-xl w-full max-w-md">
             <div className="flex justify-between items-center mb-5 pb-3 border-b border-zinc-100 dark:border-zinc-800">
               <div>
                 <h2 className="text-lg font-bold text-zinc-950 dark:text-white">
@@ -758,7 +762,7 @@ export default function GalleryAdminPage() {
             <form onSubmit={handleUpdateImage} className="space-y-4 text-xs">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500">
+                  <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400">
                     Photo Preview
                   </label>
                   {editPreviewUrl && (
@@ -835,7 +839,7 @@ export default function GalleryAdminPage() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Alt Tag Description
                 </label>
                 <textarea
@@ -858,7 +862,7 @@ export default function GalleryAdminPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !editDirty}
                   className="inline-flex items-center gap-2 px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-lg text-xs uppercase tracking-wider active:scale-[0.98] shadow-xs cursor-pointer disabled:opacity-50"
                 >
                   {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}

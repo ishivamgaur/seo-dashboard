@@ -38,6 +38,10 @@ export default function VehiclesPage() {
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+  const [savedVehicle, setSavedVehicle] = useState(null);
+  const vehicleSnapshot = () =>
+    JSON.stringify({ vehicleName, seatingCapacity, description, features, imageUrl });
+  const vehicleDirty = !!image || !savedVehicle || vehicleSnapshot() !== savedVehicle;
 
   const fetchVehicles = async () => {
     try {
@@ -212,6 +216,15 @@ export default function VehiclesPage() {
 
   const openAddModal = () => {
     resetForm();
+    setSavedVehicle(
+      JSON.stringify({
+        vehicleName: "",
+        seatingCapacity: "",
+        description: "",
+        features: "",
+        imageUrl: "",
+      })
+    );
     setIsModalOpen(true);
   };
 
@@ -229,6 +242,15 @@ export default function VehiclesPage() {
     setImage(null);
     setImageUrl(v.image || "");
     setImagePreviewUrl(v.image || "");
+    setSavedVehicle(
+      JSON.stringify({
+        vehicleName: v.vehicleName || "",
+        seatingCapacity: v.seatingCapacity?.toString() || "",
+        description: v.description || "",
+        features: featList,
+        imageUrl: v.image || "",
+      })
+    );
     setIsModalOpen(true);
   };
 
@@ -287,12 +309,12 @@ export default function VehiclesPage() {
         <div className="overflow-x-auto">
           <div className="min-w-[850px]">
             <div className="grid grid-cols-[144px_120px_220px_120px_minmax(0,1fr)_100px] items-center bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-500 dark:text-zinc-400 font-mono uppercase tracking-wider text-[11px] border-b border-zinc-100 dark:border-zinc-800/80">
-              <div className="px-5 py-3.5 whitespace-nowrap">Drag / Order</div>
-              <div className="px-5 py-3.5">Preview</div>
-              <div className="px-5 py-3.5">Vehicle Model</div>
-              <div className="px-5 py-3.5">Capacity</div>
-              <div className="px-5 py-3.5">Features</div>
-              <div className="px-5 py-3.5 text-right">Actions</div>
+              <div className="px-3 sm:px-5 py-3.5 whitespace-nowrap">Drag / Order</div>
+              <div className="px-3 sm:px-5 py-3.5">Preview</div>
+              <div className="px-3 sm:px-5 py-3.5">Vehicle Model</div>
+              <div className="px-3 sm:px-5 py-3.5">Capacity</div>
+              <div className="px-3 sm:px-5 py-3.5">Features</div>
+              <div className="px-3 sm:px-5 py-3.5 text-right">Actions</div>
             </div>
 
             {isLoading ? (
@@ -325,7 +347,7 @@ export default function VehiclesPage() {
                       key={v.id}
                       className="grid grid-cols-[144px_120px_220px_120px_minmax(0,1fr)_100px] items-center text-xs text-zinc-900 dark:text-zinc-100 hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80 transition-colors"
                     >
-                      <div className="px-5 py-3.5 whitespace-nowrap">
+                      <div className="px-3 sm:px-5 py-3.5 whitespace-nowrap">
                         <div className="flex items-center gap-4">
                           <div className="p-1 text-zinc-300 dark:text-zinc-600">
                             <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
@@ -338,12 +360,12 @@ export default function VehiclesPage() {
                               <ArrowDown className="w-2.5 h-2.5 stroke-[2]" />
                             </span>
                           </div>
-                          <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
+                          <span className="font-mono text-xs tabular-nums font-semibold text-zinc-500 dark:text-zinc-400 w-5 text-center select-none">
                             {index + 1}
                           </span>
                         </div>
                       </div>
-                      <div className="px-5 py-3.5">
+                      <div className="px-3 sm:px-5 py-3.5">
                         <div className="relative w-20 h-12 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                           {v.image ? (
                             <Image
@@ -358,13 +380,13 @@ export default function VehiclesPage() {
                           )}
                         </div>
                       </div>
-                      <div className="px-5 py-3.5 font-bold text-zinc-950 dark:text-white truncate">
+                      <div className="px-3 sm:px-5 py-3.5 font-bold text-zinc-950 dark:text-white truncate">
                         {v.vehicleName}
                       </div>
-                      <div className="px-5 py-3.5 font-mono tabular-nums font-semibold">
+                      <div className="px-3 sm:px-5 py-3.5 font-mono tabular-nums font-semibold">
                         {v.seatingCapacity} Seats
                       </div>
-                      <div className="px-5 py-3.5">
+                      <div className="px-3 sm:px-5 py-3.5">
                         <div className="flex flex-wrap gap-1 max-w-sm">
                           {featArray.slice(0, 3).map((feat, idx) => (
                             <span
@@ -381,7 +403,7 @@ export default function VehiclesPage() {
                           )}
                         </div>
                       </div>
-                      <div className="px-5 py-3.5 text-right whitespace-nowrap">
+                      <div className="px-3 sm:px-5 py-3.5 text-right whitespace-nowrap">
                         <button
                           type="button"
                           onClick={() => openEditModal(v)}
@@ -434,7 +456,7 @@ export default function VehiclesPage() {
                                     : "hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80"
                                 }`}
                               >
-                                <div className="px-5 py-3.5 whitespace-nowrap">
+                                <div className="px-3 sm:px-5 py-3.5 whitespace-nowrap">
                                   <div className="flex items-center gap-4">
                                     <button
                                       type="button"
@@ -477,13 +499,13 @@ export default function VehiclesPage() {
                                       </button>
                                     </div>
 
-                                    <span className="font-mono text-xs tabular-nums font-semibold text-zinc-400 dark:text-zinc-500 w-5 text-center select-none">
+                                    <span className="font-mono text-xs tabular-nums font-semibold text-zinc-500 dark:text-zinc-400 w-5 text-center select-none">
                                       {index + 1}
                                     </span>
                                   </div>
                                 </div>
 
-                                <div className="px-5 py-3.5">
+                                <div className="px-3 sm:px-5 py-3.5">
                                   <div className="relative w-20 h-12 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                                     {v.image ? (
                                       <Image
@@ -499,7 +521,7 @@ export default function VehiclesPage() {
                                   </div>
                                 </div>
 
-                                <div className="px-5 py-3.5 font-bold text-zinc-950 dark:text-white truncate">
+                                <div className="px-3 sm:px-5 py-3.5 font-bold text-zinc-950 dark:text-white truncate">
                                   <div className="flex items-center gap-2">
                                     <span>{v.vehicleName}</span>
                                     <span className="text-[10px] font-mono font-semibold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/50 px-1.5 py-0.5 rounded">
@@ -508,11 +530,11 @@ export default function VehiclesPage() {
                                   </div>
                                 </div>
 
-                                <div className="px-5 py-3.5 font-mono tabular-nums font-semibold">
+                                <div className="px-3 sm:px-5 py-3.5 font-mono tabular-nums font-semibold">
                                   {v.seatingCapacity} Seats
                                 </div>
 
-                                <div className="px-5 py-3.5">
+                                <div className="px-3 sm:px-5 py-3.5">
                                   <div className="flex flex-wrap gap-1 max-w-sm">
                                     {featArray.slice(0, 3).map((feat, idx) => (
                                       <span
@@ -530,7 +552,7 @@ export default function VehiclesPage() {
                                   </div>
                                 </div>
 
-                                <div className="px-5 py-3.5 text-right whitespace-nowrap">
+                                <div className="px-3 sm:px-5 py-3.5 text-right whitespace-nowrap">
                                   <button
                                     type="button"
                                     onClick={() => openEditModal(v)}
@@ -561,13 +583,13 @@ export default function VehiclesPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="bg-white dark:bg-[#13161c] rounded-2xl p-6 shadow-2xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
+          <div className="bg-white dark:bg-[#13161c] rounded-2xl p-4 sm:p-6 shadow-2xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
             <div className="flex justify-between items-center mb-5 pb-3">
               <div>
                 <h2 className="text-base font-bold text-zinc-950 dark:text-white">
                   {editingVehicle ? "Edit Vehicle Listing" : "Add Vehicle to Fleet"}
                 </h2>
-                <span className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
+                <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
                   Fill details and upload high-res photo for the showroom
                 </span>
               </div>
@@ -582,7 +604,7 @@ export default function VehiclesPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Vehicle Name
                 </label>
                 <input
@@ -597,7 +619,7 @@ export default function VehiclesPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                     Seating Capacity
                   </label>
                   <input
@@ -612,7 +634,7 @@ export default function VehiclesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                     Permit / Category
                   </label>
                   <input
@@ -625,7 +647,7 @@ export default function VehiclesPage() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Description
                 </label>
                 <textarea
@@ -639,7 +661,7 @@ export default function VehiclesPage() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Features (Comma Separated)
                 </label>
                 <input
@@ -652,7 +674,7 @@ export default function VehiclesPage() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Vehicle Image
                 </label>
 
@@ -705,7 +727,7 @@ export default function VehiclesPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={saving}
+                  disabled={saving || !vehicleDirty}
                   className="inline-flex items-center gap-2 px-5 py-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-70 text-white font-semibold rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
                 >
                   {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}

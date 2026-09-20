@@ -32,7 +32,9 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(256);
   const [isDragging, setIsDragging] = useState(false);
-  const [transitionsReady, setTransitionsReady] = useState(false);
+  const [allowAnimate, setAllowAnimate] = useState(false);
+  const [animateClose, setAnimateClose] = useState(false);
+  const closing = allowAnimate && !isDragging && animateClose;
 
   const isDraggingRef = useRef(false);
   const dragStartXRef = useRef(0);
@@ -44,6 +46,11 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
   useEffect(() => {
     isCollapsedRef.current = isCollapsed;
   }, [isCollapsed]);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setAllowAnimate(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   useEffect(() => {
     sidebarWidthRef.current = sidebarWidth;
@@ -63,21 +70,16 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
           setSidebarWidth(parsed);
         }
       }
-      // arm transitions only after first paint so the restored
-      // width applies instantly instead of animating on reload
-      const frame = requestAnimationFrame(() => setTransitionsReady(true));
-      return () => cancelAnimationFrame(frame);
     } catch {}
   }, []);
 
   const toggleCollapse = () => {
-    setIsCollapsed((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem("admin_sidebar_collapsed", String(next));
-      } catch {}
-      return next;
-    });
+    const next = !isCollapsedRef.current;
+    setAnimateClose(next);
+    setIsCollapsed(next);
+    try {
+      localStorage.setItem("admin_sidebar_collapsed", String(next));
+    } catch {}
   };
 
   const handleMouseDown = (e) => {
@@ -101,6 +103,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
       const targetWidth = dragStartWidthRef.current + deltaX;
 
       if (targetWidth < 140) {
+        setAnimateClose(false);
         setIsCollapsed(true);
         isCollapsedRef.current = true;
       } else {
@@ -149,9 +152,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
     <aside
       style={{ width: collapsed ? 68 : sidebarWidth }}
       className={`relative bg-white dark:bg-[#0c0d10] text-zinc-900 dark:text-zinc-100 flex flex-col h-full border-r border-zinc-200/90 dark:border-zinc-800/80 shadow-xs shrink-0 select-none ${
-        isDragging || !transitionsReady
-          ? "transition-none"
-          : "transition-[width] duration-300 ease-in-out"
+        closing ? "transition-[width] duration-300 ease-in-out" : "transition-none"
       }`}
     >
       {!onClose && (
@@ -218,7 +219,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
       <nav className={`flex-1 overflow-y-auto ${collapsed ? "py-2" : "py-4"}`}>
         {!collapsed && (
           <div className="px-4 mb-2 flex items-center">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-semibold">
               Operations
             </span>
           </div>
@@ -276,7 +277,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
       <div
         className={`${
           collapsed ? "py-3 justify-center" : "p-4 justify-between"
-        } border-t border-zinc-200/90 dark:border-zinc-800/80 flex items-center text-[11px] font-mono text-zinc-400 dark:text-zinc-500 shrink-0`}
+        } border-t border-zinc-200/90 dark:border-zinc-800/80 flex items-center text-[11px] font-mono text-zinc-500 dark:text-zinc-400 shrink-0`}
       >
         {collapsed ? (
           <span className="text-[10px]">v2.0</span>

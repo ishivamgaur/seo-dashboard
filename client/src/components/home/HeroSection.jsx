@@ -36,7 +36,7 @@ const HeroSection = ({ data }) => {
         <path d="M0,52 C360,96 1080,96 1440,52 L1440,100 L0,100 Z" fill="currentColor" />
       </svg>
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-32 sm:py-44 md:py-56">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-32 md:py-44 lg:py-56">
         <Reveal className="max-w-xl">
           {badgeText && (
             <span className="inline-block text-xs font-mono text-teal-300 bg-teal-950/60 border border-teal-800/60 px-2.5 py-0.5 rounded font-semibold">

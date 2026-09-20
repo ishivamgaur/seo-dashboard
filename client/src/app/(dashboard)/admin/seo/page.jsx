@@ -24,6 +24,7 @@ function SeoSettingsContent() {
   const [copied, setCopied] = useState(false);
   const [schemaSaving, setSchemaSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [savedMeta, setSavedMeta] = useState(null);
 
   useEffect(() => {
     const currentTabInUrl = searchParams.get("tab");
@@ -55,6 +56,7 @@ function SeoSettingsContent() {
     twitterDescription: "",
     twitterImage: "",
   });
+  const metaDirty = !savedMeta || JSON.stringify(formData) !== JSON.stringify(savedMeta);
 
   const [schemas, setSchemas] = useState([]);
   const [selectedSchema, setSelectedSchema] = useState(null);
@@ -106,6 +108,7 @@ function SeoSettingsContent() {
           ...prev,
           ...seoRes.data.data,
         }));
+        setSavedMeta({ ...seoRes.data.data });
       }
 
       if (schemaRes.data?.data) {
@@ -146,6 +149,7 @@ function SeoSettingsContent() {
     try {
       const response = await api.put("/seo", formData);
       if (response.status === 200) {
+        setSavedMeta({ ...formData });
         showToast("success", "SEO configurations saved. Live <head> tags updated.");
       } else {
         showToast("error", response.data?.message || "Failed to save settings.");
@@ -318,9 +322,29 @@ function SeoSettingsContent() {
     }
   };
 
+  const [savedSchemaSig, setSavedSchemaSig] = useState(null);
+  const schemaSignature = (type = schemaType) =>
+    JSON.stringify({
+      schemaType: type,
+      orgName,
+      legalName,
+      siteUrl,
+      logoUrl,
+      telephone,
+      streetAddress,
+      addressLocality,
+      addressRegion,
+      postalCode,
+      priceRange,
+      faqItems,
+      breadcrumbItems,
+    });
+  const schemaDirty = !savedSchemaSig || schemaSignature() !== savedSchemaSig;
+
   const openCreateSchemaModal = () => {
     setEditingSchema(null);
     setSchemaType("organization");
+    setSavedSchemaSig(schemaSignature("organization"));
     setIsSchemaModalOpen(true);
   };
 
@@ -400,7 +424,7 @@ function SeoSettingsContent() {
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500">
+                  <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400">
                     Meta Title
                   </label>
                   <span
@@ -423,7 +447,7 @@ function SeoSettingsContent() {
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500">
+                  <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400">
                     Meta Description
                   </label>
                   <span
@@ -445,7 +469,7 @@ function SeoSettingsContent() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Canonical URL
                 </label>
                 <input
@@ -459,7 +483,7 @@ function SeoSettingsContent() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Focus Keywords
                 </label>
                 <input
@@ -568,8 +592,8 @@ function SeoSettingsContent() {
           <div className="flex justify-end">
             <button
               type="submit"
-              disabled={saving}
-              className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
+              disabled={saving || !metaDirty}
+              className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -591,7 +615,7 @@ function SeoSettingsContent() {
               </h2>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   og:title
                 </label>
                 <input
@@ -605,7 +629,7 @@ function SeoSettingsContent() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   og:description
                 </label>
                 <textarea
@@ -619,7 +643,7 @@ function SeoSettingsContent() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   og:image URL
                 </label>
                 <input
@@ -672,7 +696,7 @@ function SeoSettingsContent() {
               </h2>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   twitter:title
                 </label>
                 <input
@@ -686,7 +710,7 @@ function SeoSettingsContent() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   twitter:description
                 </label>
                 <textarea
@@ -700,7 +724,7 @@ function SeoSettingsContent() {
               </div>
 
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   twitter:image URL
                 </label>
                 <input
@@ -751,8 +775,8 @@ function SeoSettingsContent() {
           <div className="flex justify-end">
             <button
               type="submit"
-              disabled={saving}
-              className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
+              disabled={saving || !metaDirty}
+              className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -835,14 +859,14 @@ function SeoSettingsContent() {
               })}
             </div>
 
-            <div className="md:col-span-7 bg-white dark:bg-[#13161c] rounded-xl p-6 shadow-xs flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-4">
-                  <span className="font-mono text-xs uppercase font-bold text-teal-600 dark:text-teal-400">
+            <div className="md:col-span-7 bg-white dark:bg-[#13161c] rounded-xl p-4 sm:p-6 shadow-xs flex flex-col justify-between min-w-0">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-4">
+                  <span className="font-mono text-xs uppercase font-bold text-teal-600 dark:text-teal-400 truncate min-w-0 flex-1">
                     {selectedSchema?.schemaType?.replace("_", " ") || "Schema"} JSON-LD Markup
                   </span>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
                       onClick={handleCopySchema}
@@ -867,7 +891,7 @@ function SeoSettingsContent() {
                   </div>
                 </div>
 
-                <pre className="p-4 rounded-xl bg-zinc-900 text-zinc-100 font-mono text-[11px] overflow-x-auto max-h-96 leading-relaxed">
+                <pre className="p-3 sm:p-4 rounded-xl bg-zinc-900 text-zinc-100 font-mono text-[11px] overflow-auto max-w-full max-h-96 leading-relaxed">
                   {selectedSchema?.schemaData
                     ? typeof selectedSchema.schemaData === "string"
                       ? JSON.stringify(JSON.parse(selectedSchema.schemaData), null, 2)
@@ -886,7 +910,7 @@ function SeoSettingsContent() {
 
       {isSchemaModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 shadow-xl w-full max-w-xl overflow-y-auto max-h-[90vh]">
+          <div className="bg-white dark:bg-[#13161c] rounded-xl p-4 sm:p-6 shadow-xl w-full max-w-xl overflow-y-auto max-h-[90vh]">
             <div className="flex justify-between items-center mb-5 pb-3 border-b border-zinc-100 dark:border-zinc-800">
               <div>
                 <h2 className="text-lg font-bold text-zinc-950 dark:text-white">
@@ -907,7 +931,7 @@ function SeoSettingsContent() {
 
             <form onSubmit={handleSaveSchema} className="space-y-4 text-xs">
               <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                   Supported Schema Type
                 </label>
                 <select
@@ -926,7 +950,7 @@ function SeoSettingsContent() {
               {schemaType === "organization" && (
                 <div className="space-y-3 pt-2">
                   <div>
-                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                       Organization Legal Name
                     </label>
                     <input
@@ -938,7 +962,7 @@ function SeoSettingsContent() {
                     />
                   </div>
                   <div>
-                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                       Website URL
                     </label>
                     <input
@@ -950,7 +974,7 @@ function SeoSettingsContent() {
                     />
                   </div>
                   <div>
-                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                       Logo Image URL
                     </label>
                     <input
@@ -967,7 +991,7 @@ function SeoSettingsContent() {
               {schemaType === "local_business" && (
                 <div className="space-y-3 pt-2">
                   <div>
-                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                       Business Name
                     </label>
                     <input
@@ -980,7 +1004,7 @@ function SeoSettingsContent() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                      <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                         Phone
                       </label>
                       <input
@@ -992,7 +1016,7 @@ function SeoSettingsContent() {
                       />
                     </div>
                     <div>
-                      <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                      <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                         City / Locality
                       </label>
                       <input
@@ -1005,7 +1029,7 @@ function SeoSettingsContent() {
                     </div>
                   </div>
                   <div>
-                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                       Street Address
                     </label>
                     <input
@@ -1022,7 +1046,7 @@ function SeoSettingsContent() {
               {schemaType === "website" && (
                 <div className="space-y-3 pt-2">
                   <div>
-                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                       Website Name
                     </label>
                     <input
@@ -1034,7 +1058,7 @@ function SeoSettingsContent() {
                     />
                   </div>
                   <div>
-                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                       Target URL
                     </label>
                     <input
@@ -1181,8 +1205,8 @@ function SeoSettingsContent() {
                 </button>
                 <button
                   type="submit"
-                  disabled={schemaSaving}
-                  className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-70 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
+                  disabled={schemaSaving || !schemaDirty}
+                  className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
                 >
                   {schemaSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>{schemaSaving ? "Saving..." : "Generate & Save Schema"}</span>
