@@ -35,8 +35,7 @@ export default function OccasionsPage() {
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
   const [savedOccasion, setSavedOccasion] = useState(null);
-  const occasionSnapshot = () =>
-    JSON.stringify({ title, description, imageUrl });
+  const occasionSnapshot = () => JSON.stringify({ title, description, imageUrl });
   const occasionDirty = !!image || !savedOccasion || occasionSnapshot() !== savedOccasion;
 
   const fetchOccasions = async () => {
@@ -196,9 +195,7 @@ export default function OccasionsPage() {
 
   const openAddModal = () => {
     resetForm();
-    setSavedOccasion(
-      JSON.stringify({ title: "", description: "", imageUrl: "" })
-    );
+    setSavedOccasion(JSON.stringify({ title: "", description: "", imageUrl: "" }));
     setIsModalOpen(true);
   };
 

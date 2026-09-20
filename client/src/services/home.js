@@ -33,7 +33,8 @@ const HOME_SECTIONS = {
   contact: "contact",
 };
 
-export const siteBaseUrl = (seo) => (seo?.canonicalUrl || "https://urbancruise.in").replace(/\/$/, "");
+export const siteBaseUrl = (seo) =>
+  (seo?.canonicalUrl || "https://urbancruise.in").replace(/\/$/, "");
 
 // SEO metadata for a dedicated section route (fleet, reviews, ...).
 export const buildSectionMetadata = (seo, { path, title, description }) => {

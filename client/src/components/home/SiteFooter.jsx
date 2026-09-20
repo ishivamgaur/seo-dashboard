@@ -40,9 +40,9 @@ const SiteFooter = () => {
               )
             )}
           </nav>
-            <div className="self-start sm:self-auto shrink-0">
-              <ThemeSelector />
-            </div>
+          <div className="self-start sm:self-auto shrink-0">
+            <ThemeSelector />
+          </div>
         </div>
         <p className="mt-6 text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
           © {new Date().getFullYear()} {BRAND.name}. All rights reserved.

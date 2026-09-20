@@ -180,7 +180,9 @@ function ContentManagementContent() {
       if (res.status === 200) {
         setSavedHero({
           ...heroForm,
-          bannerImage: heroFile ? res.data?.data?.bannerImage || heroForm.bannerImage : heroForm.bannerImage,
+          bannerImage: heroFile
+            ? res.data?.data?.bannerImage || heroForm.bannerImage
+            : heroForm.bannerImage,
         });
         setHeroFile(null);
         showToast("success", "Hero section updated successfully.");

@@ -43,8 +43,7 @@ export default function GalleryAdminPage() {
   const [editAltTag, setEditAltTag] = useState("");
   const [uploading, setUploading] = useState(false);
   const [savedEdit, setSavedEdit] = useState(null);
-  const editDirty =
-    !!editImageFile || !savedEdit || editAltTag !== savedEdit;
+  const editDirty = !!editImageFile || !savedEdit || editAltTag !== savedEdit;
   const [deletingId, setDeletingId] = useState(null);
   const [error, setError] = useState(null);
 

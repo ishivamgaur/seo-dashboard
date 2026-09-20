@@ -32,7 +32,12 @@ const Button = ({
 
   if (href && href.startsWith("#")) {
     return (
-      <a href={`/${href}`} onClick={(e) => scrollToHash(e, href, onClick)} className={cls} {...rest}>
+      <a
+        href={`/${href}`}
+        onClick={(e) => scrollToHash(e, href, onClick)}
+        className={cls}
+        {...rest}
+      >
         {children}
       </a>
     );

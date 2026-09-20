@@ -15,9 +15,7 @@ import { resolveMediaUrl } from "@/lib/site";
 const ALT_FADE = "from-[#eceff3] to-[#dde7df] dark:from-[#090a0d] dark:to-[#0c0f14]";
 
 const TestimonialsSection = ({ data }) => {
-  const testimonials = (Array.isArray(data) ? data : []).filter(
-    (t) => t.customerName && t.review
-  );
+  const testimonials = (Array.isArray(data) ? data : []).filter((t) => t.customerName && t.review);
   if (!testimonials.length) return null;
 
   return (
