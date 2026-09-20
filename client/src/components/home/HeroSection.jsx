@@ -10,7 +10,7 @@ import { BRAND, resolveMediaUrl } from "@/lib/site";
 const HeroSection = ({ data }) => {
   if (!data?.heading || !data?.bannerImage) return null;
 
-  const { heading, subHeading, ctaText, ctaUrl } = data;
+  const { heading, subHeading, ctaText, ctaUrl, secondaryCtaText, secondaryCtaUrl } = data;
   const bannerImage = resolveMediaUrl(data.bannerImage);
 
   return (
@@ -54,9 +54,11 @@ const HeroSection = ({ data }) => {
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               )}
-              <Button href="#vehicles" variant="ghostOnDark">
-                View fleet
-              </Button>
+              {secondaryCtaText && (
+                <Button href={secondaryCtaUrl || "#vehicles"} variant="ghostOnDark">
+                  {secondaryCtaText}
+                </Button>
+              )}
             </div>
           )}
         </Reveal>

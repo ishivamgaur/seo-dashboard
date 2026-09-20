@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import Image from "next/image";
+import SafeImage from "@/components/ui/SafeImage";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Save, Code, Search, Share2, Plus, X, Copy, Globe, Check, Loader2 } from "lucide-react";
 import DeleteButton from "@/components/common/DeleteButton";
@@ -639,7 +639,7 @@ function SeoSettingsContent() {
                 <div className="rounded-xl overflow-hidden bg-[#f6f8fa] dark:bg-[#1a1e27]">
                   <div className="relative aspect-[1.91/1] w-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
                     {formData.ogImage ? (
-                      <Image
+                      <SafeImage
                         src={formData.ogImage}
                         alt="OG Preview"
                         fill
@@ -720,7 +720,7 @@ function SeoSettingsContent() {
                 <div className="rounded-xl overflow-hidden bg-[#f6f8fa] dark:bg-[#1a1e27]">
                   <div className="relative aspect-[2/1] w-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
                     {formData.twitterImage || formData.ogImage ? (
-                      <Image
+                      <SafeImage
                         src={formData.twitterImage || formData.ogImage}
                         alt="Twitter Preview"
                         fill

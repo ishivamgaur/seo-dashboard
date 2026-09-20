@@ -1,11 +1,11 @@
 import { API_BASE, FALLBACK_IMAGES, BRAND } from "@/lib/site";
 
-const REVALIDATE_SECONDS = 60;
+const REVALIDATE_SECONDS = 3600;
 
 const fetchJson = async (endpoint) => {
   try {
     const res = await fetch(`${API_BASE}${endpoint}`, {
-      next: { revalidate: REVALIDATE_SECONDS },
+      next: { revalidate: REVALIDATE_SECONDS, tags: ["site-content"] },
     });
     if (!res.ok) return null;
     const json = await res.json();
@@ -17,6 +17,38 @@ const fetchJson = async (endpoint) => {
 };
 
 export const fetchSeoSettings = () => fetchJson("/seo");
+
+// Granular fetch for single-section routes.
+export const fetchSection = (endpoint) => fetchJson(endpoint);
+
+export const siteBaseUrl = (seo) => (seo?.canonicalUrl || "https://urbancruise.in").replace(/\/$/, "");
+
+// SEO metadata for a dedicated section route (fleet, reviews, ...).
+export const buildSectionMetadata = (seo, { path, title, description }) => {
+  const base = siteBaseUrl(seo);
+  const pageTitle = `${title} | Urban Cruise`;
+  return {
+    title: pageTitle,
+    description,
+    alternates: { canonical: `${base}${path}` },
+    robots: {
+      index: seo?.robotsIndex !== false,
+      follow: seo?.robotsFollow !== false,
+    },
+    openGraph: {
+      title: pageTitle,
+      description,
+      url: `${base}${path}`,
+      siteName: BRAND.siteName,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: pageTitle,
+      description,
+    },
+  };
+};
 
 export const fetchHomeData = async () => {
   const [schema, hero, about, vehicles, occasions, testimonials, gallery, contact] =

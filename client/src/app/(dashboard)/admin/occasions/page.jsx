@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import Image from "next/image";
+import SafeImage from "@/components/ui/SafeImage";
 import {
   Edit2,
   Plus,
@@ -297,7 +297,7 @@ export default function OccasionsPage() {
                     <div className="px-5 py-3.5">
                       <div className="relative w-28 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                         {o.image ? (
-                          <Image
+                          <SafeImage
                             src={o.image}
                             alt={o.title}
                             fill
@@ -418,7 +418,7 @@ export default function OccasionsPage() {
                                 <div className="px-5 py-3.5">
                                   <div className="relative w-28 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                                     {o.image ? (
-                                      <Image
+                                      <SafeImage
                                         src={o.image}
                                         alt={o.title}
                                         fill

@@ -41,6 +41,8 @@ function ContentManagementContent() {
     subHeading: "",
     ctaText: "",
     ctaUrl: "",
+    secondaryCtaText: "",
+    secondaryCtaUrl: "",
     bannerImage: "",
   });
   const [heroFile, setHeroFile] = useState(null);
@@ -77,6 +79,8 @@ function ContentManagementContent() {
             subHeading: h.subHeading || "",
             ctaText: h.ctaText || "",
             ctaUrl: h.ctaUrl || "",
+            secondaryCtaText: h.secondaryCtaText || "",
+            secondaryCtaUrl: h.secondaryCtaUrl || "",
             bannerImage: h.bannerImage || "",
           });
           setHeroPreview(h.bannerImage || "");
@@ -137,6 +141,8 @@ function ContentManagementContent() {
       formData.append("subHeading", heroForm.subHeading);
       formData.append("ctaText", heroForm.ctaText);
       formData.append("ctaUrl", heroForm.ctaUrl);
+      formData.append("secondaryCtaText", heroForm.secondaryCtaText);
+      formData.append("secondaryCtaUrl", heroForm.secondaryCtaUrl);
       if (heroFile) {
         formData.append("bannerImage", heroFile);
       } else if (heroForm.bannerImage) {
@@ -316,6 +322,34 @@ function ContentManagementContent() {
                   value={heroForm.ctaUrl}
                   onChange={(e) => setHeroForm({ ...heroForm, ctaUrl: e.target.value })}
                   placeholder="#contact"
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  Secondary Button Text
+                </label>
+                <input
+                  type="text"
+                  value={heroForm.secondaryCtaText}
+                  onChange={(e) => setHeroForm({ ...heroForm, secondaryCtaText: e.target.value })}
+                  placeholder="e.g. View fleet"
+                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+                />
+              </div>
+
+              <div>
+                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                  Secondary Target Link
+                </label>
+                <input
+                  type="text"
+                  value={heroForm.secondaryCtaUrl}
+                  onChange={(e) => setHeroForm({ ...heroForm, secondaryCtaUrl: e.target.value })}
+                  placeholder="#vehicles"
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
                 />
               </div>

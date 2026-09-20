@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import Image from "next/image";
+import SafeImage from "@/components/ui/SafeImage";
 import {
   Plus,
   X,
@@ -372,7 +372,7 @@ export default function GalleryAdminPage() {
                         <div className="px-5 py-3.5">
                           <div className="relative w-24 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                             {src ? (
-                              <Image
+                              <SafeImage
                                 src={src}
                                 alt={alt}
                                 fill
@@ -496,7 +496,7 @@ export default function GalleryAdminPage() {
                                   <div className="px-5 py-3.5">
                                     <div className="relative w-24 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                                       {src ? (
-                                        <Image
+                                        <SafeImage
                                           src={src}
                                           alt={alt}
                                           fill
@@ -556,7 +556,7 @@ export default function GalleryAdminPage() {
               >
                 <div className="relative aspect-[16/10] w-full bg-[#f6f8fa] dark:bg-[#1a1e27] overflow-hidden">
                   {src ? (
-                    <Image
+                    <SafeImage
                       src={src}
                       alt={alt}
                       fill
@@ -781,7 +781,7 @@ export default function GalleryAdminPage() {
                     editingImage.image_url ||
                     editingImage.image ||
                     editingImage.url ? (
-                    <Image
+                    <SafeImage
                       src={
                         editingImage.imagePath ||
                         editingImage.image_path ||

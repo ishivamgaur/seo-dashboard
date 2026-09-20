@@ -6,9 +6,9 @@ import SectionFade from "@/components/home/SectionFade";
 import Wordmark from "./Wordmark";
 
 const FOOTER_LINKS = [
-  { href: "#about", label: "About" },
-  { href: "#vehicles", label: "Fleet" },
-  { href: "#contact", label: "Contact" },
+  { href: "/about", label: "About" },
+  { href: "/fleet", label: "Fleet" },
+  { href: "/contact", label: "Contact" },
   { href: "/admin", label: "Admin" },
 ];
 
@@ -20,15 +20,25 @@ const SiteFooter = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <Wordmark />
           <nav className="flex flex-wrap gap-4 text-xs font-semibold tracking-wide text-zinc-600 dark:text-zinc-400">
-            {FOOTER_LINKS.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="hover:text-zinc-950 dark:hover:text-zinc-100"
-              >
-                {l.label}
-              </Link>
-            ))}
+            {FOOTER_LINKS.map((l) =>
+              l.href.startsWith("#") ? (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  className="hover:text-zinc-950 dark:hover:text-zinc-100"
+                >
+                  {l.label}
+                </a>
+              ) : (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="hover:text-zinc-950 dark:hover:text-zinc-100"
+                >
+                  {l.label}
+                </Link>
+              )
+            )}
           </nav>
           <ThemeSelector />
         </div>

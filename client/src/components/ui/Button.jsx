@@ -8,25 +8,44 @@ const VARIANTS = {
   ghostOnDark: "border border-white/30 text-white hover:bg-white/10",
 };
 
+// Same-page anchors glide smoothly and show their hash in the url.
+const scrollToHash = (e, selector, fallback) => {
+  const el = document.querySelector(selector);
+  if (el) {
+    e.preventDefault();
+    el.scrollIntoView({ behavior: "smooth" });
+    window.history.replaceState(null, "", `/${selector}`);
+  }
+  if (fallback) fallback(e);
+};
+
 const Button = ({
   href,
   type = "button",
   variant = "primary",
   className = "",
   children,
+  onClick,
   ...rest
 }) => {
   const cls = `inline-flex items-center justify-center gap-2 h-8 px-4 rounded-lg text-xs font-semibold transition-colors ${VARIANTS[variant]} ${className}`;
 
+  if (href && href.startsWith("#")) {
+    return (
+      <a href={`/${href}`} onClick={(e) => scrollToHash(e, href, onClick)} className={cls} {...rest}>
+        {children}
+      </a>
+    );
+  }
   if (href) {
     return (
-      <Link href={href} className={cls} {...rest}>
+      <Link href={href} className={cls} onClick={onClick} {...rest}>
         {children}
       </Link>
     );
   }
   return (
-    <button type={type} className={cls} {...rest}>
+    <button type={type} className={cls} onClick={onClick} {...rest}>
       {children}
     </button>
   );

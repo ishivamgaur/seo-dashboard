@@ -14,7 +14,7 @@ const SectionShell = ({
   children,
 }) => {
   return (
-    <section id={id} className={TONES[tone] || TONES.base}>
+    <section id={id} className={`scroll-mt-16 ${TONES[tone] || TONES.base}`}>
       {fade && <SectionFade className={fade} />}
       <div className={`max-w-6xl mx-auto px-4 sm:px-6 pb-12 md:pb-16 ${topClass}`}>{children}</div>
     </section>

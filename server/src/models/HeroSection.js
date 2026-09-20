@@ -24,6 +24,14 @@ const HeroSection = sequelize.define(
       type: DataTypes.STRING(500),
       field: "cta_url",
     },
+    secondaryCtaText: {
+      type: DataTypes.STRING(100),
+      field: "secondary_cta_text",
+    },
+    secondaryCtaUrl: {
+      type: DataTypes.STRING(500),
+      field: "secondary_cta_url",
+    },
   },
   {
     tableName: "hero_sections",

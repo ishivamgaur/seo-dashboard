@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import SafeImage from "@/components/ui/SafeImage";
 import { CarFront, Compass, Star, Images, ArrowRight } from "lucide-react";
 import api from "@/lib/api";
 
@@ -269,7 +269,7 @@ export default function DashboardOverview() {
                       </span>
                       <div className="relative w-10 h-7 bg-zinc-200/60 dark:bg-[#13161c] rounded overflow-hidden flex items-center justify-center shrink-0">
                         {v.image ? (
-                          <Image
+                          <SafeImage
                             src={v.image}
                             alt={v.vehicleName}
                             fill

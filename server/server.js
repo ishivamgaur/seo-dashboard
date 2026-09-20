@@ -9,6 +9,7 @@ import { config } from './src/config/environment.js';
 import { sequelize } from './src/config/database.js';
 import routes from './src/routes/index.js';
 import { errorHandler } from './src/middleware/errorHandler.js';
+import { revalidateAfterMutation } from './src/middleware/revalidate.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+app.use(revalidateAfterMutation);
 app.use('/api', routes);
 
 app.get('/api/health', (req, res) => {

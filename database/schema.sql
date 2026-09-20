@@ -48,6 +48,8 @@ CREATE TABLE IF NOT EXISTS hero_section (
   banner_image VARCHAR(500),
   cta_text VARCHAR(100),
   cta_url VARCHAR(500),
+  secondary_cta_text VARCHAR(100),
+  secondary_cta_url VARCHAR(500),
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
