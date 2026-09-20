@@ -1074,9 +1074,10 @@ function SeoSettingsContent() {
                           <button
                             type="button"
                             onClick={() => setFaqItems(faqItems.filter((_, i) => i !== idx))}
-                            className="text-red-500 hover:text-red-600 text-[11px] cursor-pointer"
+                            className="text-zinc-400 hover:text-red-600 transition-colors p-1 cursor-pointer"
+                            title="Remove item"
                           >
-                            Remove
+                            <X className="w-3.5 h-3.5" />
                           </button>
                         )}
                       </div>
@@ -1159,9 +1160,10 @@ function SeoSettingsContent() {
                           onClick={() =>
                             setBreadcrumbItems(breadcrumbItems.filter((_, i) => i !== idx))
                           }
-                          className="text-red-500 hover:text-red-600 text-xs px-1 cursor-pointer"
+                          className="text-zinc-400 hover:text-red-600 transition-colors p-1 cursor-pointer"
+                          title="Remove item"
                         >
-                          ✕
+                          <X className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>
