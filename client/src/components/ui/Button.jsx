@@ -8,17 +8,6 @@ const VARIANTS = {
   ghostOnDark: "border border-white/30 text-white hover:bg-white/10",
 };
 
-// Same-page anchors glide smoothly and show their hash in the url.
-const scrollToHash = (e, selector, fallback) => {
-  const el = document.querySelector(selector);
-  if (el) {
-    e.preventDefault();
-    el.scrollIntoView({ behavior: "smooth" });
-    window.history.replaceState(null, "", `/${selector}`);
-  }
-  if (fallback) fallback(e);
-};
-
 const Button = ({
   href,
   type = "button",
@@ -32,12 +21,7 @@ const Button = ({
 
   if (href && href.startsWith("#")) {
     return (
-      <a
-        href={`/${href}`}
-        onClick={(e) => scrollToHash(e, href, onClick)}
-        className={cls}
-        {...rest}
-      >
+      <a href={`/${href}`} onClick={onClick} className={cls} {...rest}>
         {children}
       </a>
     );

@@ -38,7 +38,9 @@ const ContactSection = ({ data, vehicles = [] }) => {
       setForm({ name: "", phone: "", vehicle: "", message: "" });
       setTimeout(() => setSent(false), 8000);
     } catch (err) {
-      setSendError(err.response?.data?.message || "Could not send your request. Please call us directly.");
+      setSendError(
+        err.response?.data?.message || "Could not send your request. Please call us directly."
+      );
     } finally {
       setSending(false);
     }
