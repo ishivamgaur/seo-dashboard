@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import FilterSelect from "@/components/common/FilterSelect";
+import api from "@/lib/api";
 import Reveal from "./Reveal";
 import SectionShell from "@/components/ui/SectionShell";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -23,12 +24,24 @@ const ContactSection = ({ data, vehicles = [] }) => {
   const mapEmbed = data?.mapEmbed || "";
 
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState("");
   const [form, setForm] = useState({ name: "", phone: "", vehicle: "", message: "" });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSent(true);
-    setTimeout(() => setSent(false), 5000);
+    setSending(true);
+    setSendError("");
+    try {
+      await api.post("/contact/inquiry", form);
+      setSent(true);
+      setForm({ name: "", phone: "", vehicle: "", message: "" });
+      setTimeout(() => setSent(false), 8000);
+    } catch (err) {
+      setSendError(err.response?.data?.message || "Could not send your request. Please call us directly.");
+    } finally {
+      setSending(false);
+    }
   };
 
   const infoRows = [

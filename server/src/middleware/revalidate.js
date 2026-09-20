@@ -18,7 +18,11 @@ const tagsForPath = (rawPath) => {
 };
 
 const revalidateAfterMutation = (req, res, next) => {
-  if (["POST", "PUT", "PATCH", "DELETE"].includes(req.method) && !req.path.startsWith("/auth")) {
+  if (
+    ["POST", "PUT", "PATCH", "DELETE"].includes(req.method) &&
+    !req.path.startsWith("/auth") &&
+    !req.path.endsWith("/inquiry")
+  ) {
     res.on("finish", () => {
       if (res.statusCode < 400) triggerRevalidate(tagsForPath(req.path));
     });
