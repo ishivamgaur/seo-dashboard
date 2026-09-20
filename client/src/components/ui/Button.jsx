@@ -17,7 +17,7 @@ const Button = ({
   onClick,
   ...rest
 }) => {
-  const cls = `inline-flex items-center justify-center gap-2 h-8 px-4 rounded-lg text-xs font-semibold transition-colors ${VARIANTS[variant]} ${className}`;
+  const cls = `inline-flex items-center justify-center gap-2 h-8 px-4 rounded-lg text-xs font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${VARIANTS[variant]} ${className}`;
 
   if (href && href.startsWith("#")) {
     return (

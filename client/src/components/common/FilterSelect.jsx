@@ -80,14 +80,14 @@ export default function FilterSelect({ label, value, onChange, options = [], cla
           role="listbox"
           className="absolute top-full left-0 mt-1 min-w-[140px] w-max z-50 p-1 bg-white dark:bg-[#13161c] border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_25px_-5px_rgba(0,0,0,0.5)]"
         >
-          {options.map((opt) => {
+          {options.map((opt, idx) => {
             const optVal = typeof opt === "object" ? opt.value : opt;
             const optLabel = typeof opt === "object" ? opt.label : opt;
             const isOptionActive = String(optVal) === String(value);
 
             return (
               <button
-                key={optVal}
+                key={`${optVal}-${idx}`}
                 type="button"
                 role="option"
                 aria-selected={isOptionActive}

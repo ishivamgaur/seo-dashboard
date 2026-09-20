@@ -38,17 +38,46 @@ export const sendInquiry = catchAsync(async (req, res) => {
     throw new ApiError(503, "No recipient address configured.");
   }
 
+  const clean = {
+    name: name.trim(),
+    phone: phone.trim(),
+    vehicle: vehicle?.trim() || "-",
+    message: (message || "").trim() || "(no message)",
+    at: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
+  };
+
+  const row = (label, value, shade) => `
+    <tr>
+      <td style="padding:10px 14px;font-size:12px;font-weight:700;color:#52525b;text-transform:uppercase;letter-spacing:0.08em;width:130px;background:${shade};">${label}</td>
+      <td style="padding:10px 14px;font-size:14px;color:#18181b;background:#ffffff;">${value}</td>
+    </tr>`;
+
+  const rows = [
+    row("Name", clean.name, "#f6f8fa"),
+    row("Phone", clean.phone, "#ffffff"),
+    row("Vehicle", clean.vehicle, "#f6f8fa"),
+    row("Message", clean.message.replace(/\n/g, "<br>"), "#ffffff"),
+    row("Received", `${clean.at} IST`, "#f6f8fa"),
+  ].join("");
+
   await transporter.sendMail({
     from: process.env.SMTP_USER,
     to,
-    subject: `New booking inquiry from ${name.trim()}`,
-    text: [
-      `Name: ${name.trim()}`,
-      `Phone: ${phone.trim()}`,
-      `Vehicle: ${vehicle?.trim() || "-"}`,
-      "",
-      (message || "").trim() || "(no message)",
-    ].join("\n"),
+    subject: `New booking inquiry from ${clean.name}`,
+    text: `Name: ${clean.name}\nPhone: ${clean.phone}\nVehicle: ${clean.vehicle}\nReceived: ${clean.at} IST\n\n${clean.message}`,
+    html: `
+      <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;">
+        <div style="background:#0d9488;color:#ffffff;padding:16px 20px;border-radius:12px 12px 0 0;">
+          <div style="font-size:16px;font-weight:bold;">New booking inquiry</div>
+          <div style="font-size:12px;opacity:0.9;">Urban Cruise website form</div>
+        </div>
+        <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;border:1px solid #e4e4e7;border-top:0;">
+          <tbody>${rows}</tbody>
+        </table>
+        <div style="font-size:11px;color:#a1a1aa;padding:10px 4px;">
+          Reply directly to this email or call the customer back.
+        </div>
+      </div>`,
   });
 
   return res.json(new ApiResponse(200, "Inquiry sent successfully", null));

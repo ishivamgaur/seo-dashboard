@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Check, Loader2 } from "lucide-react";
 import FilterSelect from "@/components/common/FilterSelect";
 import api from "@/lib/api";
 import Reveal from "./Reveal";
@@ -27,6 +28,8 @@ const ContactSection = ({ data, vehicles = [] }) => {
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState("");
   const [form, setForm] = useState({ name: "", phone: "", vehicle: "", message: "" });
+
+  const vehicleNames = [...new Set(vehicles.map((v) => v.vehicleName).filter(Boolean))];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -127,9 +130,17 @@ const ContactSection = ({ data, vehicles = [] }) => {
         <Reveal delay={0.12}>
           <Card className="h-full p-5 sm:p-6">
             {sent ? (
-              <p className="text-sm text-zinc-600 dark:text-zinc-300 py-10 text-center">
-                Thank you. We will contact you shortly.
-              </p>
+              <div className="py-10 text-center">
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-teal-600/10 dark:bg-teal-400/10 text-teal-600 dark:text-teal-400">
+                  <Check className="w-5 h-5" />
+                </span>
+                <p className="mt-3 text-sm font-semibold text-zinc-900 dark:text-white">
+                  Request sent
+                </p>
+                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                  Thank you. We will contact you shortly.
+                </p>
+              </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -160,7 +171,7 @@ const ContactSection = ({ data, vehicles = [] }) => {
                     onChange={(val) => setForm({ ...form, vehicle: val })}
                     options={[
                       { value: "", label: "Select a vehicle" },
-                      ...vehicles.map((v) => ({ value: v.vehicleName, label: v.vehicleName })),
+                      ...vehicleNames.map((name) => ({ value: name, label: name })),
                     ]}
                     className="w-full [&>button]:w-full [&>button]:h-10 [&>button]:text-sm [&_[role=listbox]]:w-full"
                   />
@@ -175,8 +186,14 @@ const ContactSection = ({ data, vehicles = [] }) => {
                     className={`${inputCls} placeholder:text-zinc-400`}
                   />
                 </div>
+                {sendError && (
+                  <p className="text-xs font-medium text-red-600 dark:text-red-400">{sendError}</p>
+                )}
                 <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/60 flex justify-end">
-                  <Button type="submit">Send request</Button>
+                  <Button type="submit" disabled={sending}>
+                    {sending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{sending ? "Sending..." : "Send request"}</span>
+                  </Button>
                 </div>
               </form>
             )}
