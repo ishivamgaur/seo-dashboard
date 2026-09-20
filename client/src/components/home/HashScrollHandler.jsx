@@ -11,10 +11,10 @@ export default function HashScrollHandler() {
       window.history.scrollRestoration = "manual";
     }
 
+    window.scrollTo(0, 0);
     const scroll = () => {
       const hash = window.location.hash;
       if (!hash) {
-        window.scrollTo(0, 0);
         return;
       }
       try {

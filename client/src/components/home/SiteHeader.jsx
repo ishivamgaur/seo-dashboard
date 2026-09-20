@@ -69,7 +69,13 @@ const SiteHeader = () => {
 
       <AnimatePresence>
         {menuOpen && (
-          <motion.nav
+          <>
+            <div
+              aria-hidden="true"
+              onClick={() => setMenuOpen(false)}
+              className="md:hidden fixed inset-0 z-40 cursor-default"
+            />
+            <motion.nav
             initial={{ opacity: 0, y: -8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
@@ -108,6 +114,7 @@ const SiteHeader = () => {
               </Button>
             </div>
           </motion.nav>
+          </>
         )}
       </AnimatePresence>
     </header>
