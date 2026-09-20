@@ -1,16 +1,18 @@
-# 🏗️ ARCHITECTURE — SEO Dashboard & Dynamic Homepage Management
+# ARCHITECTURE — SEO Dashboard & Dynamic Homepage Management
 
 ## Tech Stack
 
-| Layer      | Technology              |
-|------------|-------------------------|
-| Frontend   | Next.js 14 (App Router) |
-| Styling    | Tailwind CSS            |
-| Backend    | Node.js + Express.js    |
-| ORM        | Sequelize               |
-| Database   | MySQL                   |
-| Auth       | JWT (jsonwebtoken)      |
-| Uploads    | Multer                  |
+| Layer      | Technology                                      |
+|------------|-------------------------------------------------|
+| Frontend   | Next.js 16 (App Router, static + ISR)           |
+| Styling    | Tailwind CSS v4                                 |
+| Motion     | Framer Motion (reveals), Swiper (testimonials)  |
+| Backend    | Node.js + Express.js                            |
+| ORM        | Sequelize                                       |
+| Database   | MySQL (TiDB Cloud compatible)                   |
+| Auth       | JWT (role stamped in token)                     |
+| Uploads    | Multer (memory) + Sharp presets + Cloudinary    |
+| Toasts     | Sonner (themed, top-right)                      |
 
 ---
 
@@ -23,175 +25,127 @@ seo-dashboard/
 ├── FEATURES.md                  ← Goals & feature planning
 │
 ├── client/                      # Next.js Frontend
-│   ├── public/
-│   │   └── assets/
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── layout.js            # Root layout (SEO head injection)
-│   │   │   ├── page.js              # Public homepage
-│   │   │   ├── globals.css
+│   │   │   ├── layout.js            # Root layout + HashScrollHandler
+│   │   │   ├── page.js              # Public homepage (all sections)
+│   │   │   ├── globals.css          # Theme, scrollbar, grain, toasts
+│   │   │   ├── icon.svg             # UC favicon
+│   │   │   ├── sitemap.js           # Generated sitemap
+│   │   │   ├── robots.js            # Generated robots (respects noindex)
+│   │   │   ├── about|fleet|services|reviews|gallery|contact/
+│   │   │   │   └── page.js          # Indexable route per section
+│   │   │   ├── api/revalidate/
+│   │   │   │   └── route.js         # Cache purge webhook (secret-guarded)
 │   │   │   ├── login/
-│   │   │   │   └── page.js
-│   │   │   └── admin/
-│   │   │       ├── layout.js        # Admin shell (sidebar + header)
-│   │   │       ├── page.js          # Dashboard overview
-│   │   │       ├── seo/
-│   │   │       │   └── page.js
-│   │   │       ├── schema/
-│   │   │       │   └── page.js
-│   │   │       ├── hero/
-│   │   │       │   └── page.js
-│   │   │       ├── about/
-│   │   │       │   └── page.js
-│   │   │       ├── vehicles/
-│   │   │       │   ├── page.js
-│   │   │       │   └── [id]/
-│   │   │       │       └── page.js
-│   │   │       ├── occasions/
-│   │   │       │   └── page.js
-│   │   │       ├── testimonials/
-│   │   │       │   └── page.js
-│   │   │       ├── gallery/
-│   │   │       │   └── page.js
-│   │   │       └── contact/
-│   │   │           └── page.js
+│   │   │   │   └── page.js          # Split-screen login
+│   │   │   └── (dashboard)/admin/
+│   │   │       ├── layout.jsx       # Shell + Toaster + mobile sidebar
+│   │   │       ├── page.jsx         # Overview (live counts, averages)
+│   │   │       ├── seo/page.jsx     # Meta + social + schema generator
+│   │   │       ├── vehicles/page.jsx
+│   │   │       ├── occasions/page.jsx
+│   │   │       ├── testimonials/page.jsx
+│   │   │       ├── gallery/page.jsx
+│   │   │       └── content/page.jsx # Hero / about / contact tabs
 │   │   │
 │   │   ├── components/
-│   │   │   ├── ui/                  # Reusable primitives
-│   │   │   │   ├── Button.jsx
-│   │   │   │   ├── Input.jsx
-│   │   │   │   ├── Textarea.jsx
-│   │   │   │   ├── Select.jsx
-│   │   │   │   ├── Card.jsx
-│   │   │   │   ├── Modal.jsx
-│   │   │   │   ├── FileUpload.jsx
-│   │   │   │   ├── StarRating.jsx
-│   │   │   │   ├── Spinner.jsx
-│   │   │   │   └── Toast.jsx
-│   │   │   ├── admin/               # Admin-specific
-│   │   │   │   ├── Sidebar.jsx
-│   │   │   │   ├── Header.jsx
-│   │   │   │   ├── SeoForm.jsx
-│   │   │   │   ├── SchemaForm.jsx
-│   │   │   │   ├── HeroForm.jsx
-│   │   │   │   ├── AboutForm.jsx
-│   │   │   │   ├── VehicleCard.jsx
-│   │   │   │   ├── VehicleForm.jsx
-│   │   │   │   ├── OccasionForm.jsx
-│   │   │   │   ├── TestimonialForm.jsx
-│   │   │   │   ├── GalleryUploader.jsx
-│   │   │   │   └── ContactForm.jsx
-│   │   │   └── home/                # Public homepage sections
-│   │   │       ├── Navbar.jsx
-│   │   │       ├── HeroSection.jsx
-│   │   │       ├── AboutSection.jsx
-│   │   │       ├── VehiclesSection.jsx
-│   │   │       ├── OccasionsSection.jsx
-│   │   │       ├── TestimonialsSection.jsx
-│   │   │       ├── GallerySection.jsx
-│   │   │       ├── ContactSection.jsx
-│   │   │       └── Footer.jsx
-│   │   │
-│   │   ├── hooks/
-│   │   │   ├── useAuth.js
-│   │   │   ├── useFetch.js
-│   │   │   └── useForm.js
+│   │   │   ├── ui/                  # Shared primitives
+│   │   │   │   ├── SectionShell.jsx # Tone + fade + container
+│   │   │   │   ├── SectionHeader.jsx
+│   │   │   │   ├── Card.jsx         # Opt-in hover border
+│   │   │   │   ├── Badge.jsx        # Teal mono pill
+│   │   │   │   ├── Button.jsx       # Single size, Link/anchor/button
+│   │   │   │   └── SafeImage.jsx    # next/image without host validation
+│   │   │   ├── home/                # Public sections + chrome
+│   │   │   │   ├── SiteHeader.jsx   # Sticky nav + mobile menu
+│   │   │   │   ├── SiteFooter.jsx
+│   │   │   │   ├── Wordmark.jsx
+│   │   │   │   ├── HeroSection.jsx
+│   │   │   │   ├── AboutSection.jsx
+│   │   │   │   ├── VehiclesSection.jsx
+│   │   │   │   ├── OccasionsSection.jsx
+│   │   │   │   ├── TestimonialsSection.jsx  # Swiper autoplay
+│   │   │   │   ├── GallerySection.jsx       # Masonry + lightbox morph
+│   │   │   │   ├── ContactSection.jsx       # Real inquiry POST
+│   │   │   │   ├── SectionFade.jsx  # Tonal melt dividers
+│   │   │   │   ├── FramedImage.jsx  # Shared photo panel
+│   │   │   │   ├── Reveal.jsx       # Scroll reveal (blur + rise)
+│   │   │   │   └── HashScrollHandler.jsx    # Deep-link smooth scroll
+│   │   │   ├── layout/
+│   │   │   │   ├── Sidebar.jsx      # Collapsible, role badge
+│   │   │   │   └── Header.jsx       # Role pill, mobile overflow menu
+│   │   │   └── common/
+│   │   │       ├── ThemeSelector.jsx
+│   │   │       ├── FilterSelect.jsx # Dashboard dropdown (reused in form)
+│   │   │       └── DeleteButton.jsx # Admin-only, pending spinner
 │   │   │
 │   │   ├── lib/
-│   │   │   ├── api.js               # Axios instance
-│   │   │   ├── constants.js
-│   │   │   └── validators.js
+│   │   │   ├── site.js              # API base, media resolver, brand
+│   │   │   ├── content.js           # parseStringArray, splitParagraphs
+│   │   │   └── api.js               # Axios client (auth interceptor)
 │   │   │
-│   │   └── context/
-│   │       └── AuthContext.js
+│   │   ├── services/
+│   │   │   └── home.js              # ONLY public fetch layer + metadata
+│   │   │
+│   │   ├── context/
+│   │   │   ├── AuthContext.jsx      # User + role
+│   │   │   └── ThemeContext.jsx     # next-themes wrapper
+│   │   │
+│   │   ├── .prettierrc / .prettierignore / .env.example
+│   │   ├── next.config.mjs
+│   │   └── package.json             # format / format:check scripts
 │   │
-│   ├── tailwind.config.js
-│   ├── next.config.mjs
-│   └── package.json
-│
 ├── server/                          # Express Backend
 │   ├── src/
 │   │   ├── config/
-│   │   │   ├── database.js          # Sequelize connection
+│   │   │   ├── database.js          # Sequelize + optional TLS (DB_SSL)
 │   │   │   └── environment.js       # Env loader + validation
 │   │   │
-│   │   ├── models/
-│   │   │   ├── index.js             # Model registry
-│   │   │   ├── User.js
-│   │   │   ├── SeoSetting.js
-│   │   │   ├── Schema.js
-│   │   │   ├── HeroSection.js
-│   │   │   ├── AboutSection.js
-│   │   │   ├── Vehicle.js
-│   │   │   ├── Occasion.js
-│   │   │   ├── Testimonial.js
-│   │   │   ├── GalleryImage.js
-│   │   │   └── ContactInfo.js
+│   │   ├── models/                  # (Sequelize tableNames in brackets)
+│   │   │   ├── User.js              # [users] + role enum
+│   │   │   ├── SeoSetting.js        # [seo_settings]
+│   │   │   ├── Schema.js            # [schemas]
+│   │   │   ├── HeroSection.js       # [hero_sections + badge/secondary CTA]
+│   │   │   ├── AboutSection.js      # [about_sections, 3 spec fields]
+│   │   │   ├── Vehicle.js           # [vehicles]
+│   │   │   ├── Occasion.js          # [occasions]
+│   │   │   ├── Testimonial.js       # [testimonials]
+│   │   │   ├── GalleryImage.js      # [gallery_images]
+│   │   │   └── ContactInfo.js       # [contact_infos]
 │   │   │
-│   │   ├── controllers/
-│   │   │   ├── authController.js
-│   │   │   ├── seoController.js
-│   │   │   ├── schemaController.js
-│   │   │   ├── heroController.js
-│   │   │   ├── aboutController.js
-│   │   │   ├── vehicleController.js
-│   │   │   ├── occasionController.js
-│   │   │   ├── testimonialController.js
-│   │   │   ├── galleryController.js
-│   │   │   └── contactController.js
-│   │   │
-│   │   ├── routes/
-│   │   │   ├── index.js             # Route aggregator
-│   │   │   ├── authRoutes.js
-│   │   │   ├── seoRoutes.js
-│   │   │   ├── schemaRoutes.js
-│   │   │   ├── heroRoutes.js
-│   │   │   ├── aboutRoutes.js
-│   │   │   ├── vehicleRoutes.js
-│   │   │   ├── occasionRoutes.js
-│   │   │   ├── testimonialRoutes.js
-│   │   │   ├── galleryRoutes.js
-│   │   │   └── contactRoutes.js
+│   │   ├── controllers/             # + sendInquiry (contact, nodemailer)
+│   │   ├── routes/                  # + contact inquiry route
 │   │   │
 │   │   ├── middleware/
 │   │   │   ├── authenticate.js      # JWT verification
-│   │   │   ├── authorize.js         # Role guard
-│   │   │   ├── upload.js            # Multer config
-│   │   │   ├── validate.js          # Validation runner
-│   │   │   └── errorHandler.js      # Global error handler
+│   │   │   ├── authorize.js         # Role guard (deletes = admin-only)
+│   │   │   ├── upload.js            # Sharp presets per use case
+│   │   │   ├── revalidate.js        # Cache-purge on mutation
+│   │   │   ├── validate.js
+│   │   │   └── errorHandler.js      # Masks Sequelize errors as 400
 │   │   │
-│   │   ├── validators/
-│   │   │   ├── authValidator.js
-│   │   │   ├── seoValidator.js
-│   │   │   ├── vehicleValidator.js
-│   │   │   └── commonValidator.js
+│   │   ├── validators/ + utils/
+│   │   │   ├── revalidate.js        # Webhook caller (fire-and-forget)
+│   │   │   ├── catchAsync.js, ApiError.js, ApiResponse.js
+│   │   │   ├── crudFactory.js, fileHelper.js (Cloudinary-aware)
 │   │   │
-│   │   └── utils/
-│   │       ├── catchAsync.js        # Async wrapper
-│   │       ├── ApiError.js          # Custom error class
-│   │       ├── ApiResponse.js       # Standardized response
-│   │       ├── crudFactory.js       # Generic CRUD generator
-│   │       └── fileHelper.js        # File path + delete utils
+│   │   ├── .prettierrc / .prettierignore / .env.example
+│   │   ├── server.js
+│   │   ├── seed-urbancruise.js      # Demo fleet, occasions, reviews, gallery
+│   │   ├── seed-schemas.js          # 5 schema templates
+│   │   ├── seed-cloudinary.js       # Sample media upload
+│   │   └── package.json             # format scripts, nodemailer, sharp
 │   │
-│   ├── uploads/                     # Media storage (gitignored)
-│   │   ├── hero/
-│   │   ├── vehicles/
-│   │   ├── occasions/
-│   │   ├── testimonials/
-│   │   ├── gallery/
-│   │   └── general/
-│   │
-│   ├── server.js                    # Entry point
-│   ├── .env.example
-│   └── package.json
-│
 ├── database/
-│   ├── schema.sql                   # Full DB creation script
-│   └── seed.sql                     # Sample data
+│   └── schema.sql                   # Canonical schema (singular names)
 │
 ├── .gitignore
-└── README.md
 ```
+
+> Name mismatch to know: `schema.sql` uses singular table names
+> (`hero_section`), Sequelize models use plurals (`hero_sections`).
+> The app always reads the plural tables created by `sync()`.
 
 ---
 
@@ -200,25 +154,23 @@ seo-dashboard/
 | Context              | Convention    | Example                          |
 |----------------------|---------------|----------------------------------|
 | JS variables         | `camelCase`   | `heroData`, `getVehicles`        |
-| React components     | `PascalCase`  | `VehicleCard.jsx`                |
-| DB tables            | `snake_case`  | `gallery_images`, `seo_settings` |
+| React components     | `PascalCase`  | `VehicleCard.jsx` — n/a, pages own forms |
+| DB tables (models)   | `snake_case` plural | `gallery_images`, `about_sections` |
 | DB columns           | `snake_case`  | `meta_title`, `sort_order`       |
 | API routes           | `kebab-case`  | `/api/vehicles`, `/api/gallery`  |
-| Env variables        | `UPPER_SNAKE` | `DB_HOST`, `JWT_SECRET`          |
-| Non-component files  | `camelCase`   | `authController.js`              |
+| Public routes        | lowercase     | `/fleet`, `/reviews`, `/contact` |
+| Env variables        | `UPPER_SNAKE` | `DB_HOST`, `REVALIDATE_SECRET`   |
 
 ---
 
 ## Code Standards
 
-- **Max ~150 lines per file** — split if larger
-- **2-space indentation**
-- **Single quotes** in JS, double in JSX attributes
-- **Semicolons** — yes
-- **Import order** — Node builtins → packages → internal
-- **Comments** — only explain *why*, not *what*
+- **2-space indentation**, **double quotes**, **semicolons**
+- **Comments** — lowercase `//`, only where the why is non-obvious
 - **API response shape** — always `{ success, message, data }`
-- **No repeated code** — use catchAsync, crudFactory, useFetch
+- **No repeated code** — ui primitives, shared lib/services, crudFactory
+- **No placeholder content** — sections render nothing without real data
+- **Prettier** — `format` / `format:check` in both packages
 
 ---
 
@@ -230,206 +182,135 @@ seo-dashboard/
 | id         | INT AUTO_INCREMENT PK         |
 | name       | VARCHAR(100) NOT NULL         |
 | email      | VARCHAR(150) NOT NULL UNIQUE  |
-| password   | VARCHAR(255) NOT NULL         |
+| password   | VARCHAR(255) NOT NULL (bcrypt)|
 | role       | ENUM('admin','editor')        |
 | created_at | TIMESTAMP DEFAULT NOW         |
 | updated_at | TIMESTAMP ON UPDATE NOW       |
 
-### seo_settings
-| Column              | Type                               |
-|---------------------|------------------------------------|
-| id                  | INT AUTO_INCREMENT PK              |
-| page_identifier     | VARCHAR(50) UNIQUE DEFAULT 'homepage' |
-| meta_title          | VARCHAR(255)                       |
-| meta_description    | TEXT                               |
-| focus_keywords      | VARCHAR(500)                       |
-| canonical_url       | VARCHAR(500)                       |
-| robots_index        | BOOLEAN DEFAULT TRUE               |
-| robots_follow       | BOOLEAN DEFAULT TRUE               |
-| og_title            | VARCHAR(255)                       |
-| og_description      | TEXT                               |
-| og_image            | VARCHAR(500)                       |
-| twitter_title       | VARCHAR(255)                       |
-| twitter_description | TEXT                                |
-| twitter_image       | VARCHAR(500)                       |
-| updated_at          | TIMESTAMP ON UPDATE NOW            |
+### seo_settings (11 task fields)
+meta_title, meta_description, focus_keywords, canonical_url,
+robots_index, robots_follow, og_title, og_description, og_image,
+twitter_title, twitter_description, twitter_image (+ id, page_identifier, updated_at)
 
 ### schemas
-| Column      | Type                                                             |
-|-------------|------------------------------------------------------------------|
-| id          | INT AUTO_INCREMENT PK                                            |
-| schema_type | ENUM('organization','faq','breadcrumb','website','local_business') |
-| schema_data | JSON NOT NULL                                                    |
-| is_active   | BOOLEAN DEFAULT TRUE                                             |
-| created_at  | TIMESTAMP DEFAULT NOW                                            |
-| updated_at  | TIMESTAMP ON UPDATE NOW                                          |
+schema_type ENUM('organization','faq','breadcrumb','website','local_business'),
+schema_data JSON, is_active BOOLEAN (+ id, timestamps)
 
-### hero_section
-| Column       | Type                    |
-|--------------|-------------------------|
-| id           | INT AUTO_INCREMENT PK   |
-| heading      | VARCHAR(255) NOT NULL   |
-| sub_heading  | VARCHAR(500)            |
-| banner_image | VARCHAR(500)            |
-| cta_text     | VARCHAR(100)            |
-| cta_url      | VARCHAR(500)            |
-| updated_at   | TIMESTAMP ON UPDATE NOW |
+### hero_sections (5 task fields + 3 managed extras)
+heading*, sub_heading, banner_image, cta_text, cta_url,
+secondary_cta_text, secondary_cta_url, badge_text (+ id, updated_at)
 
-### about_section
-| Column         | Type                    |
-|----------------|-------------------------|
-| id             | INT AUTO_INCREMENT PK   |
-| section_title  | VARCHAR(255) NOT NULL   |
-| description    | TEXT                    |
-| featured_image | VARCHAR(500)            |
-| updated_at     | TIMESTAMP ON UPDATE NOW |
+### about_sections (exactly the 3 task fields)
+section_title*, description, featured_image (+ id, updated_at)
 
 ### vehicles
-| Column           | Type                    |
-|------------------|-------------------------|
-| id               | INT AUTO_INCREMENT PK   |
-| vehicle_name     | VARCHAR(200) NOT NULL   |
-| image            | VARCHAR(500)            |
-| seating_capacity | INT NOT NULL            |
-| description      | TEXT                    |
-| features         | JSON                    |
-| sort_order       | INT DEFAULT 0           |
-| is_active        | BOOLEAN DEFAULT TRUE    |
-| created_at       | TIMESTAMP DEFAULT NOW   |
-| updated_at       | TIMESTAMP ON UPDATE NOW |
+vehicle_name*, image, seating_capacity*, description, features JSON,
+sort_order, is_active (+ id, timestamps)
 
 ### occasions
-| Column      | Type                    |
-|-------------|-------------------------|
-| id          | INT AUTO_INCREMENT PK   |
-| title       | VARCHAR(200) NOT NULL   |
-| description | TEXT                    |
-| image       | VARCHAR(500)            |
-| sort_order  | INT DEFAULT 0           |
-| created_at  | TIMESTAMP DEFAULT NOW   |
-| updated_at  | TIMESTAMP ON UPDATE NOW |
+title*, description, image, sort_order (+ id, timestamps)
 
 ### testimonials
-| Column         | Type                             |
-|----------------|----------------------------------|
-| id             | INT AUTO_INCREMENT PK            |
-| customer_name  | VARCHAR(150) NOT NULL            |
-| review         | TEXT NOT NULL                     |
-| rating         | TINYINT CHECK (1-5)              |
-| customer_image | VARCHAR(500)                     |
-| is_active      | BOOLEAN DEFAULT TRUE             |
-| created_at     | TIMESTAMP DEFAULT NOW            |
-| updated_at     | TIMESTAMP ON UPDATE NOW          |
+customer_name*, review*, rating TINYINT 1–5, customer_image,
+is_active (+ id, timestamps)
 
 ### gallery_images
-| Column     | Type                  |
-|------------|-----------------------|
-| id         | INT AUTO_INCREMENT PK |
-| image_path | VARCHAR(500) NOT NULL |
-| alt_tag    | VARCHAR(300)          |
-| sort_order | INT DEFAULT 0         |
-| created_at | TIMESTAMP DEFAULT NOW |
+image_path*, alt_tag, sort_order (+ id, created_at)
 
 ### contact_info
-| Column     | Type                    |
-|------------|-------------------------|
-| id         | INT AUTO_INCREMENT PK   |
-| phone      | VARCHAR(20)             |
-| email      | VARCHAR(150)            |
-| address    | TEXT                    |
-| map_embed  | TEXT                    |
-| updated_at | TIMESTAMP ON UPDATE NOW |
+phone, email, address, map_embed (+ id, updated_at)
 
 ---
 
 ## API Endpoints
 
-All prefixed with `/api`
+All prefixed with `/api`. Deletes require `admin` role; everything
+else mutating requires any authenticated `admin`/`editor`.
 
-### Auth
-| Method | Route         | Auth | Purpose        |
-|--------|---------------|------|----------------|
-| POST   | /auth/login   | No   | Admin login    |
-| GET    | /auth/me      | Yes  | Current user   |
+| Method | Route                  | Access        | Purpose              |
+|--------|------------------------|---------------|----------------------|
+| POST   | /auth/login            | Public        | Login (role in JWT)  |
+| GET    | /auth/me               | Auth          | Current user         |
+| GET    | /seo                   | Public        | Get settings         |
+| PUT    | /seo                   | Auth          | Update (+og/twitter uploads) |
+| GET    | /schemas[?all=true]    | Public        | List (+inactive with all) |
+| POST   | /schemas               | Auth          | Create               |
+| PUT    | /schemas/:id           | Auth          | Update               |
+| DELETE | /schemas/:id           | **Admin**     | Delete               |
+| PATCH  | /schemas/:id/toggle    | Auth          | Toggle active        |
+| GET    | /hero                  | Public        | Get                  |
+| PUT    | /hero                  | Auth          | Update               |
+| GET    | /about                 | Public        | Get                  |
+| PUT    | /about                 | Auth          | Update               |
+| GET    | /vehicles[/:id]        | Public        | List / single        |
+| POST   | /vehicles              | Auth          | Create               |
+| PUT    | /vehicles/:id          | Auth          | Update               |
+| DELETE | /vehicles/:id          | **Admin**     | Delete               |
+| PATCH  | /vehicles/reorder      | Auth          | Reorder              |
+| GET    | /occasions             | Public        | List                 |
+| POST   | /occasions             | Auth          | Create               |
+| PUT    | /occasions/:id         | Auth          | Update               |
+| DELETE | /occasions/:id         | **Admin**     | Delete               |
+| PATCH  | /occasions/reorder     | Auth          | Reorder              |
+| GET    | /testimonials          | Public        | List                 |
+| POST   | /testimonials          | Auth          | Create               |
+| PUT    | /testimonials/:id      | Auth          | Update               |
+| DELETE | /testimonials/:id      | **Admin**     | Delete               |
+| GET    | /gallery               | Public        | List                 |
+| POST   | /gallery               | Auth          | Upload (≤10)         |
+| PUT    | /gallery/:id           | Auth          | Update alt/file      |
+| DELETE | /gallery/:id           | **Admin**     | Delete               |
+| PATCH  | /gallery/reorder       | Auth          | Reorder              |
+| GET    | /contact               | Public        | Get                  |
+| PUT    | /contact               | Auth          | Update               |
+| POST   | /contact/inquiry       | Public        | Booking email (SMTP) |
 
-### SEO
-| Method | Route | Auth | Purpose        |
-|--------|-------|------|----------------|
-| GET    | /seo  | No   | Get settings   |
-| PUT    | /seo  | Yes  | Update settings|
+---
 
-### Schemas
-| Method | Route        | Auth | Purpose |
-|--------|--------------|------|---------|
-| GET    | /schemas     | No   | List    |
-| GET    | /schemas/:id | No   | Single  |
-| POST   | /schemas     | Yes  | Create  |
-| PUT    | /schemas/:id | Yes  | Update  |
-| DELETE | /schemas/:id | Yes  | Delete  |
+## Caching Strategy (production standard)
 
-### Hero
-| Method | Route | Auth | Purpose |
-|--------|-------|------|---------|
-| GET    | /hero | No   | Get     |
-| PUT    | /hero | Yes  | Update  |
+- Public fetches use `next: { revalidate: 3600, tags }` — pages are
+  static, survive backend outages serving last-good HTML.
+- Every section fetch carries `site` + `home` + `section:<name>` tags;
+  dedicated routes carry `site` + their section tag.
+- `POST /api/revalidate` (secret-guarded) purges exact tags.
+- Backend `revalidateAfterMutation` maps each mutated resource to its
+  tags — only changed pages uncache. Auth and inquiry routes excluded.
 
-### About
-| Method | Route  | Auth | Purpose |
-|--------|--------|------|---------|
-| GET    | /about | No   | Get     |
-| PUT    | /about | Yes  | Update  |
+## Upload Presets (sharp, before Cloudinary)
 
-### Vehicles
-| Method | Route              | Auth | Purpose  |
-|--------|--------------------|------|----------|
-| GET    | /vehicles          | No   | List     |
-| GET    | /vehicles/:id      | No   | Single   |
-| POST   | /vehicles          | Yes  | Create   |
-| PUT    | /vehicles/:id      | Yes  | Update   |
-| DELETE | /vehicles/:id      | Yes  | Delete   |
-| PATCH  | /vehicles/reorder  | Yes  | Reorder  |
+| Preset   | Size            | Quality | Used for                  |
+|----------|-----------------|---------|---------------------------|
+| avatar   | 256×256 cover   | 80      | Testimonial photos        |
+| social   | 1200×630 cover  | 82      | OG / Twitter images (no GIF) |
+| standard | ≤1600px inside  | 82      | Hero, vehicles, occasions, gallery, about |
 
-### Occasions
-| Method | Route          | Auth | Purpose |
-|--------|----------------|------|---------|
-| GET    | /occasions     | No   | List    |
-| POST   | /occasions     | Yes  | Create  |
-| PUT    | /occasions/:id | Yes  | Update  |
-| DELETE | /occasions/:id | Yes  | Delete  |
+## Environment
 
-### Testimonials
-| Method | Route              | Auth | Purpose |
-|--------|--------------------|------|---------|
-| GET    | /testimonials      | No   | List    |
-| POST   | /testimonials      | Yes  | Create  |
-| PUT    | /testimonials/:id  | Yes  | Update  |
-| DELETE | /testimonials/:id  | Yes  | Delete  |
-
-### Gallery
-| Method | Route        | Auth | Purpose      |
-|--------|--------------|------|--------------|
-| GET    | /gallery     | No   | List         |
-| POST   | /gallery     | Yes  | Upload       |
-| PUT    | /gallery/:id | Yes  | Update alt   |
-| DELETE | /gallery/:id | Yes  | Delete image |
-
-### Contact
-| Method | Route    | Auth | Purpose |
-|--------|----------|------|---------|
-| GET    | /contact | No   | Get     |
-| PUT    | /contact | Yes  | Update  |
+| Variable            | Where    | Purpose                              |
+|---------------------|----------|--------------------------------------|
+| `DB_HOST/PORT/USER/PASS/NAME` | Server | MySQL connection              |
+| `DB_SSL`            | Server   | `true` enables TLS (TiDB Cloud)      |
+| `JWT_SECRET`        | Server   | Token signing (required)             |
+| `CLIENT_URL`        | Server   | CORS origin + revalidate webhook host|
+| `REVALIDATE_SECRET` | Both, identical | Cache-purge shared secret     |
+| `CLOUDINARY_*`      | Server   | Media upload creds                   |
+| `SMTP_HOST/PORT/USER/PASS` | Server | Inquiry mail transport          |
+| `NEXT_PUBLIC_API_URL` | Client | Backend base URL (build-time)        |
 
 ---
 
 ## DRY Utilities
 
-| Utility         | Location                   | Purpose                               |
-|-----------------|----------------------------|---------------------------------------|
-| `catchAsync`    | `server/src/utils/`        | Wraps async handlers, no try-catch    |
-| `ApiError`      | `server/src/utils/`        | Throw errors with status codes        |
-| `ApiResponse`   | `server/src/utils/`        | Consistent `{success, message, data}` |
-| `crudFactory`   | `server/src/utils/`        | Generate CRUD controllers for models  |
-| `fileHelper`    | `server/src/utils/`        | File path resolution + deletion       |
-| `useFetch`      | `client/src/hooks/`        | Reusable data fetching hook           |
-| `useForm`       | `client/src/hooks/`        | Reusable form state management        |
-| `api.js`        | `client/src/lib/`          | Axios instance with interceptors      |
+| Utility            | Location            | Purpose                              |
+|--------------------|---------------------|--------------------------------------|
+| `catchAsync`       | `server/src/utils/` | Wraps async handlers, no try-catch   |
+| `ApiError`         | `server/src/utils/` | Throw errors with status codes       |
+| `ApiResponse`      | `server/src/utils/` | Consistent `{success, message, data}`|
+| `crudFactory`      | `server/src/utils/` | Generate CRUD controllers for models |
+| `fileHelper`       | `server/src/utils/` | Cloudinary-aware file deletion       |
+| `triggerRevalidate`| `server/src/utils/` | Fire-and-forget cache purge webhook  |
+| `site.js`          | `client/src/lib/`   | API base, media resolver, brand      |
+| `content.js`       | `client/src/lib/`   | Array/paragraph CMS parsers          |
+| `services/home.js` | `client/src/services/` | Sole public fetch + metadata layer |
+| `api.js`           | `client/src/lib/`   | Axios instance with auth interceptor |
