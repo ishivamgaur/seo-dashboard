@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS hero_section (
   cta_url VARCHAR(500),
   secondary_cta_text VARCHAR(100),
   secondary_cta_url VARCHAR(500),
+  badge_text VARCHAR(100),
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

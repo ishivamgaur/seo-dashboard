@@ -43,6 +43,7 @@ function ContentManagementContent() {
     ctaUrl: "",
     secondaryCtaText: "",
     secondaryCtaUrl: "",
+    badgeText: "",
     bannerImage: "",
   });
   const [heroFile, setHeroFile] = useState(null);
@@ -81,6 +82,7 @@ function ContentManagementContent() {
             ctaUrl: h.ctaUrl || "",
             secondaryCtaText: h.secondaryCtaText || "",
             secondaryCtaUrl: h.secondaryCtaUrl || "",
+            badgeText: h.badgeText || "",
             bannerImage: h.bannerImage || "",
           });
           setHeroPreview(h.bannerImage || "");
@@ -143,6 +145,7 @@ function ContentManagementContent() {
       formData.append("ctaUrl", heroForm.ctaUrl);
       formData.append("secondaryCtaText", heroForm.secondaryCtaText);
       formData.append("secondaryCtaUrl", heroForm.secondaryCtaUrl);
+      formData.append("badgeText", heroForm.badgeText);
       if (heroFile) {
         formData.append("bannerImage", heroFile);
       } else if (heroForm.bannerImage) {
@@ -353,6 +356,19 @@ function ContentManagementContent() {
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
+                Pill Badge Text
+              </label>
+              <input
+                type="text"
+                value={heroForm.badgeText}
+                onChange={(e) => setHeroForm({ ...heroForm, badgeText: e.target.value })}
+                placeholder="e.g. Urban Cruise Fleet"
+                className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+              />
             </div>
 
             <div>

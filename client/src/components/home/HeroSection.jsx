@@ -5,12 +5,13 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import Reveal from "./Reveal";
 import Button from "@/components/ui/Button";
-import { BRAND, resolveMediaUrl } from "@/lib/site";
+import { resolveMediaUrl } from "@/lib/site";
 
 const HeroSection = ({ data }) => {
   if (!data?.heading || !data?.bannerImage) return null;
 
-  const { heading, subHeading, ctaText, ctaUrl, secondaryCtaText, secondaryCtaUrl } = data;
+  const { heading, subHeading, ctaText, ctaUrl, secondaryCtaText, secondaryCtaUrl, badgeText } =
+    data;
   const bannerImage = resolveMediaUrl(data.bannerImage);
 
   return (
@@ -37,9 +38,11 @@ const HeroSection = ({ data }) => {
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-32 sm:py-44 md:py-56">
         <Reveal className="max-w-xl">
-          <span className="inline-block text-xs font-mono text-teal-300 bg-teal-950/60 border border-teal-800/60 px-2.5 py-0.5 rounded font-semibold">
-            {BRAND.name} Fleet
-          </span>
+          {badgeText && (
+            <span className="inline-block text-xs font-mono text-teal-300 bg-teal-950/60 border border-teal-800/60 px-2.5 py-0.5 rounded font-semibold">
+              {badgeText}
+            </span>
+          )}
           <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white text-balance leading-tight">
             {heading}
           </h1>

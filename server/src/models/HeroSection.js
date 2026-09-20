@@ -32,6 +32,10 @@ const HeroSection = sequelize.define(
       type: DataTypes.STRING(500),
       field: "secondary_cta_url",
     },
+    badgeText: {
+      type: DataTypes.STRING(100),
+      field: "badge_text",
+    },
   },
   {
     tableName: "hero_sections",
