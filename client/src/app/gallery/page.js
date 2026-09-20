@@ -14,7 +14,7 @@ export async function generateMetadata() {
 }
 
 export default async function GalleryPage() {
-  const gallery = await fetchSection("/gallery");
+  const gallery = await fetchSection("/gallery", "gallery");
 
   return (
     <div className="min-h-screen bg-[#eceff3] dark:bg-[#090a0d] text-zinc-900 dark:text-zinc-100 flex flex-col font-sans antialiased">

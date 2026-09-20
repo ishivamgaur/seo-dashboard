@@ -15,8 +15,8 @@ export async function generateMetadata() {
 
 export default async function ContactPage() {
   const [contact, vehicles] = await Promise.all([
-    fetchSection("/contact"),
-    fetchSection("/vehicles"),
+    fetchSection("/contact", "contact"),
+    fetchSection("/vehicles", "vehicles"),
   ]);
 
   return (

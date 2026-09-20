@@ -14,7 +14,7 @@ export async function generateMetadata() {
 }
 
 export default async function FleetPage() {
-  const vehicles = await fetchSection("/vehicles");
+  const vehicles = await fetchSection("/vehicles", "vehicles");
 
   return (
     <div className="min-h-screen bg-[#eceff3] dark:bg-[#090a0d] text-zinc-900 dark:text-zinc-100 flex flex-col font-sans antialiased">

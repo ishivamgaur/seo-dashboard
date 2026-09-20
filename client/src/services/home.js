@@ -2,10 +2,10 @@ import { API_BASE, FALLBACK_IMAGES, BRAND } from "@/lib/site";
 
 const REVALIDATE_SECONDS = 3600;
 
-const fetchJson = async (endpoint) => {
+const fetchJson = async (endpoint, tags = ["site"]) => {
   try {
     const res = await fetch(`${API_BASE}${endpoint}`, {
-      next: { revalidate: REVALIDATE_SECONDS, tags: ["site-content"] },
+      next: { revalidate: REVALIDATE_SECONDS, tags },
     });
     if (!res.ok) return null;
     const json = await res.json();
@@ -19,7 +19,19 @@ const fetchJson = async (endpoint) => {
 export const fetchSeoSettings = () => fetchJson("/seo");
 
 // Granular fetch for single-section routes.
-export const fetchSection = (endpoint) => fetchJson(endpoint);
+export const fetchSection = (endpoint, section) =>
+  fetchJson(endpoint, section ? ["site", `section:${section}`] : ["site"]);
+
+const HOME_SECTIONS = {
+  schemas: "schemas",
+  hero: "hero",
+  about: "about",
+  vehicles: "vehicles",
+  occasions: "occasions",
+  testimonials: "testimonials",
+  gallery: "gallery",
+  contact: "contact",
+};
 
 export const siteBaseUrl = (seo) => (seo?.canonicalUrl || "https://urbancruise.in").replace(/\/$/, "");
 
@@ -51,17 +63,16 @@ export const buildSectionMetadata = (seo, { path, title, description }) => {
 };
 
 export const fetchHomeData = async () => {
-  const [schema, hero, about, vehicles, occasions, testimonials, gallery, contact] =
-    await Promise.all([
-      fetchJson("/schemas"),
-      fetchJson("/hero"),
-      fetchJson("/about"),
-      fetchJson("/vehicles"),
-      fetchJson("/occasions"),
-      fetchJson("/testimonials"),
-      fetchJson("/gallery"),
-      fetchJson("/contact"),
-    ]);
+  // Every section fetch on the homepage carries the home tag plus its
+  // own section tag, so purging one section refreshes the homepage
+  // without touching unrelated cached pages.
+  const entries = await Promise.all(
+    Object.entries(HOME_SECTIONS).map(([key, section]) =>
+      fetchJson(`/${key}`, ["site", "home", `section:${section}`]).then((data) => [key, data])
+    )
+  );
+  const byKey = Object.fromEntries(entries);
+  const { schema, hero, about, vehicles, occasions, testimonials, gallery, contact } = byKey;
 
   return {
     schema,
