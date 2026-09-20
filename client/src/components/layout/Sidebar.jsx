@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "../../context/AuthContext";
 import {
   LayoutDashboard,
   Search,
@@ -26,9 +27,12 @@ const navItems = [
 
 export default function Sidebar({ isOpen = false, onClose = null }) {
   const pathname = usePathname();
+  const { user } = useAuth() || {};
+  const roleLabel = user?.role === "editor" ? "Editor" : "Admin";
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(256);
   const [isDragging, setIsDragging] = useState(false);
+  const [transitionsReady, setTransitionsReady] = useState(false);
 
   const isDraggingRef = useRef(false);
   const dragStartXRef = useRef(0);
@@ -59,6 +63,10 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
           setSidebarWidth(parsed);
         }
       }
+      // arm transitions only after first paint so the restored
+      // width applies instantly instead of animating on reload
+      const frame = requestAnimationFrame(() => setTransitionsReady(true));
+      return () => cancelAnimationFrame(frame);
     } catch {}
   }, []);
 
@@ -141,7 +149,9 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
     <aside
       style={{ width: collapsed ? 68 : sidebarWidth }}
       className={`relative bg-white dark:bg-[#0c0d10] text-zinc-900 dark:text-zinc-100 flex flex-col h-full border-r border-zinc-200/90 dark:border-zinc-800/80 shadow-xs shrink-0 select-none ${
-        isDragging ? "transition-none" : "transition-[width] duration-300 ease-in-out"
+        isDragging || !transitionsReady
+          ? "transition-none"
+          : "transition-[width] duration-300 ease-in-out"
       }`}
     >
       {!onClose && (
@@ -274,7 +284,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
           <>
             <span>Urban Cruise v2.0</span>
             <span className="text-[10px] bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-500">
-              Admin
+              {roleLabel}
             </span>
           </>
         )}

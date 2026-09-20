@@ -379,13 +379,16 @@ export default function LoginPage() {
             </div>
           </form>
 
-          <div className="mt-8 pt-4 border-t border-zinc-200/70 dark:border-zinc-800/60 flex items-center justify-between gap-2">
-            <span className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
-              Demo: admin@seodashboard.com / admin123
-            </span>
+          <div className="mt-8 pt-4 border-t border-zinc-200/70 dark:border-zinc-800/60 space-y-1.5">
+            <p className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
+              Demo admin: admin@seodashboard.com / admin123
+            </p>
+            <p className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
+              Demo editor: editor@seodashboard.com / editor123
+            </p>
             <Link
               href="/"
-              className="text-[11px] font-mono text-teal-600 dark:text-teal-400 hover:underline shrink-0"
+              className="inline-block mt-1 text-[11px] font-mono text-teal-600 dark:text-teal-400 hover:underline"
             >
               View site
             </Link>

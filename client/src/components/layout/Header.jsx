@@ -60,10 +60,10 @@ export default function Header({ onMenuClick = () => {} }) {
 
         <div
           className="h-8 px-3 inline-flex items-center gap-1.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27] text-xs font-medium text-zinc-700 dark:text-zinc-300 select-none"
-          title={`Administrator: ${user?.name || "Admin"} (${user?.email || "admin@seodashboard.com"})`}
+          title={`${user?.role === "editor" ? "Editor" : "Administrator"}: ${user?.name || "Admin"} (${user?.email || "admin@seodashboard.com"})`}
         >
           <User className="w-3.5 h-3.5 shrink-0 text-teal-600 dark:text-teal-400 stroke-[1.75]" />
-          <span className="leading-none">Admin</span>
+          <span className="leading-none">{user?.role === "editor" ? "Editor" : "Admin"}</span>
         </div>
 
         <button
