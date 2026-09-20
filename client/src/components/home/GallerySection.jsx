@@ -95,7 +95,7 @@ const GallerySection = ({ data }) => {
             <motion.div
               layoutId={`fleet-photo-${current.key}`}
               transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              className="relative w-full max-w-3xl rounded-xl overflow-hidden"
+              className="relative w-full max-w-3xl rounded-xl overflow-hidden bg-black"
               onTouchStart={(e) => {
                 touchX.current = e.touches[0].clientX;
               }}
@@ -110,22 +110,17 @@ const GallerySection = ({ data }) => {
               <img
                 src={current.src}
                 alt={current.altTag || "Fleet photo"}
-                className="w-full h-auto max-h-[70vh] object-contain bg-black"
+                className="w-full h-auto max-h-[75vh] object-contain"
               />
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2, delay: 0.1 }}
-              className="mt-3 flex items-center justify-between gap-3 text-white w-full max-w-3xl"
-            >
-              <span className="text-sm font-medium truncate">
-                {current.altTag || "Fleet photo"}
-              </span>
-              <span className="font-mono tabular-nums text-xs text-zinc-300 shrink-0">
-                {String(current.n).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
-              </span>
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-4 pt-10 pb-4 flex items-end justify-between gap-3">
+                <span className="text-sm font-medium text-white truncate">
+                  {current.altTag || "Fleet photo"}
+                </span>
+                <span className="font-mono tabular-nums text-xs text-zinc-300 shrink-0">
+                  {String(current.n).padStart(2, "0")} /{" "}
+                  {String(photos.length).padStart(2, "0")}
+                </span>
+              </div>
             </motion.div>
             <button
               type="button"
