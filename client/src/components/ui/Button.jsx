@@ -1,20 +1,18 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
+import React from "react";
+import Link from "next/link";
 
-// Single button system for the whole site — same padding as the
-// admin panel buttons (px-4 py-2, text-xs).
 const VARIANTS = {
-  primary: 'bg-teal-600 hover:bg-teal-500 text-white',
-  ghostOnDark: 'border border-white/30 text-white hover:bg-white/10',
+  primary: "bg-teal-600 hover:bg-teal-500 text-white",
+  ghostOnDark: "border border-white/30 text-white hover:bg-white/10",
 };
 
 const Button = ({
   href,
-  type = 'button',
-  variant = 'primary',
-  className = '',
+  type = "button",
+  variant = "primary",
+  className = "",
   children,
   ...rest
 }) => {

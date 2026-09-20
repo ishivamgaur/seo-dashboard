@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Image from 'next/image';
-import Reveal from './Reveal';
-import SectionShell from '@/components/ui/SectionShell';
-import SectionHeader from '@/components/ui/SectionHeader';
-import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
-import Button from '@/components/ui/Button';
-import { FALLBACK_IMAGES, resolveMediaUrl } from '@/lib/site';
-import { parseStringArray } from '@/lib/content';
+import React from "react";
+import Reveal from "./Reveal";
+import FramedImage from "./FramedImage";
+import SectionShell from "@/components/ui/SectionShell";
+import SectionHeader from "@/components/ui/SectionHeader";
+import Card from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
+import { resolveMediaUrl } from "@/lib/site";
+import { parseStringArray } from "@/lib/content";
 
-const ALT_FADE = 'from-[#eceff3] to-[#dde7df] dark:from-[#090a0d] dark:to-[#0c0f14]';
+const ALT_FADE = "from-[#eceff3] to-[#dde7df] dark:from-[#090a0d] dark:to-[#0c0f14]";
 
 const VehiclesSection = ({ data }) => {
   const vehicles = Array.isArray(data) && data.length > 0 ? data : [];
@@ -27,21 +27,18 @@ const VehiclesSection = ({ data }) => {
 
       <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {vehicles.map((v, i) => {
+          if (!v.vehicleName) return null;
           const features = parseStringArray(v.features);
+          const imageSrc = resolveMediaUrl(v.image);
           return (
             <Reveal key={v.id || i} delay={(i % 3) * 0.08} className="h-full">
               <Card interactive className="h-full overflow-hidden flex flex-col group">
-                <div className="p-2.5 pb-0">
-                  <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden bg-[#f1eee7] dark:bg-black">
-                    <Image
-                      src={resolveMediaUrl(v.image, FALLBACK_IMAGES.vehicle)}
-                      alt={v.vehicleName}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-                    />
-                  </div>
-                </div>
+                <FramedImage
+                  src={imageSrc}
+                  alt={v.vehicleName}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  flushBottom
+                />
                 <div className="p-5 flex flex-col flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="text-sm font-bold text-zinc-950 dark:text-white truncate">

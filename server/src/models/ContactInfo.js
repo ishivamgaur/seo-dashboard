@@ -1,8 +1,8 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../config/database.js';
+import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
 
 const ContactInfo = sequelize.define(
-  'ContactInfo',
+  "ContactInfo",
   {
     phone: {
       type: DataTypes.STRING(20),
@@ -15,11 +15,11 @@ const ContactInfo = sequelize.define(
     },
     mapEmbed: {
       type: DataTypes.TEXT,
-      field: 'map_embed',
+      field: "map_embed",
     },
   },
   {
-    tableName: 'contact_infos',
+    tableName: "contact_infos",
     freezeTableName: true,
     underscored: true,
     timestamps: true,

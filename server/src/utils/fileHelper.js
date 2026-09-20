@@ -1,5 +1,5 @@
-import { v2 as cloudinary } from 'cloudinary';
-import { config } from '../config/environment.js';
+import { v2 as cloudinary } from "cloudinary";
+import { config } from "../config/environment.js";
 
 cloudinary.config({
   cloud_name: config.cloudinary.cloudName,
@@ -13,13 +13,13 @@ export const deleteFile = async (fileUrl) => {
   try {
     // Extract public ID from Cloudinary URL
     // URL looks like: https://res.cloudinary.com/cloud_name/image/upload/v123456789/seo-dashboard/vehicles/filename.jpg
-    const parts = fileUrl.split('/');
+    const parts = fileUrl.split("/");
     const filenameWithExt = parts.pop();
     const subfolder = parts.pop();
     const rootFolder = parts.pop();
 
-    if (rootFolder === 'seo-dashboard') {
-      const publicId = `${rootFolder}/${subfolder}/${filenameWithExt.split('.')[0]}`;
+    if (rootFolder === "seo-dashboard") {
+      const publicId = `${rootFolder}/${subfolder}/${filenameWithExt.split(".")[0]}`;
       await cloudinary.uploader.destroy(publicId);
       console.log(`Deleted image from Cloudinary: ${publicId}`);
     }

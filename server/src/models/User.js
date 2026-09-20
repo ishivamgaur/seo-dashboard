@@ -1,8 +1,8 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../config/database.js';
+import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
 
 const User = sequelize.define(
-  'User',
+  "User",
   {
     name: {
       type: DataTypes.STRING(100),
@@ -18,12 +18,12 @@ const User = sequelize.define(
       allowNull: false,
     },
     role: {
-      type: DataTypes.ENUM('admin', 'editor'),
-      defaultValue: 'admin',
+      type: DataTypes.ENUM("admin", "editor"),
+      defaultValue: "admin",
     },
   },
   {
-    tableName: 'users',
+    tableName: "users",
     freezeTableName: true,
     underscored: true,
     timestamps: true,

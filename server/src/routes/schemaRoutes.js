@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router } from "express";
 import {
   getAll,
   getOne,
@@ -6,16 +6,17 @@ import {
   update,
   remove,
   toggleActive,
-} from '../controllers/schemaController.js';
-import { authenticate } from '../middleware/authenticate.js';
+} from "../controllers/schemaController.js";
+import { authenticate } from "../middleware/authenticate.js";
+import { authorize } from "../middleware/authorize.js";
 
 const router = Router();
 
-router.get('/', getAll);
-router.get('/:id', getOne);
-router.post('/', authenticate, create);
-router.put('/:id', authenticate, update);
-router.delete('/:id', authenticate, remove);
-router.patch('/:id/toggle', authenticate, toggleActive);
+router.get("/", getAll);
+router.get("/:id", getOne);
+router.post("/", authenticate, create);
+router.put("/:id", authenticate, update);
+router.delete("/:id", authenticate, authorize("admin"), remove);
+router.patch("/:id/toggle", authenticate, toggleActive);
 
 export default router;

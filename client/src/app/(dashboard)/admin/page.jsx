@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { CarFront, Compass, Star, Images, ArrowRight } from 'lucide-react';
-import api from '@/lib/api';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { CarFront, Compass, Star, Images, ArrowRight } from "lucide-react";
+import api from "@/lib/api";
 
 export default function DashboardOverview() {
   const [counts, setCounts] = useState({
@@ -14,6 +15,8 @@ export default function DashboardOverview() {
   });
   const [recentVehicles, setRecentVehicles] = useState([]);
   const [seoSnapshot, setSeoSnapshot] = useState(null);
+  const [totalSeats, setTotalSeats] = useState(0);
+  const [avgRating, setAvgRating] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,23 +24,23 @@ export default function DashboardOverview() {
       try {
         const [vData, oData, tData, gData, sData] = await Promise.all([
           api
-            .get('/vehicles')
+            .get("/vehicles")
             .then((r) => r.data)
             .catch(() => ({ data: [] })),
           api
-            .get('/occasions')
+            .get("/occasions")
             .then((r) => r.data)
             .catch(() => ({ data: [] })),
           api
-            .get('/testimonials')
+            .get("/testimonials")
             .then((r) => r.data)
             .catch(() => ({ data: [] })),
           api
-            .get('/gallery')
+            .get("/gallery")
             .then((r) => r.data)
             .catch(() => ({ data: [] })),
           api
-            .get('/seo')
+            .get("/seo")
             .then((r) => r.data)
             .catch(() => ({ data: null })),
         ]);
@@ -54,10 +57,23 @@ export default function DashboardOverview() {
           gallery: galleryList.length,
         });
 
+        const totalSeats = vehiclesList.reduce(
+          (sum, v) => sum + (Number(v.seatingCapacity) || 0),
+          0
+        );
+        setTotalSeats(totalSeats);
+
+        const ratings = testimonialsList.map((t) => Number(t.rating)).filter((r) => r > 0);
+        setAvgRating(
+          ratings.length > 0
+            ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1)
+            : null
+        );
+
         setRecentVehicles(vehiclesList.slice(0, 4));
         setSeoSnapshot(sData.data || null);
       } catch (err) {
-        console.error('Failed to load dashboard metrics:', err);
+        console.error("Failed to load dashboard metrics:", err);
       } finally {
         setLoading(false);
       }
@@ -68,32 +84,48 @@ export default function DashboardOverview() {
 
   const kpis = [
     {
-      title: 'Active Vehicles',
+      title: "Active Vehicles",
       value: counts.vehicles.toString(),
-      sub: 'Total fleet in inventory',
+      sub: (
+        <>
+          <span className="font-mono tabular-nums font-semibold text-teal-700 dark:text-teal-300">
+            {totalSeats} seats
+          </span>{" "}
+          across fleet
+        </>
+      ),
       icon: CarFront,
-      href: '/admin/vehicles',
+      href: "/admin/vehicles",
     },
     {
-      title: 'Services & Occasions',
+      title: "Services & Occasions",
       value: counts.occasions.toString(),
-      sub: 'Available travel packages',
+      sub: "Available travel packages",
       icon: Compass,
-      href: '/admin/occasions',
+      href: "/admin/occasions",
     },
     {
-      title: 'Client Reviews',
+      title: "Client Reviews",
       value: counts.testimonials.toString(),
-      sub: '5-star customer ratings',
+      sub: avgRating ? (
+        <>
+          <span className="font-mono tabular-nums font-semibold text-teal-700 dark:text-teal-300">
+            {avgRating} average
+          </span>{" "}
+          rating
+        </>
+      ) : (
+        "No ratings yet"
+      ),
       icon: Star,
-      href: '/admin/testimonials',
+      href: "/admin/testimonials",
     },
     {
-      title: 'Gallery Media',
+      title: "Gallery Media",
       value: counts.gallery.toString(),
-      sub: 'Showroom fleet photos',
+      sub: "Showroom fleet photos",
       icon: Images,
-      href: '/admin/gallery',
+      href: "/admin/gallery",
     },
   ];
 
@@ -235,12 +267,14 @@ export default function DashboardOverview() {
                       <span className="font-mono text-zinc-400 text-xs w-5 shrink-0">
                         #{idx + 1}
                       </span>
-                      <div className="w-10 h-7 bg-zinc-200/60 dark:bg-[#13161c] rounded overflow-hidden flex items-center justify-center shrink-0">
+                      <div className="relative w-10 h-7 bg-zinc-200/60 dark:bg-[#13161c] rounded overflow-hidden flex items-center justify-center shrink-0">
                         {v.image ? (
-                          <img
+                          <Image
                             src={v.image}
                             alt={v.vehicleName}
-                            className="object-contain w-full h-full"
+                            fill
+                            sizes="40px"
+                            className="object-contain"
                           />
                         ) : (
                           <CarFront className="w-3.5 h-3.5 text-zinc-400" />
@@ -275,9 +309,9 @@ export default function DashboardOverview() {
                 </span>
                 <p
                   className="font-medium text-zinc-900 dark:text-zinc-100 mt-1.5 truncate"
-                  title={seoSnapshot?.metaTitle || 'Urban Cruise'}
+                  title={seoSnapshot?.metaTitle || "Urban Cruise"}
                 >
-                  {seoSnapshot?.metaTitle || 'Urban Cruise - Vehicle Rentals'}
+                  {seoSnapshot?.metaTitle || "Urban Cruise - Vehicle Rentals"}
                 </p>
               </div>
 
@@ -286,7 +320,7 @@ export default function DashboardOverview() {
                   Canonical URL
                 </span>
                 <p className="font-mono text-zinc-700 dark:text-zinc-300 mt-1.5 truncate text-[11px]">
-                  {seoSnapshot?.canonicalUrl || 'https://urbancruise.in'}
+                  {seoSnapshot?.canonicalUrl || "https://urbancruise.in"}
                 </p>
               </div>
 
@@ -295,8 +329,8 @@ export default function DashboardOverview() {
                   Search Robots
                 </span>
                 <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold text-[11px] bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded">
-                  {seoSnapshot?.robotsIndex !== false ? 'index' : 'noindex'},{' '}
-                  {seoSnapshot?.robotsFollow !== false ? 'follow' : 'nofollow'}
+                  {seoSnapshot?.robotsIndex !== false ? "index" : "noindex"},{" "}
+                  {seoSnapshot?.robotsFollow !== false ? "follow" : "nofollow"}
                 </span>
               </div>
             </div>
@@ -309,51 +343,6 @@ export default function DashboardOverview() {
                 <span>Edit Meta & Schemas</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
-            </div>
-          </div>
-
-          <div className="rounded-xl bg-white dark:bg-[#13161c] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-white">
-                  System Services
-                </h3>
-              </div>
-
-              <div className="space-y-2 text-xs">
-                <div className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27]">
-                  <span className="text-zinc-600 dark:text-zinc-300 font-medium">API Gateway</span>
-                  <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded text-[11px]">
-                    PORT 5000
-                  </span>
-                </div>
-                <div className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27]">
-                  <span className="text-zinc-600 dark:text-zinc-300 font-medium">Database</span>
-                  <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded text-[11px]">
-                    MySQL
-                  </span>
-                </div>
-                <div className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27]">
-                  <span className="text-zinc-600 dark:text-zinc-300 font-medium">
-                    Client Engine
-                  </span>
-                  <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded text-[11px]">
-                    Next.js 16
-                  </span>
-                </div>
-                <div className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27]">
-                  <span className="text-zinc-600 dark:text-zinc-300 font-medium">Theme Engine</span>
-                  <span className="font-mono text-teal-700 dark:text-teal-300 font-semibold bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded text-[11px]">
-                    next-themes
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-3.5 mt-2">
-              <span className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500 block font-medium">
-                All systems operational
-              </span>
             </div>
           </div>
         </div>

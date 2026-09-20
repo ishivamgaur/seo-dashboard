@@ -1,7 +1,5 @@
-import React from 'react';
+import React from "react";
 
-// Standard section heading block: mono eyebrow, bold title,
-// optional description + right-side aside (e.g. count badge).
 const SectionHeader = ({ eyebrow, title, description, aside }) => {
   return (
     <div className="flex items-start justify-between gap-3">
@@ -12,7 +10,7 @@ const SectionHeader = ({ eyebrow, title, description, aside }) => {
           </p>
         )}
         <h2
-          className={`${eyebrow ? 'mt-2' : ''} text-xl sm:text-2xl font-bold tracking-tight leading-tight text-zinc-950 dark:text-white text-balance`}
+          className={`${eyebrow ? "mt-2" : ""} text-xl sm:text-2xl font-bold tracking-tight leading-tight text-zinc-950 dark:text-white text-balance`}
         >
           {title}
         </h2>

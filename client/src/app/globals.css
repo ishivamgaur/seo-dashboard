@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
   --max-width-8xl: 90rem;
@@ -8,7 +8,7 @@
 
 :root {
   --font-sans:
-    var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
 }
 
@@ -16,10 +16,16 @@ html {
   scroll-behavior: smooth;
   /* Reserve scrollbar width so layout never shifts when scroll appears */
   scrollbar-gutter: stable;
+}
+
+/* Same thin scrollbar on every scroll container (page, sidebar,
+   dashboard panels, modals) — Firefox needs it per element */
+* {
   scrollbar-width: thin;
   scrollbar-color: #c2cac5 transparent;
 }
 
+html.dark *,
 html.dark {
   scrollbar-color: #2b3231 transparent;
 }
@@ -50,6 +56,38 @@ html.dark ::-webkit-scrollbar-thumb:hover {
   background: #3a4342;
 }
 
+[data-sonner-toaster] {
+  --width: 320px;
+}
+
+[data-sonner-toast] {
+  width: auto;
+  max-width: min(320px, calc(100vw - 32px));
+  font-size: 11px;
+  border-radius: 10px;
+  padding: 8px 12px;
+  background: #faf7f2;
+  color: #18181b;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+[data-sonner-toast][data-type="success"] [data-icon] {
+  color: #0d9488;
+}
+
+html.dark [data-sonner-toast] {
+  background: #13161c;
+  color: #f4f4f5;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+html.dark [data-sonner-toast][data-type="success"] [data-icon] {
+  color: #2dd4bf;
+}
+
 body {
   background-color: #eceff3;
   color: #18181b;
@@ -57,7 +95,7 @@ body {
     var(--font-geist-sans),
     -apple-system,
     BlinkMacSystemFont,
-    'Segoe UI',
+    "Segoe UI",
     Roboto,
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -80,4 +118,28 @@ html.dark body {
 
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+/* Road dashes streaming leftward while the convoy drives right */
+@keyframes road-stream {
+  to {
+    stroke-dashoffset: 22px;
+  }
+}
+
+.animate-road-stream {
+  animation: road-stream 0.8s linear infinite;
+}
+
+/* Spinning wheels on the login van illustration */
+@keyframes wheel-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-wheel {
+  animation: wheel-spin 1.6s linear infinite;
+  transform-box: fill-box;
+  transform-origin: center;
 }

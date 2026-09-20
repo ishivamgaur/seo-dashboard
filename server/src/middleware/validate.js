@@ -1,6 +1,6 @@
-import { validationResult } from 'express-validator';
+import { validationResult } from "express-validator";
 
-import { ApiError } from '../utils/ApiError.js';
+import { ApiError } from "../utils/ApiError.js";
 
 const validate = (req, res, next) => {
   const errors = validationResult(req);
@@ -11,7 +11,7 @@ const validate = (req, res, next) => {
       message: err.msg,
     }));
 
-    throw ApiError.badRequest('Validation failed', formattedErrors);
+    throw ApiError.badRequest("Validation failed", formattedErrors);
   }
 
   next();

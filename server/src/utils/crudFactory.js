@@ -1,26 +1,26 @@
-import { catchAsync } from './catchAsync.js';
-import { ApiError } from './ApiError.js';
-import { ApiResponse } from './ApiResponse.js';
+import { catchAsync } from "./catchAsync.js";
+import { ApiError } from "./ApiError.js";
+import { ApiResponse } from "./ApiResponse.js";
 
 const getOrderClause = (Model) => {
   const order = [];
   const attrs = Model.rawAttributes || {};
 
   // Respect sort_order when present on the model
-  if ('sort_order' in attrs || 'sortOrder' in attrs) {
-    const col = 'sort_order' in attrs ? 'sort_order' : 'sortOrder';
-    order.push([col, 'ASC']);
+  if ("sort_order" in attrs || "sortOrder" in attrs) {
+    const col = "sort_order" in attrs ? "sort_order" : "sortOrder";
+    order.push([col, "ASC"]);
   }
 
-  if ('created_at' in attrs || 'createdAt' in attrs) {
-    const col = 'created_at' in attrs ? 'created_at' : 'createdAt';
-    order.push([col, 'DESC']);
+  if ("created_at" in attrs || "createdAt" in attrs) {
+    const col = "created_at" in attrs ? "created_at" : "createdAt";
+    order.push([col, "DESC"]);
   }
 
   return order.length ? order : undefined;
 };
 
-const createCrudController = (Model, resourceName = 'Resource') => ({
+const createCrudController = (Model, resourceName = "Resource") => ({
   getAll: catchAsync(async (req, res) => {
     const order = getOrderClause(Model);
     const records = await Model.findAll({ order });

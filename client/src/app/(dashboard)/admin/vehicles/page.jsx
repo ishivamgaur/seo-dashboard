@@ -1,10 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
-import Image from 'next/image';
+import React, { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
 import {
   Edit2,
-  Trash2,
   Plus,
   X,
   CarFront,
@@ -12,10 +11,13 @@ import {
   ArrowDown,
   GripVertical,
   Search,
-} from 'lucide-react';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import api from '@/lib/api';
-import FilterSelect from '@/components/common/FilterSelect';
+  Loader2,
+} from "lucide-react";
+import { toast } from "sonner";
+import DeleteButton from "@/components/common/DeleteButton";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import api from "@/lib/api";
+import FilterSelect from "@/components/common/FilterSelect";
 
 export default function VehiclesPage() {
   const [vehicles, setVehicles] = useState([]);
@@ -23,39 +25,40 @@ export default function VehiclesPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState(null);
-  const [statusMsg, setStatusMsg] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [capacityFilter, setCapacityFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [capacityFilter, setCapacityFilter] = useState("all");
 
-  const [vehicleName, setVehicleName] = useState('');
-  const [seatingCapacity, setSeatingCapacity] = useState('');
-  const [description, setDescription] = useState('');
-  const [features, setFeatures] = useState('');
+  const [vehicleName, setVehicleName] = useState("");
+  const [seatingCapacity, setSeatingCapacity] = useState("");
+  const [description, setDescription] = useState("");
+  const [features, setFeatures] = useState("");
   const [image, setImage] = useState(null);
-  const [imageUrl, setImageUrl] = useState('');
-  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState("");
+  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
 
   const fetchVehicles = async () => {
     try {
-      const res = await api.get('/vehicles');
+      const res = await api.get("/vehicles");
       if (res.data?.success) setVehicles(res.data.data || []);
     } catch (error) {
-      console.error('Failed to fetch vehicles:', error);
+      console.error("Failed to fetch vehicles:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- mount gate keeps drag-drop client-only
     setIsMounted(true);
     fetchVehicles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const showToast = (msg) => {
-    setStatusMsg(msg);
-    setTimeout(() => setStatusMsg(''), 3500);
-  };
+  // single toast helper for this page (sonner renders it globally)
+  const showToast = (msg) => toast.success(msg);
 
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((v) => {
@@ -66,20 +69,20 @@ export default function VehiclesPage() {
       if (!matchesSearch) return false;
 
       const seats = Number(v.seatingCapacity) || 0;
-      if (capacityFilter === '9-12') return seats >= 9 && seats <= 12;
-      if (capacityFilter === '13-16') return seats >= 13 && seats <= 16;
-      if (capacityFilter === '17+') return seats >= 17;
+      if (capacityFilter === "9-12") return seats >= 9 && seats <= 12;
+      if (capacityFilter === "13-16") return seats >= 13 && seats <= 16;
+      if (capacityFilter === "17+") return seats >= 17;
       return true;
     });
   }, [vehicles, searchQuery, capacityFilter]);
 
-  const isFilterActive = searchQuery !== '' || capacityFilter !== 'all';
+  const isFilterActive = searchQuery !== "" || capacityFilter !== "all";
 
   const handleDragEnd = async (result) => {
     if (!result.destination) return;
     if (result.destination.index === result.source.index) return;
     if (isFilterActive) {
-      showToast('Clear search filters before reordering fleet.');
+      showToast("Clear search filters before reordering fleet.");
       return;
     }
 
@@ -95,10 +98,11 @@ export default function VehiclesPage() {
     }));
 
     try {
-      await api.patch('/vehicles/reorder', { order: orderPayload });
-      showToast('Fleet showroom display order updated.');
+      await api.patch("/vehicles/reorder", { order: orderPayload });
+      showToast("Fleet showroom display order updated.");
     } catch (err) {
-      console.error('Failed to reorder vehicles', err);
+      console.error("Failed to reorder vehicles", err);
+      toast.error("Failed to update display order.");
       fetchVehicles();
     }
   };
@@ -119,10 +123,11 @@ export default function VehiclesPage() {
     }));
 
     try {
-      await api.patch('/vehicles/reorder', { order: orderPayload });
-      showToast('Fleet display order updated.');
+      await api.patch("/vehicles/reorder", { order: orderPayload });
+      showToast("Fleet display order updated.");
     } catch (err) {
-      console.error('Failed to reorder vehicles', err);
+      console.error("Failed to reorder vehicles", err);
+      toast.error("Failed to update display order.");
       fetchVehicles();
     }
   };
@@ -138,63 +143,71 @@ export default function VehiclesPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append('vehicleName', vehicleName);
-    formData.append('seatingCapacity', seatingCapacity);
-    formData.append('description', description);
+    formData.append("vehicleName", vehicleName);
+    formData.append("seatingCapacity", seatingCapacity);
+    formData.append("description", description);
 
     const featArray = features
       ? features
-          .split(',')
+          .split(",")
           .map((f) => f.trim())
           .filter(Boolean)
       : [];
-    formData.append('features', JSON.stringify(featArray));
+    formData.append("features", JSON.stringify(featArray));
 
     if (image) {
-      formData.append('image', image);
+      formData.append("image", image);
     } else if (imageUrl) {
-      formData.append('image', imageUrl);
+      formData.append("image", imageUrl);
     }
 
     const vehicleId = editingVehicle?.id;
-    const url = editingVehicle ? `/vehicles/${vehicleId}` : '/vehicles';
-    const method = editingVehicle ? 'put' : 'post';
+    const url = editingVehicle ? `/vehicles/${vehicleId}` : "/vehicles";
+    const method = editingVehicle ? "put" : "post";
 
+    setSaving(true);
     try {
       const res = await api[method](url, formData);
       if (res.status === 200 || res.status === 201) {
         setIsModalOpen(false);
         resetForm();
         fetchVehicles();
-        showToast(editingVehicle ? 'Vehicle updated successfully.' : 'Vehicle added to fleet.');
+        showToast(editingVehicle ? "Vehicle updated successfully." : "Vehicle added to fleet.");
       }
     } catch (error) {
-      console.error('Failed to save vehicle:', error);
+      console.error("Failed to save vehicle:", error);
+      toast.error(error.response?.data?.message || "Failed to save vehicle.");
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this vehicle listing?')) return;
+    if (!confirm("Are you sure you want to delete this vehicle listing?")) return;
+    setDeletingId(id);
     try {
       const res = await api.delete(`/vehicles/${id}`);
       if (res.status === 200) {
         fetchVehicles();
-        showToast('Vehicle deleted successfully.');
+        showToast("Vehicle deleted successfully.");
       }
     } catch (error) {
-      console.error('Failed to delete vehicle:', error);
+      console.error("Failed to delete vehicle:", error);
+      toast.error(error.response?.data?.message || "Failed to delete vehicle.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
   const resetForm = () => {
     setEditingVehicle(null);
-    setVehicleName('');
-    setSeatingCapacity('');
-    setDescription('');
-    setFeatures('');
+    setVehicleName("");
+    setSeatingCapacity("");
+    setDescription("");
+    setFeatures("");
     setImage(null);
-    setImageUrl('');
-    setImagePreviewUrl('');
+    setImageUrl("");
+    setImagePreviewUrl("");
   };
 
   const openAddModal = () => {
@@ -204,18 +217,18 @@ export default function VehiclesPage() {
 
   const openEditModal = (v) => {
     setEditingVehicle(v);
-    setVehicleName(v.vehicleName || '');
-    setSeatingCapacity(v.seatingCapacity?.toString() || '');
-    setDescription(v.description || '');
+    setVehicleName(v.vehicleName || "");
+    setSeatingCapacity(v.seatingCapacity?.toString() || "");
+    setDescription(v.description || "");
     const featList = Array.isArray(v.features)
-      ? v.features.join(', ')
-      : typeof v.features === 'string'
-        ? JSON.parse(v.features || '[]').join(', ')
-        : '';
+      ? v.features.join(", ")
+      : typeof v.features === "string"
+        ? JSON.parse(v.features || "[]").join(", ")
+        : "";
     setFeatures(featList);
     setImage(null);
-    setImageUrl(v.image || '');
-    setImagePreviewUrl(v.image || '');
+    setImageUrl(v.image || "");
+    setImagePreviewUrl(v.image || "");
     setIsModalOpen(true);
   };
 
@@ -232,12 +245,6 @@ export default function VehiclesPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {statusMsg && (
-            <span className="text-xs font-mono text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/40 px-3 py-1.5 rounded-lg font-medium">
-              {statusMsg}
-            </span>
-          )}
-
           <button
             type="button"
             onClick={openAddModal}
@@ -267,10 +274,10 @@ export default function VehiclesPage() {
             value={capacityFilter}
             onChange={setCapacityFilter}
             options={[
-              { value: 'all', label: 'All Fleet' },
-              { value: '9-12', label: '9-12 Seats' },
-              { value: '13-16', label: '13-16 Seats' },
-              { value: '17+', label: '17+ Seats' },
+              { value: "all", label: "All Fleet" },
+              { value: "9-12", label: "9-12 Seats" },
+              { value: "13-16", label: "13-16 Seats" },
+              { value: "17+", label: "17+ Seats" },
             ]}
           />
         </div>
@@ -309,8 +316,8 @@ export default function VehiclesPage() {
                 {filteredVehicles.map((v, index) => {
                   const featArray = Array.isArray(v.features)
                     ? v.features
-                    : typeof v.features === 'string'
-                      ? JSON.parse(v.features || '[]')
+                    : typeof v.features === "string"
+                      ? JSON.parse(v.features || "[]")
                       : [];
 
                   return (
@@ -339,10 +346,12 @@ export default function VehiclesPage() {
                       <div className="px-5 py-3.5">
                         <div className="relative w-20 h-12 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                           {v.image ? (
-                            <img
+                            <Image
                               src={v.image}
                               alt={v.vehicleName}
-                              className="object-contain w-full h-full"
+                              fill
+                              sizes="96px"
+                              className="object-contain"
                             />
                           ) : (
                             <CarFront className="w-5 h-5 text-zinc-400" />
@@ -381,14 +390,10 @@ export default function VehiclesPage() {
                         >
                           <Edit2 className="w-4 h-4 stroke-[1.75]" />
                         </button>
-                        <button
-                          type="button"
+                        <DeleteButton
                           onClick={() => handleDelete(v.id)}
-                          className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md transition-colors cursor-pointer"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4 h-4 stroke-[1.75]" />
-                        </button>
+                          pending={deletingId === v.id}
+                        />
                       </div>
                     </div>
                   );
@@ -407,8 +412,8 @@ export default function VehiclesPage() {
                         const id = v.id.toString();
                         const featArray = Array.isArray(v.features)
                           ? v.features
-                          : typeof v.features === 'string'
-                            ? JSON.parse(v.features || '[]')
+                          : typeof v.features === "string"
+                            ? JSON.parse(v.features || "[]")
                             : [];
 
                         return (
@@ -425,8 +430,8 @@ export default function VehiclesPage() {
                                 style={providedDrag.draggableProps.style}
                                 className={`grid grid-cols-[144px_120px_220px_120px_minmax(0,1fr)_100px] items-center text-xs text-zinc-900 dark:text-zinc-100 transition-colors ${
                                   snapshot.isDragging
-                                    ? 'bg-white dark:bg-[#13161c] shadow-2xl ring-2 ring-teal-500 rounded-xl z-50'
-                                    : 'hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80'
+                                    ? "bg-white dark:bg-[#13161c] shadow-2xl ring-2 ring-teal-500 rounded-xl z-50"
+                                    : "hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80"
                                 }`}
                               >
                                 <div className="px-5 py-3.5 whitespace-nowrap">
@@ -437,13 +442,13 @@ export default function VehiclesPage() {
                                       disabled={isFilterActive}
                                       className={`p-1 rounded transition-colors ${
                                         isFilterActive
-                                          ? 'opacity-30 cursor-not-allowed text-zinc-400'
-                                          : 'hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-grab active:cursor-grabbing'
+                                          ? "opacity-30 cursor-not-allowed text-zinc-400"
+                                          : "hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-grab active:cursor-grabbing"
                                       }`}
                                       title={
                                         isFilterActive
-                                          ? 'Clear filters to reorder'
-                                          : 'Drag to reorder showroom position'
+                                          ? "Clear filters to reorder"
+                                          : "Drag to reorder showroom position"
                                       }
                                     >
                                       <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
@@ -481,10 +486,12 @@ export default function VehiclesPage() {
                                 <div className="px-5 py-3.5">
                                   <div className="relative w-20 h-12 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                                     {v.image ? (
-                                      <img
+                                      <Image
                                         src={v.image}
                                         alt={v.vehicleName}
-                                        className="object-contain w-full h-full"
+                                        fill
+                                        sizes="96px"
+                                        className="object-contain"
                                       />
                                     ) : (
                                       <CarFront className="w-5 h-5 text-zinc-400" />
@@ -532,14 +539,10 @@ export default function VehiclesPage() {
                                   >
                                     <Edit2 className="w-4 h-4 stroke-[1.75]" />
                                   </button>
-                                  <button
-                                    type="button"
+                                  <DeleteButton
                                     onClick={() => handleDelete(v.id)}
-                                    className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md transition-colors cursor-pointer"
-                                    title="Delete"
-                                  >
-                                    <Trash2 className="w-4 h-4 stroke-[1.75]" />
-                                  </button>
+                                    pending={deletingId === v.id}
+                                  />
                                 </div>
                               </div>
                             )}
@@ -562,7 +565,7 @@ export default function VehiclesPage() {
             <div className="flex justify-between items-center mb-5 pb-3">
               <div>
                 <h2 className="text-base font-bold text-zinc-950 dark:text-white">
-                  {editingVehicle ? 'Edit Vehicle Listing' : 'Add Vehicle to Fleet'}
+                  {editingVehicle ? "Edit Vehicle Listing" : "Add Vehicle to Fleet"}
                 </h2>
                 <span className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
                   Fill details and upload high-res photo for the showroom
@@ -656,6 +659,7 @@ export default function VehiclesPage() {
                 {imagePreviewUrl && (
                   <div className="mb-3 p-2.5 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] flex items-center gap-3">
                     <div className="w-20 h-14 bg-white dark:bg-[#13161c] rounded-lg overflow-hidden flex items-center justify-center shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- blob preview urls can't use next/image */}
                       <img
                         src={imagePreviewUrl}
                         alt="Preview"
@@ -701,9 +705,11 @@ export default function VehiclesPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
+                  disabled={saving}
+                  className="inline-flex items-center gap-2 px-5 py-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-70 text-white font-semibold rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
                 >
-                  Save Vehicle
+                  {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{saving ? "Saving..." : "Save Vehicle"}</span>
                 </button>
               </div>
             </form>

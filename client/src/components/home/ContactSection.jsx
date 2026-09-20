@@ -1,29 +1,29 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import FilterSelect from '@/components/common/FilterSelect';
-import Reveal from './Reveal';
-import SectionShell from '@/components/ui/SectionShell';
-import SectionHeader from '@/components/ui/SectionHeader';
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
+import React, { useState } from "react";
+import FilterSelect from "@/components/common/FilterSelect";
+import Reveal from "./Reveal";
+import SectionShell from "@/components/ui/SectionShell";
+import SectionHeader from "@/components/ui/SectionHeader";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
 
-const ALT_FADE = 'from-[#eceff3] to-[#dde7df] dark:from-[#090a0d] dark:to-[#0c0f14]';
+const ALT_FADE = "from-[#eceff3] to-[#dde7df] dark:from-[#090a0d] dark:to-[#0c0f14]";
 
 const inputCls =
-  'w-full bg-[#f1eee7] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-sm border-0';
+  "w-full bg-[#f1eee7] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-sm border-0";
 
 const labelCls =
-  'block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5';
+  "block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5";
 
 const ContactSection = ({ data, vehicles = [] }) => {
-  const phone = data?.phone || '+91 98765 43210';
-  const email = data?.email || 'bookings@urbancruise.in';
-  const address = data?.address || 'Plot No. 42, Sector 18, Gurugram, Haryana 122008, India';
-  const mapEmbed = data?.mapEmbed || '';
+  const phone = data?.phone || "";
+  const email = data?.email || "";
+  const address = data?.address || "";
+  const mapEmbed = data?.mapEmbed || "";
 
   const [sent, setSent] = useState(false);
-  const [form, setForm] = useState({ name: '', phone: '', vehicle: '', message: '' });
+  const [form, setForm] = useState({ name: "", phone: "", vehicle: "", message: "" });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -32,76 +32,82 @@ const ContactSection = ({ data, vehicles = [] }) => {
   };
 
   const infoRows = [
-    {
-      label: 'Phone',
+    phone && {
+      label: "Phone",
       value: (
         <a
-          href={`tel:${phone.replace(/\s+/g, '')}`}
+          href={`tel:${phone.replace(/\s+/g, "")}`}
           className="hover:text-teal-600 dark:hover:text-teal-400"
         >
           {phone}
         </a>
       ),
-      valueCls: 'font-mono tabular-nums font-bold text-zinc-950 dark:text-white',
+      valueCls: "font-mono tabular-nums font-bold text-zinc-950 dark:text-white",
     },
-    {
-      label: 'Email',
+    email && {
+      label: "Email",
       value: (
         <a href={`mailto:${email}`} className="hover:text-teal-600 dark:hover:text-teal-400">
           {email}
         </a>
       ),
-      valueCls: 'font-semibold text-zinc-950 dark:text-white break-all',
+      valueCls: "font-semibold text-zinc-950 dark:text-white break-all",
     },
-    {
-      label: 'Address',
+    address && {
+      label: "Address",
       value: address,
-      valueCls: 'text-zinc-600 dark:text-zinc-300',
+      valueCls: "text-zinc-600 dark:text-zinc-300",
     },
-  ];
+  ].filter(Boolean);
 
-  const isIframe = mapEmbed.trim().startsWith('<iframe');
+  const isIframe = mapEmbed.trim().startsWith("<iframe");
 
   return (
     <SectionShell id="contact" tone="alt" fade={ALT_FADE}>
       <SectionHeader eyebrow="Contact" title="Book your trip" />
 
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
-        <Reveal>
-          <Card className="h-full p-5 sm:p-6">
-            <dl className="space-y-2.5">
-              {infoRows.map((row) => (
-                <div
-                  key={row.label}
-                  className="px-3.5 py-2.5 rounded-lg bg-[#f1eee7] dark:bg-[#1a1e27]"
-                >
-                  <dt className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-medium">
-                    {row.label}
-                  </dt>
-                  <dd className={`mt-1 text-sm ${row.valueCls}`}>{row.value}</dd>
-                </div>
-              ))}
-            </dl>
+      <div
+        className={`mt-8 grid grid-cols-1 gap-5 ${infoRows.length > 0 || mapEmbed ? "md:grid-cols-2" : ""}`}
+      >
+        {(infoRows.length > 0 || mapEmbed) && (
+          <Reveal>
+            <Card className="h-full p-5 sm:p-6">
+              {infoRows.length > 0 && (
+                <dl className="space-y-2.5">
+                  {infoRows.map((row) => (
+                    <div
+                      key={row.label}
+                      className="px-3.5 py-2.5 rounded-lg bg-[#f1eee7] dark:bg-[#1a1e27]"
+                    >
+                      <dt className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-medium">
+                        {row.label}
+                      </dt>
+                      <dd className={`mt-1 text-sm ${row.valueCls}`}>{row.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
 
-            {mapEmbed && (
-              <div className="mt-3 rounded-xl overflow-hidden bg-[#f1eee7] dark:bg-black aspect-video">
-                {isIframe ? (
-                  <div
-                    className="[&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0 w-full h-full"
-                    dangerouslySetInnerHTML={{ __html: mapEmbed }}
-                  />
-                ) : (
-                  <iframe
-                    title="Office location"
-                    src={mapEmbed}
-                    className="w-full h-full border-0"
-                    loading="lazy"
-                  />
-                )}
-              </div>
-            )}
-          </Card>
-        </Reveal>
+              {mapEmbed && (
+                <div className="mt-3 rounded-xl overflow-hidden bg-[#f1eee7] dark:bg-black aspect-video">
+                  {isIframe ? (
+                    <div
+                      className="[&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0 w-full h-full"
+                      dangerouslySetInnerHTML={{ __html: mapEmbed }}
+                    />
+                  ) : (
+                    <iframe
+                      title="Office location"
+                      src={mapEmbed}
+                      className="w-full h-full border-0"
+                      loading="lazy"
+                    />
+                  )}
+                </div>
+              )}
+            </Card>
+          </Reveal>
+        )}
 
         <Reveal delay={0.12}>
           <Card className="h-full p-5 sm:p-6">
@@ -138,7 +144,7 @@ const ContactSection = ({ data, vehicles = [] }) => {
                     value={form.vehicle}
                     onChange={(val) => setForm({ ...form, vehicle: val })}
                     options={[
-                      { value: '', label: 'Select a vehicle' },
+                      { value: "", label: "Select a vehicle" },
                       ...vehicles.map((v) => ({ value: v.vehicleName, label: v.vehicleName })),
                     ]}
                     className="w-full [&>button]:w-full [&>button]:h-10 [&>button]:text-sm [&_[role=listbox]]:w-full"

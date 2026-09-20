@@ -1,12 +1,12 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../config/database.js';
+import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
 
 const Vehicle = sequelize.define(
-  'Vehicle',
+  "Vehicle",
   {
     vehicleName: {
       type: DataTypes.STRING(200),
-      field: 'vehicle_name',
+      field: "vehicle_name",
       allowNull: false,
     },
     image: {
@@ -14,7 +14,7 @@ const Vehicle = sequelize.define(
     },
     seatingCapacity: {
       type: DataTypes.INTEGER,
-      field: 'seating_capacity',
+      field: "seating_capacity",
       allowNull: false,
     },
     description: {
@@ -25,17 +25,17 @@ const Vehicle = sequelize.define(
     },
     sortOrder: {
       type: DataTypes.INTEGER,
-      field: 'sort_order',
+      field: "sort_order",
       defaultValue: 0,
     },
     isActive: {
       type: DataTypes.BOOLEAN,
-      field: 'is_active',
+      field: "is_active",
       defaultValue: true,
     },
   },
   {
-    tableName: 'vehicles',
+    tableName: "vehicles",
     freezeTableName: true,
     underscored: true,
     timestamps: true,

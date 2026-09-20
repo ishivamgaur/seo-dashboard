@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Search,
@@ -12,16 +12,16 @@ import {
   Images,
   LayoutTemplate,
   X,
-} from 'lucide-react';
+} from "lucide-react";
 
 const navItems = [
-  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-  { name: 'SEO Settings', href: '/admin/seo', icon: Search },
-  { name: 'Vehicles', href: '/admin/vehicles', icon: CarFront },
-  { name: 'Occasions', href: '/admin/occasions', icon: Compass },
-  { name: 'Testimonials', href: '/admin/testimonials', icon: Star },
-  { name: 'Gallery', href: '/admin/gallery', icon: Images },
-  { name: 'Content', href: '/admin/content', icon: LayoutTemplate },
+  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "SEO Settings", href: "/admin/seo", icon: Search },
+  { name: "Vehicles", href: "/admin/vehicles", icon: CarFront },
+  { name: "Occasions", href: "/admin/occasions", icon: Compass },
+  { name: "Testimonials", href: "/admin/testimonials", icon: Star },
+  { name: "Gallery", href: "/admin/gallery", icon: Images },
+  { name: "Content", href: "/admin/content", icon: LayoutTemplate },
 ];
 
 export default function Sidebar({ isOpen = false, onClose = null }) {
@@ -47,11 +47,12 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
 
   useEffect(() => {
     try {
-      const savedCollapsed = localStorage.getItem('admin_sidebar_collapsed');
+      const savedCollapsed = localStorage.getItem("admin_sidebar_collapsed");
       if (savedCollapsed !== null) {
-        setIsCollapsed(savedCollapsed === 'true');
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- restores saved sidebar state on mount
+        setIsCollapsed(savedCollapsed === "true");
       }
-      const savedWidth = localStorage.getItem('admin_sidebar_width');
+      const savedWidth = localStorage.getItem("admin_sidebar_width");
       if (savedWidth) {
         const parsed = parseInt(savedWidth, 10);
         if (parsed >= 180 && parsed <= 380) {
@@ -65,7 +66,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
     setIsCollapsed((prev) => {
       const next = !prev;
       try {
-        localStorage.setItem('admin_sidebar_collapsed', String(next));
+        localStorage.setItem("admin_sidebar_collapsed", String(next));
       } catch {}
       return next;
     });
@@ -80,8 +81,8 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
     hasMovedRef.current = false;
     setIsDragging(true);
 
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
 
     const onMouseMove = (moveEvent) => {
       if (!isDraggingRef.current) return;
@@ -108,26 +109,26 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
       isDraggingRef.current = false;
       setIsDragging(false);
 
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
 
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
 
       if (!hasMovedRef.current) {
         toggleCollapse();
       } else {
         try {
-          localStorage.setItem('admin_sidebar_collapsed', String(isCollapsedRef.current));
+          localStorage.setItem("admin_sidebar_collapsed", String(isCollapsedRef.current));
           if (!isCollapsedRef.current) {
-            localStorage.setItem('admin_sidebar_width', String(sidebarWidthRef.current));
+            localStorage.setItem("admin_sidebar_width", String(sidebarWidthRef.current));
           }
         } catch {}
       }
     };
 
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
   };
 
   const handleLinkClick = () => {
@@ -140,7 +141,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
     <aside
       style={{ width: collapsed ? 68 : sidebarWidth }}
       className={`relative bg-white dark:bg-[#0c0d10] text-zinc-900 dark:text-zinc-100 flex flex-col h-full border-r border-zinc-200/90 dark:border-zinc-800/80 shadow-xs shrink-0 select-none ${
-        isDragging ? 'transition-none' : 'transition-[width] duration-300 ease-in-out'
+        isDragging ? "transition-none" : "transition-[width] duration-300 ease-in-out"
       }`}
     >
       {!onClose && (
@@ -150,19 +151,19 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
           onMouseDown={handleMouseDown}
           title={
             collapsed
-              ? 'Slide right or click to expand'
-              : 'Slide left to collapse or click to toggle'
+              ? "Slide right or click to expand"
+              : "Slide left to collapse or click to toggle"
           }
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           className={`hidden md:block absolute top-0 -right-1.5 w-3.5 h-full z-30 cursor-col-resize group/border select-none ${
-            isDragging ? 'bg-teal-500/20' : ''
+            isDragging ? "bg-teal-500/20" : ""
           }`}
         >
           <div
             className={`w-[2px] h-full mx-auto transition-colors duration-150 ${
               isDragging
-                ? 'bg-teal-500 dark:bg-teal-400'
-                : 'bg-transparent group-hover/border:bg-teal-500/60 dark:group-hover/border:bg-teal-400/60'
+                ? "bg-teal-500 dark:bg-teal-400"
+                : "bg-transparent group-hover/border:bg-teal-500/60 dark:group-hover/border:bg-teal-400/60"
             }`}
           />
         </div>
@@ -170,14 +171,14 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
 
       <div
         className={`h-16 flex items-center ${
-          collapsed ? 'justify-center px-2' : 'justify-between px-5'
+          collapsed ? "justify-center px-2" : "justify-between px-5"
         } border-b border-zinc-200/90 dark:border-zinc-800/80 shrink-0 overflow-hidden`}
       >
         <Link
           href="/admin"
           onClick={handleLinkClick}
           className="flex items-center group cursor-pointer overflow-hidden whitespace-nowrap"
-          title={collapsed ? 'Urban Cruise' : undefined}
+          title={collapsed ? "Urban Cruise" : undefined}
         >
           {collapsed ? (
             <span className="text-[17px] font-black font-mono text-zinc-950 dark:text-white flex items-center gap-1">
@@ -204,7 +205,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
         )}
       </div>
 
-      <nav className={`flex-1 overflow-y-auto ${collapsed ? 'py-2' : 'py-4'}`}>
+      <nav className={`flex-1 overflow-y-auto ${collapsed ? "py-2" : "py-4"}`}>
         {!collapsed && (
           <div className="px-4 mb-2 flex items-center">
             <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
@@ -213,12 +214,12 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
           </div>
         )}
 
-        <ul className={`space-y-1 ${collapsed ? 'px-2' : 'px-3'}`}>
+        <ul className={`space-y-1 ${collapsed ? "px-2" : "px-3"}`}>
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
               pathname === item.href ||
-              (item.href !== '/admin' && pathname.startsWith(`${item.href}/`));
+              (item.href !== "/admin" && pathname.startsWith(`${item.href}/`));
 
             if (collapsed) {
               return (
@@ -229,8 +230,8 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
                     title={item.name}
                     className={`group flex items-center justify-center w-10 h-10 mx-auto rounded-lg active:scale-[0.96] transition-colors cursor-pointer ${
                       isActive
-                        ? 'bg-teal-600 text-white shadow-xs shadow-teal-700/20'
-                        : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-zinc-100'
+                        ? "bg-teal-600 text-white shadow-xs shadow-teal-700/20"
+                        : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-zinc-100"
                     }`}
                   >
                     <Icon className="w-[18px] h-[18px] shrink-0 stroke-[1.75]" />
@@ -246,8 +247,8 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
                   onClick={handleLinkClick}
                   className={`group flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold tracking-wide active:scale-[0.98] cursor-pointer ${
                     isActive
-                      ? 'bg-teal-600 text-white font-bold shadow-xs shadow-teal-700/20'
-                      : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-zinc-100'
+                      ? "bg-teal-600 text-white font-bold shadow-xs shadow-teal-700/20"
+                      : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-zinc-100"
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
@@ -264,7 +265,7 @@ export default function Sidebar({ isOpen = false, onClose = null }) {
 
       <div
         className={`${
-          collapsed ? 'py-3 justify-center' : 'p-4 justify-between'
+          collapsed ? "py-3 justify-center" : "p-4 justify-between"
         } border-t border-zinc-200/90 dark:border-zinc-800/80 flex items-center text-[11px] font-mono text-zinc-400 dark:text-zinc-500 shrink-0`}
       >
         {collapsed ? (

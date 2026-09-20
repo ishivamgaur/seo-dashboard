@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
 import {
   Star,
   Plus,
   Edit2,
-  Trash2,
   X,
   Search,
   CheckCircle2,
@@ -13,49 +13,53 @@ import {
   LayoutGrid,
   MessageSquare,
   Upload,
-} from 'lucide-react';
-import api from '@/lib/api';
-import FilterSelect from '@/components/common/FilterSelect';
+  Loader2,
+} from "lucide-react";
+import { toast } from "sonner";
+import DeleteButton from "@/components/common/DeleteButton";
+import api from "@/lib/api";
+import FilterSelect from "@/components/common/FilterSelect";
 
 export default function TestimonialsAdminPage() {
   const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [statusMsg, setStatusMsg] = useState('');
-  const [viewMode, setViewMode] = useState('table');
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [viewMode, setViewMode] = useState("table");
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [ratingFilter, setRatingFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [ratingFilter, setRatingFilter] = useState("all");
 
   const [formData, setFormData] = useState({
     id: null,
-    customerName: '',
-    review: '',
+    customerName: "",
+    review: "",
     rating: 5,
-    customerImage: '',
+    customerImage: "",
   });
   const [imageFile, setImageFile] = useState(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
-
-  useEffect(() => {
-    fetchTestimonials();
-  }, []);
-
-  const showToast = (msg) => {
-    setStatusMsg(msg);
-    setTimeout(() => setStatusMsg(''), 3500);
-  };
+  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
 
   const fetchTestimonials = async () => {
     try {
-      const res = await api.get('/testimonials');
+      const res = await api.get("/testimonials");
       if (res.data?.success) setTestimonials(res.data.data || []);
     } catch (err) {
-      console.error('Failed to fetch testimonials:', err);
+      console.error("Failed to fetch testimonials:", err);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial list load on mount
+    fetchTestimonials();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // single toast helper for this page (sonner renders it globally)
+  const showToast = (msg) => toast.success(msg);
 
   const filteredTestimonials = useMemo(() => {
     return testimonials.filter((t) => {
@@ -65,42 +69,42 @@ export default function TestimonialsAdminPage() {
 
       if (!matchesSearch) return false;
 
-      if (ratingFilter !== 'all') {
+      if (ratingFilter !== "all") {
         return Number(t.rating) === Number(ratingFilter);
       }
       return true;
     });
   }, [testimonials, searchQuery, ratingFilter]);
 
-  const isFilterActive = searchQuery !== '' || ratingFilter !== 'all';
+  const isFilterActive = searchQuery !== "" || ratingFilter !== "all";
 
   const openModal = (t = null) => {
     setFormData(
       t
         ? {
             id: t.id,
-            customerName: t.customerName || '',
-            review: t.review || '',
+            customerName: t.customerName || "",
+            review: t.review || "",
             rating: t.rating || 5,
-            customerImage: t.customerImage || '',
+            customerImage: t.customerImage || "",
           }
         : {
             id: null,
-            customerName: '',
-            review: '',
+            customerName: "",
+            review: "",
             rating: 5,
-            customerImage: '',
+            customerImage: "",
           }
     );
     setImageFile(null);
-    setImagePreviewUrl(t?.customerImage || '');
+    setImagePreviewUrl(t?.customerImage || "");
     setModalOpen(true);
   };
 
   const closeModal = () => {
     setModalOpen(false);
     setImageFile(null);
-    setImagePreviewUrl('');
+    setImagePreviewUrl("");
   };
 
   const handleImageSelect = (e) => {
@@ -113,45 +117,50 @@ export default function TestimonialsAdminPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setSaving(true);
 
     const form = new FormData();
-    form.append('customerName', formData.customerName);
-    form.append('review', formData.review);
-    form.append('rating', formData.rating);
+    form.append("customerName", formData.customerName);
+    form.append("review", formData.review);
+    form.append("rating", formData.rating);
     if (imageFile) {
-      form.append('customerImage', imageFile);
+      form.append("customerImage", imageFile);
     } else if (formData.customerImage) {
-      form.append('customerImage', formData.customerImage);
+      form.append("customerImage", formData.customerImage);
     }
 
-    const url = formData.id ? `/testimonials/${formData.id}` : '/testimonials';
-    const method = formData.id ? 'put' : 'post';
+    const url = formData.id ? `/testimonials/${formData.id}` : "/testimonials";
+    const method = formData.id ? "put" : "post";
 
     try {
       const res = await api[method](url, form);
       if (res.status === 200 || res.status === 201) {
         closeModal();
         fetchTestimonials();
-        showToast(formData.id ? 'Review updated.' : 'Review created.');
+        showToast(formData.id ? "Review updated." : "Review created.");
       }
     } catch (err) {
-      console.error('Failed to save testimonial:', err);
+      console.error("Failed to save testimonial:", err);
+      toast.error(err.response?.data?.message || "Failed to save review.");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this testimonial?')) return;
+    if (!confirm("Are you sure you want to delete this testimonial?")) return;
+    setDeletingId(id);
     try {
       const res = await api.delete(`/testimonials/${id}`);
       if (res.status === 200) {
         fetchTestimonials();
-        showToast('Review deleted.');
+        showToast("Review deleted.");
       }
     } catch (err) {
       console.error(err);
+      toast.error(err.response?.data?.message || "Failed to delete review.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -169,12 +178,6 @@ export default function TestimonialsAdminPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {statusMsg && (
-            <span className="text-xs font-mono text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/40 px-3 py-1.5 rounded-lg font-medium">
-              {statusMsg}
-            </span>
-          )}
-
           <button
             type="button"
             onClick={() => openModal()}
@@ -204,10 +207,10 @@ export default function TestimonialsAdminPage() {
             value={ratingFilter}
             onChange={setRatingFilter}
             options={[
-              { value: 'all', label: 'All Ratings' },
-              { value: '5', label: '5 Stars' },
-              { value: '4', label: '4 Stars' },
-              { value: '3', label: '3 Stars' },
+              { value: "all", label: "All Ratings" },
+              { value: "5", label: "5 Stars" },
+              { value: "4", label: "4 Stars" },
+              { value: "3", label: "3 Stars" },
             ]}
           />
 
@@ -216,11 +219,11 @@ export default function TestimonialsAdminPage() {
           <div className="flex items-center bg-[#f6f8fa] dark:bg-[#1a1e27] p-1 rounded-xl shrink-0">
             <button
               type="button"
-              onClick={() => setViewMode('table')}
+              onClick={() => setViewMode("table")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                viewMode === 'table'
-                  ? 'bg-teal-600 text-white shadow-xs'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white'
+                viewMode === "table"
+                  ? "bg-teal-600 text-white shadow-xs"
+                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white"
               }`}
               title="Table View"
             >
@@ -229,11 +232,11 @@ export default function TestimonialsAdminPage() {
             </button>
             <button
               type="button"
-              onClick={() => setViewMode('grid')}
+              onClick={() => setViewMode("grid")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                viewMode === 'grid'
-                  ? 'bg-teal-600 text-white shadow-xs'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white'
+                viewMode === "grid"
+                  ? "bg-teal-600 text-white shadow-xs"
+                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white"
               }`}
               title="Card Grid View"
             >
@@ -253,14 +256,14 @@ export default function TestimonialsAdminPage() {
           <MessageSquare className="w-10 h-10 text-zinc-400 mx-auto mb-2 opacity-60" />
           <p className="font-semibold text-zinc-700 dark:text-zinc-300 text-xs">
             {isFilterActive
-              ? 'No testimonials match your filter criteria.'
-              : 'No reviews published yet.'}
+              ? "No testimonials match your filter criteria."
+              : "No reviews published yet."}
           </p>
           <p className="text-[11px] text-zinc-400 mt-1 font-mono">
             Click Add Testimonial to publish verified client reviews.
           </p>
         </div>
-      ) : viewMode === 'table' ? (
+      ) : viewMode === "table" ? (
         <div className="bg-white dark:bg-[#13161c] rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
@@ -276,7 +279,7 @@ export default function TestimonialsAdminPage() {
               <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
                 {filteredTestimonials.map((t) => {
                   const avatarSrc = t.customerImage || t.customer_image;
-                  const initial = (t.customerName || 'C').charAt(0).toUpperCase();
+                  const initial = (t.customerName || "C").charAt(0).toUpperCase();
                   const ratingVal = Number(t.rating) || 5;
 
                   return (
@@ -288,10 +291,12 @@ export default function TestimonialsAdminPage() {
                         <div className="flex items-center gap-3">
                           <div className="relative w-9 h-9 rounded-full bg-[#f6f8fa] dark:bg-[#1a1e27] overflow-hidden flex items-center justify-center shrink-0 ring-1 ring-zinc-200/80 dark:ring-zinc-800">
                             {avatarSrc ? (
-                              <img
+                              <Image
                                 src={avatarSrc}
                                 alt={t.customerName}
-                                className="object-cover w-full h-full"
+                                fill
+                                sizes="36px"
+                                className="object-cover"
                               />
                             ) : (
                               <span className="font-mono text-xs font-bold text-zinc-700 dark:text-zinc-300 select-none">
@@ -319,8 +324,8 @@ export default function TestimonialsAdminPage() {
                                 key={star}
                                 className={`w-3.5 h-3.5 ${
                                   star <= ratingVal
-                                    ? 'text-amber-400 fill-amber-400'
-                                    : 'text-zinc-200 dark:text-zinc-800 fill-zinc-200 dark:fill-zinc-800'
+                                    ? "text-amber-400 fill-amber-400"
+                                    : "text-zinc-200 dark:text-zinc-800 fill-zinc-200 dark:fill-zinc-800"
                                 }`}
                               />
                             ))}
@@ -356,14 +361,11 @@ export default function TestimonialsAdminPage() {
                           >
                             <Edit2 className="w-4 h-4 stroke-[1.75]" />
                           </button>
-                          <button
-                            type="button"
+                          <DeleteButton
                             onClick={() => handleDelete(t.id)}
-                            className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md transition-colors cursor-pointer"
                             title="Delete Review"
-                          >
-                            <Trash2 className="w-4 h-4 stroke-[1.75]" />
-                          </button>
+                            pending={deletingId === t.id}
+                          />
                         </div>
                       </td>
                     </tr>
@@ -377,7 +379,7 @@ export default function TestimonialsAdminPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredTestimonials.map((t) => {
             const avatarSrc = t.customerImage || t.customer_image;
-            const initial = (t.customerName || 'C').charAt(0).toUpperCase();
+            const initial = (t.customerName || "C").charAt(0).toUpperCase();
             const ratingVal = Number(t.rating) || 5;
 
             return (
@@ -394,8 +396,8 @@ export default function TestimonialsAdminPage() {
                             key={star}
                             className={`w-3.5 h-3.5 ${
                               star <= ratingVal
-                                ? 'text-amber-400 fill-amber-400'
-                                : 'text-zinc-200 dark:text-zinc-800 fill-zinc-200 dark:fill-zinc-800'
+                                ? "text-amber-400 fill-amber-400"
+                                : "text-zinc-200 dark:text-zinc-800 fill-zinc-200 dark:fill-zinc-800"
                             }`}
                           />
                         ))}
@@ -450,14 +452,11 @@ export default function TestimonialsAdminPage() {
                     >
                       <Edit2 className="w-4 h-4 stroke-[1.75]" />
                     </button>
-                    <button
-                      type="button"
+                    <DeleteButton
                       onClick={() => handleDelete(t.id)}
-                      className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md transition-colors cursor-pointer"
                       title="Delete Review"
-                    >
-                      <Trash2 className="w-4 h-4 stroke-[1.75]" />
-                    </button>
+                      pending={deletingId === t.id}
+                    />
                   </div>
                 </div>
               </div>
@@ -472,7 +471,7 @@ export default function TestimonialsAdminPage() {
             <div className="flex justify-between items-center mb-5 pb-3 border-b border-zinc-100 dark:border-zinc-800">
               <div>
                 <h2 className="text-lg font-bold text-zinc-950 dark:text-white">
-                  {formData.id ? 'Edit Client Review' : 'Add Client Review'}
+                  {formData.id ? "Edit Client Review" : "Add Client Review"}
                 </h2>
                 <span className="text-[11px] font-mono text-zinc-500">
                   Featured in verified social proof section on homepage
@@ -518,8 +517,8 @@ export default function TestimonialsAdminPage() {
                       <Star
                         className={`w-5 h-5 ${
                           star <= formData.rating
-                            ? 'text-amber-400 fill-amber-400'
-                            : 'text-zinc-300 dark:text-zinc-700'
+                            ? "text-amber-400 fill-amber-400"
+                            : "text-zinc-300 dark:text-zinc-700"
                         }`}
                       />
                     </button>
@@ -551,6 +550,7 @@ export default function TestimonialsAdminPage() {
 
                 {imagePreviewUrl && (
                   <div className="mb-2.5 flex items-center gap-3 p-2 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- blob preview urls can't use next/image */}
                     <img
                       src={imagePreviewUrl}
                       alt="Preview"
@@ -561,7 +561,7 @@ export default function TestimonialsAdminPage() {
                         Photo Loaded
                       </span>
                       <span className="text-[11px] text-zinc-400 truncate block">
-                        {imageFile ? imageFile.name : 'Current client avatar'}
+                        {imageFile ? imageFile.name : "Current client avatar"}
                       </span>
                     </div>
                   </div>
@@ -587,10 +587,11 @@ export default function TestimonialsAdminPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-lg text-xs uppercase tracking-wider active:scale-[0.98] shadow-xs cursor-pointer"
+                  disabled={saving}
+                  className="inline-flex items-center gap-2 px-5 py-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-70 text-white font-bold rounded-lg text-xs uppercase tracking-wider active:scale-[0.98] shadow-xs cursor-pointer"
                 >
-                  {loading ? 'Saving...' : 'Save Review'}
+                  {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{saving ? "Saving..." : "Save Review"}</span>
                 </button>
               </div>
             </form>

@@ -1,38 +1,31 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, Suspense } from 'react';
-import Link from 'next/link';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import {
-  CheckCircle2,
-  AlertCircle,
-  Save,
-  LayoutTemplate,
-  Building2,
-  PhoneCall,
-  ExternalLink,
-} from 'lucide-react';
-import api from '@/lib/api';
+import React, { useState, useEffect, Suspense } from "react";
+import Link from "next/link";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { Save, LayoutTemplate, Building2, PhoneCall, ExternalLink, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import api from "@/lib/api";
 
-const VALID_CONTENT_TABS = ['hero', 'about', 'contact'];
+const VALID_CONTENT_TABS = ["hero", "about", "contact"];
 
 function ContentManagementContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
-  const tabParam = searchParams.get('tab');
-  const initialTab = VALID_CONTENT_TABS.includes(tabParam) ? tabParam : 'hero';
+  const tabParam = searchParams.get("tab");
+  const initialTab = VALID_CONTENT_TABS.includes(tabParam) ? tabParam : "hero";
 
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const currentTabInUrl = searchParams.get('tab');
+    const currentTabInUrl = searchParams.get("tab");
     if (!currentTabInUrl || !VALID_CONTENT_TABS.includes(currentTabInUrl)) {
       router.replace(`${pathname}?tab=hero`, { scroll: false });
-      setActiveTab('hero');
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- keeps tab in sync with url
+      setActiveTab("hero");
     } else if (currentTabInUrl !== activeTab) {
       setActiveTab(currentTabInUrl);
     }
@@ -44,107 +37,80 @@ function ContentManagementContent() {
   };
 
   const [heroForm, setHeroForm] = useState({
-    heading: '',
-    subHeading: '',
-    ctaText: '',
-    ctaUrl: '',
-    bannerImage: '',
+    heading: "",
+    subHeading: "",
+    ctaText: "",
+    ctaUrl: "",
+    bannerImage: "",
   });
   const [heroFile, setHeroFile] = useState(null);
-  const [heroPreview, setHeroPreview] = useState('');
+  const [heroPreview, setHeroPreview] = useState("");
 
   const [aboutForm, setAboutForm] = useState({
-    sectionTitle: '',
-    subtitle: '',
-    description: '',
-    highlights: '',
-    yearsExperience: '',
-    citiesCovered: '',
-    fleetSize: '',
-    tripsCompleted: '',
-    featuredImage: '',
+    sectionTitle: "",
+    description: "",
+    featuredImage: "",
   });
   const [aboutFile, setAboutFile] = useState(null);
-  const [aboutPreview, setAboutPreview] = useState('');
+  const [aboutPreview, setAboutPreview] = useState("");
 
   const [contactForm, setContactForm] = useState({
-    phone: '',
-    email: '',
-    address: '',
-    mapEmbed: '',
+    phone: "",
+    email: "",
+    address: "",
+    mapEmbed: "",
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [heroRes, aboutRes, contactRes] = await Promise.all([
-          api.get('/hero').catch(() => ({ data: {} })),
-          api.get('/about').catch(() => ({ data: {} })),
-          api.get('/contact').catch(() => ({ data: {} })),
+          api.get("/hero").catch(() => ({ data: {} })),
+          api.get("/about").catch(() => ({ data: {} })),
+          api.get("/contact").catch(() => ({ data: {} })),
         ]);
 
         if (heroRes.data?.data) {
           const h = heroRes.data.data;
           setHeroForm({
-            heading: h.heading || '',
-            subHeading: h.subHeading || '',
-            ctaText: h.ctaText || '',
-            ctaUrl: h.ctaUrl || '',
-            bannerImage: h.bannerImage || '',
+            heading: h.heading || "",
+            subHeading: h.subHeading || "",
+            ctaText: h.ctaText || "",
+            ctaUrl: h.ctaUrl || "",
+            bannerImage: h.bannerImage || "",
           });
-          setHeroPreview(h.bannerImage || '');
+          setHeroPreview(h.bannerImage || "");
         }
 
         if (aboutRes.data?.data) {
           const a = aboutRes.data.data;
           setAboutForm({
-            sectionTitle: a.sectionTitle || '',
-            subtitle: a.subtitle || '',
-            description: a.description || '',
-            highlights: (() => {
-              const h = a.highlights;
-              if (Array.isArray(h)) return h.join('\n');
-              if (typeof h === 'string') {
-                try {
-                  const parsed = JSON.parse(h);
-                  if (Array.isArray(parsed)) return parsed.join('\n');
-                } catch {
-                  /* plain newline text */
-                }
-                return h;
-              }
-              return '';
-            })(),
-            yearsExperience: a.yearsExperience ?? '',
-            citiesCovered: a.citiesCovered ?? '',
-            fleetSize: a.fleetSize ?? '',
-            tripsCompleted: a.tripsCompleted ?? '',
-            featuredImage: a.featuredImage || '',
+            sectionTitle: a.sectionTitle || "",
+            description: a.description || "",
+            featuredImage: a.featuredImage || "",
           });
-          setAboutPreview(a.featuredImage || '');
+          setAboutPreview(a.featuredImage || "");
         }
 
         if (contactRes.data?.data) {
           const c = contactRes.data.data;
           setContactForm({
-            phone: c.phone || '',
-            email: c.email || '',
-            address: c.address || '',
-            mapEmbed: c.mapEmbed || '',
+            phone: c.phone || "",
+            email: c.email || "",
+            address: c.address || "",
+            mapEmbed: c.mapEmbed || "",
           });
         }
       } catch (err) {
-        console.error('Failed to load content settings:', err);
+        console.error("Failed to load content settings:", err);
       }
     };
 
     fetchData();
   }, []);
 
-  const showToast = (type, text) => {
-    setStatusMsg({ type, text });
-    setTimeout(() => setStatusMsg({ type: '', text: '' }), 4000);
-  };
+  // single toast helper for this page (sonner renders it globally)
+  const showToast = (type, text) => (type === "success" ? toast.success(text) : toast.error(text));
 
   const handleHeroFile = (e) => {
     const file = e.target.files[0];
@@ -167,22 +133,22 @@ function ContentManagementContent() {
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append('heading', heroForm.heading);
-      formData.append('subHeading', heroForm.subHeading);
-      formData.append('ctaText', heroForm.ctaText);
-      formData.append('ctaUrl', heroForm.ctaUrl);
+      formData.append("heading", heroForm.heading);
+      formData.append("subHeading", heroForm.subHeading);
+      formData.append("ctaText", heroForm.ctaText);
+      formData.append("ctaUrl", heroForm.ctaUrl);
       if (heroFile) {
-        formData.append('bannerImage', heroFile);
+        formData.append("bannerImage", heroFile);
       } else if (heroForm.bannerImage) {
-        formData.append('bannerImage', heroForm.bannerImage);
+        formData.append("bannerImage", heroForm.bannerImage);
       }
 
-      const res = await api.put('/hero', formData);
+      const res = await api.put("/hero", formData);
       if (res.status === 200) {
-        showToast('success', 'Hero section updated successfully.');
+        showToast("success", "Hero section updated successfully.");
       }
     } catch (err) {
-      showToast('error', err.response?.data?.message || 'Failed to update hero section.');
+      showToast("error", err.response?.data?.message || "Failed to update hero section.");
     } finally {
       setLoading(false);
     }
@@ -193,26 +159,20 @@ function ContentManagementContent() {
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append('sectionTitle', aboutForm.sectionTitle);
-      formData.append('subtitle', aboutForm.subtitle);
-      formData.append('description', aboutForm.description);
-      formData.append('highlights', aboutForm.highlights);
-      formData.append('yearsExperience', aboutForm.yearsExperience);
-      formData.append('citiesCovered', aboutForm.citiesCovered);
-      formData.append('fleetSize', aboutForm.fleetSize);
-      formData.append('tripsCompleted', aboutForm.tripsCompleted);
+      formData.append("sectionTitle", aboutForm.sectionTitle);
+      formData.append("description", aboutForm.description);
       if (aboutFile) {
-        formData.append('featuredImage', aboutFile);
+        formData.append("featuredImage", aboutFile);
       } else if (aboutForm.featuredImage) {
-        formData.append('featuredImage', aboutForm.featuredImage);
+        formData.append("featuredImage", aboutForm.featuredImage);
       }
 
-      const res = await api.put('/about', formData);
+      const res = await api.put("/about", formData);
       if (res.status === 200) {
-        showToast('success', 'About section updated successfully.');
+        showToast("success", "About section updated successfully.");
       }
     } catch (err) {
-      showToast('error', err.response?.data?.message || 'Failed to update about section.');
+      showToast("error", err.response?.data?.message || "Failed to update about section.");
     } finally {
       setLoading(false);
     }
@@ -222,21 +182,21 @@ function ContentManagementContent() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.put('/contact', contactForm);
+      const res = await api.put("/contact", contactForm);
       if (res.status === 200) {
-        showToast('success', 'Contact info updated successfully.');
+        showToast("success", "Contact info updated successfully.");
       }
     } catch (err) {
-      showToast('error', err.response?.data?.message || 'Failed to update contact info.');
+      showToast("error", err.response?.data?.message || "Failed to update contact info.");
     } finally {
       setLoading(false);
     }
   };
 
   const tabs = [
-    { id: 'hero', label: 'Hero Section', icon: LayoutTemplate },
-    { id: 'about', label: 'About Us Section', icon: Building2 },
-    { id: 'contact', label: 'Contact & Corporate Hub', icon: PhoneCall },
+    { id: "hero", label: "Hero Section", icon: LayoutTemplate },
+    { id: "about", label: "About Us Section", icon: Building2 },
+    { id: "contact", label: "Contact & Corporate Hub", icon: PhoneCall },
   ];
 
   return (
@@ -250,23 +210,6 @@ function ContentManagementContent() {
             Modify studio hero headlines, company story, and official corporate contact information.
           </p>
         </div>
-
-        {statusMsg.text && (
-          <div
-            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium ${
-              statusMsg.type === 'success'
-                ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300'
-                : 'bg-red-50 dark:bg-red-950/40 text-red-800 dark:text-red-300'
-            }`}
-          >
-            {statusMsg.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-teal-600 dark:text-teal-400 stroke-[2]" />
-            ) : (
-              <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 stroke-[2]" />
-            )}
-            <span>{statusMsg.text}</span>
-          </div>
-        )}
       </div>
 
       <div className="flex space-x-2 pb-1 overflow-x-auto">
@@ -280,8 +223,8 @@ function ContentManagementContent() {
               onClick={() => handleTabChange(tab.id)}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide active:scale-[0.98] cursor-pointer whitespace-nowrap transition-all ${
                 isActive
-                  ? 'bg-teal-600 text-white shadow-xs font-bold'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27]'
+                  ? "bg-teal-600 text-white shadow-xs font-bold"
+                  : "text-zinc-600 dark:text-zinc-400 hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27]"
               }`}
             >
               <Icon className="w-3.5 h-3.5 stroke-[1.75]" />
@@ -291,7 +234,7 @@ function ContentManagementContent() {
         })}
       </div>
 
-      {activeTab === 'hero' && (
+      {activeTab === "hero" && (
         <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
             <div>
@@ -386,6 +329,7 @@ function ContentManagementContent() {
               {heroPreview && (
                 <div className="mb-3 p-2.5 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] flex items-center gap-3">
                   <div className="w-24 h-14 bg-white dark:bg-black rounded-lg overflow-hidden flex items-center justify-center shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- blob preview urls can't use next/image */}
                     <img
                       src={heroPreview}
                       alt="Hero Banner Preview"
@@ -427,15 +371,19 @@ function ContentManagementContent() {
                 disabled={loading}
                 className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
               >
-                <Save className="w-4 h-4 stroke-[2]" />
-                <span>{loading ? 'Saving...' : 'Save Hero Section'}</span>
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4 stroke-[2]" />
+                )}
+                <span>{loading ? "Saving..." : "Save Hero Section"}</span>
               </button>
             </div>
           </form>
         </div>
       )}
 
-      {activeTab === 'about' && (
+      {activeTab === "about" && (
         <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
             <div>
@@ -473,20 +421,7 @@ function ContentManagementContent() {
 
             <div>
               <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
-                Subtitle Hook
-              </label>
-              <input
-                type="text"
-                value={aboutForm.subtitle}
-                onChange={(e) => setAboutForm({ ...aboutForm, subtitle: e.target.value })}
-                placeholder="Pan-India chauffeur-driven fleet for weddings, corporate travel and outstation trips."
-                className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
-              />
-            </div>
-
-            <div>
-              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
-                Company Story & Capabilities
+                Description
               </label>
               <textarea
                 rows={5}
@@ -500,82 +435,13 @@ function ContentManagementContent() {
 
             <div>
               <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
-                Trust Highlights (one per line)
-              </label>
-              <textarea
-                rows={4}
-                value={aboutForm.highlights}
-                onChange={(e) => setAboutForm({ ...aboutForm, highlights: e.target.value })}
-                placeholder={
-                  'Verified chauffeurs with commercial licences\nAll-India tourist permits on every vehicle\n24/7 live dispatch and trip support'
-                }
-                className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium leading-relaxed border-0"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
-                  Years
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={aboutForm.yearsExperience}
-                  onChange={(e) => setAboutForm({ ...aboutForm, yearsExperience: e.target.value })}
-                  placeholder="10"
-                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
-                />
-              </div>
-              <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
-                  Cities
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={aboutForm.citiesCovered}
-                  onChange={(e) => setAboutForm({ ...aboutForm, citiesCovered: e.target.value })}
-                  placeholder="15"
-                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
-                />
-              </div>
-              <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
-                  Fleet Size
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={aboutForm.fleetSize}
-                  onChange={(e) => setAboutForm({ ...aboutForm, fleetSize: e.target.value })}
-                  placeholder="40"
-                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
-                />
-              </div>
-              <div>
-                <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
-                  Trips Done
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={aboutForm.tripsCompleted}
-                  onChange={(e) => setAboutForm({ ...aboutForm, tripsCompleted: e.target.value })}
-                  placeholder="25000"
-                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
-                Featured Fleet Photograph
+                Featured Image
               </label>
 
               {aboutPreview && (
                 <div className="mb-3 p-2.5 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] flex items-center gap-3">
                   <div className="w-24 h-14 bg-white dark:bg-black rounded-lg overflow-hidden flex items-center justify-center shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- blob preview urls can't use next/image */}
                     <img
                       src={aboutPreview}
                       alt="About Featured Preview"
@@ -617,15 +483,19 @@ function ContentManagementContent() {
                 disabled={loading}
                 className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
               >
-                <Save className="w-4 h-4 stroke-[2]" />
-                <span>{loading ? 'Saving...' : 'Save About Section'}</span>
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4 stroke-[2]" />
+                )}
+                <span>{loading ? "Saving..." : "Save About Section"}</span>
               </button>
             </div>
           </form>
         </div>
       )}
 
-      {activeTab === 'contact' && (
+      {activeTab === "contact" && (
         <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
             <div>
@@ -710,8 +580,12 @@ function ContentManagementContent() {
                 disabled={loading}
                 className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
               >
-                <Save className="w-4 h-4 stroke-[2]" />
-                <span>{loading ? 'Saving...' : 'Save Contact Info'}</span>
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4 stroke-[2]" />
+                )}
+                <span>{loading ? "Saving..." : "Save Contact Info"}</span>
               </button>
             </div>
           </form>

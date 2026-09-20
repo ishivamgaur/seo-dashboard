@@ -1,22 +1,22 @@
-import { Geist, Geist_Mono } from 'next/font/google';
-import './globals.css';
-import { AuthProvider } from '../context/AuthContext';
-import { ThemeProvider } from '../context/ThemeContext';
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import { AuthProvider } from "../context/AuthContext";
+import { ThemeProvider } from "../context/ThemeContext";
 
 const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export const metadata = {
-  title: 'Urban Cruise - Luxury Car & Bus Rental Services',
+  title: "Urban Cruise - Luxury Car & Bus Rental Services",
   description:
-    'Experience luxury transportation and executive chauffeur services across 15+ Indian cities.',
+    "Experience luxury transportation and executive chauffeur services across 15+ Indian cities.",
 };
 
 export default function RootLayout({ children }) {

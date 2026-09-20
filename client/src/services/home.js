@@ -1,12 +1,4 @@
-// Public homepage data layer — the ONLY place the site calls the API.
-// Server Components import from here; nothing else touches fetch directly.
-//
-// Caching strategy (production standard): responses are cached and
-// revalidated in the background. Visitors get instant cached pages,
-// and if the backend goes down Next.js keeps serving the last
-// good render instead of fake content.
-
-import { API_BASE, FALLBACK_IMAGES, BRAND } from '@/lib/site';
+import { API_BASE, FALLBACK_IMAGES, BRAND } from "@/lib/site";
 
 const REVALIDATE_SECONDS = 60;
 
@@ -24,19 +16,19 @@ const fetchJson = async (endpoint) => {
   }
 };
 
-export const fetchSeoSettings = () => fetchJson('/seo');
+export const fetchSeoSettings = () => fetchJson("/seo");
 
 export const fetchHomeData = async () => {
   const [schema, hero, about, vehicles, occasions, testimonials, gallery, contact] =
     await Promise.all([
-      fetchJson('/schemas'),
-      fetchJson('/hero'),
-      fetchJson('/about'),
-      fetchJson('/vehicles'),
-      fetchJson('/occasions'),
-      fetchJson('/testimonials'),
-      fetchJson('/gallery'),
-      fetchJson('/contact'),
+      fetchJson("/schemas"),
+      fetchJson("/hero"),
+      fetchJson("/about"),
+      fetchJson("/vehicles"),
+      fetchJson("/occasions"),
+      fetchJson("/testimonials"),
+      fetchJson("/gallery"),
+      fetchJson("/contact"),
     ]);
 
   return {
@@ -51,13 +43,12 @@ export const fetchHomeData = async () => {
   };
 };
 
-// Builds Next.js metadata from CMS SEO settings + fallbacks.
 export const buildHomeMetadata = (seo) => {
   const title = seo?.metaTitle || `${BRAND.name} - Commercial Fleet & Chauffeur Services India`;
   const description =
     seo?.metaDescription ||
-    'Book luxury tempo travellers, Force Urbania vans, and Volvo coaches across 15 Indian cities.';
-  const canonical = seo?.canonicalUrl || 'https://urbancruise.in';
+    "Book luxury tempo travellers, Force Urbania vans, and Volvo coaches across 15 Indian cities.";
+  const canonical = seo?.canonicalUrl || "https://urbancruise.in";
   const ogImg = seo?.ogImage || FALLBACK_IMAGES.hero;
 
   return {
@@ -65,7 +56,7 @@ export const buildHomeMetadata = (seo) => {
     description,
     keywords:
       seo?.focusKeywords ||
-      'tempo traveller rental, force urbania luxury van, bus hire, wedding car rental india',
+      "tempo traveller rental, force urbania luxury van, bus hire, wedding car rental india",
     alternates: { canonical },
     robots: {
       index: seo?.robotsIndex !== false,
@@ -79,7 +70,7 @@ export const buildHomeMetadata = (seo) => {
       images: [{ url: ogImg }],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: seo?.twitterTitle || title,
       description: seo?.twitterDescription || description,
       images: [seo?.twitterImage || ogImg],

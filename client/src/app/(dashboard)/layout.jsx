@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Sidebar from '../../components/layout/Sidebar';
-import Header from '../../components/layout/Header';
-import { useAuth } from '../../context/AuthContext';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Sidebar from "../../components/layout/Sidebar";
+import Header from "../../components/layout/Header";
+import { useAuth } from "../../context/AuthContext";
+import { Toaster } from "sonner";
 
 export default function DashboardLayout({ children }) {
   const auth = useAuth() || { user: true, loading: false };
@@ -14,7 +15,7 @@ export default function DashboardLayout({ children }) {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login');
+      router.push("/login");
     }
   }, [user, loading, router]);
 
@@ -53,6 +54,7 @@ export default function DashboardLayout({ children }) {
         <Header onMenuClick={() => setMobileSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-5">{children}</main>
       </div>
+      <Toaster position="top-right" gap={8} />
     </div>
   );
 }

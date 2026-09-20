@@ -1,26 +1,26 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../config/database.js';
+import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
 
 const GalleryImage = sequelize.define(
-  'GalleryImage',
+  "GalleryImage",
   {
     imagePath: {
       type: DataTypes.STRING(500),
-      field: 'image_path',
+      field: "image_path",
       allowNull: false,
     },
     altTag: {
       type: DataTypes.STRING(300),
-      field: 'alt_tag',
+      field: "alt_tag",
     },
     sortOrder: {
       type: DataTypes.INTEGER,
-      field: 'sort_order',
+      field: "sort_order",
       defaultValue: 0,
     },
   },
   {
-    tableName: 'gallery_images',
+    tableName: "gallery_images",
     freezeTableName: true,
     underscored: true,
     timestamps: true,

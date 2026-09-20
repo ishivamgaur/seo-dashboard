@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
 import {
   Plus,
-  Trash2,
   X,
   Images,
   Edit2,
@@ -17,9 +17,12 @@ import {
   Search,
   LayoutList,
   LayoutGrid,
-} from 'lucide-react';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import api from '@/lib/api';
+  Loader2,
+} from "lucide-react";
+import DeleteButton from "@/components/common/DeleteButton";
+import { toast } from "sonner";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import api from "@/lib/api";
 
 export default function GalleryAdminPage() {
   const [images, setImages] = useState([]);
@@ -29,31 +32,22 @@ export default function GalleryAdminPage() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingImage, setEditingImage] = useState(null);
   const [editImageFile, setEditImageFile] = useState(null);
-  const [editPreviewUrl, setEditPreviewUrl] = useState('');
+  const [editPreviewUrl, setEditPreviewUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [viewMode, setViewMode] = useState('table');
+  const [viewMode, setViewMode] = useState("table");
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const [formData, setFormData] = useState({ file: null, altTag: '' });
-  const [uploadPreviewUrl, setUploadPreviewUrl] = useState('');
-  const [editAltTag, setEditAltTag] = useState('');
-  const [statusMsg, setStatusMsg] = useState('');
+  const [formData, setFormData] = useState({ file: null, altTag: "" });
+  const [uploadPreviewUrl, setUploadPreviewUrl] = useState("");
+  const [editAltTag, setEditAltTag] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    setIsMounted(true);
-    fetchGallery();
-  }, []);
-
-  const showToast = (msg) => {
-    setStatusMsg(msg);
-    setTimeout(() => setStatusMsg(''), 3500);
-  };
 
   const fetchGallery = async () => {
     try {
-      const res = await api.get('/gallery');
+      const res = await api.get("/gallery");
       if (res.data?.success) setImages(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -62,9 +56,19 @@ export default function GalleryAdminPage() {
     }
   };
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- mount gate keeps drag-drop client-only
+    setIsMounted(true);
+    fetchGallery();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // single toast helper for this page (sonner renders it globally)
+  const showToast = (msg) => toast.success(msg);
+
   const filteredImages = useMemo(() => {
     return images.filter((img) => {
-      const alt = (img.altTag || img.alt_tag || '').toLowerCase();
+      const alt = (img.altTag || img.alt_tag || "").toLowerCase();
       return alt.includes(searchQuery.toLowerCase());
     });
   }, [images, searchQuery]);
@@ -72,31 +76,31 @@ export default function GalleryAdminPage() {
   const isFilterActive = searchQuery.trim().length > 0;
 
   const openModal = () => {
-    setFormData({ file: null, altTag: '' });
-    setUploadPreviewUrl('');
+    setFormData({ file: null, altTag: "" });
+    setUploadPreviewUrl("");
     setModalOpen(true);
     setError(null);
   };
 
   const closeModal = () => {
     setModalOpen(false);
-    setUploadPreviewUrl('');
+    setUploadPreviewUrl("");
     setError(null);
   };
 
   const openEditModal = (img) => {
     setEditingImage(img);
-    setEditAltTag(img.altTag || img.alt_tag || '');
+    setEditAltTag(img.altTag || img.alt_tag || "");
     setEditImageFile(null);
-    setEditPreviewUrl('');
+    setEditPreviewUrl("");
     setEditModalOpen(true);
   };
 
   const closeEditModal = () => {
     setEditingImage(null);
-    setEditAltTag('');
+    setEditAltTag("");
     setEditImageFile(null);
-    setEditPreviewUrl('');
+    setEditPreviewUrl("");
     setEditModalOpen(false);
   };
 
@@ -119,27 +123,28 @@ export default function GalleryAdminPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.file) {
-      setError('Please select an image file to upload.');
+      setError("Please select an image file to upload.");
       return;
     }
-    setLoading(true);
+    setUploading(true);
     setError(null);
 
     const form = new FormData();
-    form.append('images', formData.file);
-    form.append('altTag', formData.altTag);
+    form.append("images", formData.file);
+    form.append("altTag", formData.altTag);
 
     try {
-      const res = await api.post('/gallery', form);
+      const res = await api.post("/gallery", form);
       if (res.status === 201 || res.status === 200) {
         closeModal();
         fetchGallery();
-        showToast('Image uploaded to gallery.');
+        showToast("Image uploaded to gallery.");
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to upload image.');
+      setError(err.response?.data?.message || "Failed to upload image.");
+      toast.error(err.response?.data?.message || "Failed to upload image.");
     } finally {
-      setLoading(false);
+      setUploading(false);
     }
   };
 
@@ -149,9 +154,9 @@ export default function GalleryAdminPage() {
 
     setIsSubmitting(true);
     const form = new FormData();
-    form.append('altTag', editAltTag);
+    form.append("altTag", editAltTag);
     if (editImageFile) {
-      form.append('image', editImageFile);
+      form.append("image", editImageFile);
     }
 
     try {
@@ -160,12 +165,12 @@ export default function GalleryAdminPage() {
         closeEditModal();
         fetchGallery();
         showToast(
-          editImageFile ? 'Gallery photo and alt tag updated.' : 'Alt tag description updated.'
+          editImageFile ? "Gallery photo and alt tag updated." : "Alt tag description updated."
         );
       }
     } catch (err) {
-      console.error('Failed to update gallery photo:', err);
-      showToast('Failed to update gallery image.');
+      console.error("Failed to update gallery photo:", err);
+      toast.error(err.response?.data?.message || "Failed to update gallery image.");
     } finally {
       setIsSubmitting(false);
     }
@@ -175,7 +180,7 @@ export default function GalleryAdminPage() {
     if (!result.destination) return;
     if (result.destination.index === result.source.index) return;
     if (isFilterActive) {
-      showToast('Clear search filter before reordering.');
+      showToast("Clear search filter before reordering.");
       return;
     }
 
@@ -191,10 +196,11 @@ export default function GalleryAdminPage() {
     }));
 
     try {
-      await api.patch('/gallery/reorder', { order: orderPayload });
-      showToast('Gallery order updated.');
+      await api.patch("/gallery/reorder", { order: orderPayload });
+      showToast("Gallery order updated.");
     } catch (err) {
-      console.error('Failed to reorder gallery', err);
+      console.error("Failed to reorder gallery", err);
+      toast.error("Failed to update gallery order.");
       fetchGallery();
     }
   };
@@ -215,24 +221,29 @@ export default function GalleryAdminPage() {
     }));
 
     try {
-      await api.patch('/gallery/reorder', { order: orderPayload });
-      showToast('Gallery order updated.');
+      await api.patch("/gallery/reorder", { order: orderPayload });
+      showToast("Gallery order updated.");
     } catch (err) {
-      console.error('Failed to reorder gallery', err);
+      console.error("Failed to reorder gallery", err);
+      toast.error("Failed to update gallery order.");
       fetchGallery();
     }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this gallery photo?')) return;
+    if (!confirm("Are you sure you want to delete this gallery photo?")) return;
+    setDeletingId(id);
     try {
       const res = await api.delete(`/gallery/${id}`);
       if (res.status === 200) {
         fetchGallery();
-        showToast('Image deleted.');
+        showToast("Image deleted.");
       }
     } catch (err) {
       console.error(err);
+      toast.error(err.response?.data?.message || "Failed to delete image.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -250,12 +261,6 @@ export default function GalleryAdminPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {statusMsg && (
-            <span className="text-xs font-mono text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/40 px-3 py-1.5 rounded-lg font-medium">
-              {statusMsg}
-            </span>
-          )}
-
           <button
             type="button"
             onClick={openModal}
@@ -283,11 +288,11 @@ export default function GalleryAdminPage() {
           <div className="flex items-center bg-[#f6f8fa] dark:bg-[#1a1e27] p-1 rounded-xl">
             <button
               type="button"
-              onClick={() => setViewMode('table')}
+              onClick={() => setViewMode("table")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                viewMode === 'table'
-                  ? 'bg-teal-600 text-white shadow-xs'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white'
+                viewMode === "table"
+                  ? "bg-teal-600 text-white shadow-xs"
+                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white"
               }`}
               title="Table Reorder View"
             >
@@ -296,11 +301,11 @@ export default function GalleryAdminPage() {
             </button>
             <button
               type="button"
-              onClick={() => setViewMode('grid')}
+              onClick={() => setViewMode("grid")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                viewMode === 'grid'
-                  ? 'bg-teal-600 text-white shadow-xs'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white'
+                viewMode === "grid"
+                  ? "bg-teal-600 text-white shadow-xs"
+                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white"
               }`}
               title="Grid Showcase View"
             >
@@ -320,11 +325,11 @@ export default function GalleryAdminPage() {
           <Images className="w-10 h-10 text-zinc-400 mx-auto mb-2" />
           <p className="text-xs font-mono text-zinc-500">
             {isFilterActive
-              ? 'No photos match your search query.'
-              : 'No images in gallery yet. Click Upload Image to add one.'}
+              ? "No photos match your search query."
+              : "No images in gallery yet. Click Upload Image to add one."}
           </p>
         </div>
-      ) : viewMode === 'table' ? (
+      ) : viewMode === "table" ? (
         <div className="bg-white dark:bg-[#13161c] rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
           <div className="overflow-x-auto">
             <div className="min-w-[650px]">
@@ -339,7 +344,7 @@ export default function GalleryAdminPage() {
                 <div className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
                   {filteredImages.map((img, index) => {
                     const src = img.imagePath || img.image_url;
-                    const alt = img.altTag || img.alt_tag || 'Fleet Showcase Photo';
+                    const alt = img.altTag || img.alt_tag || "Fleet Showcase Photo";
 
                     return (
                       <div
@@ -367,7 +372,13 @@ export default function GalleryAdminPage() {
                         <div className="px-5 py-3.5">
                           <div className="relative w-24 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                             {src ? (
-                              <img src={src} alt={alt} className="object-contain w-full h-full" />
+                              <Image
+                                src={src}
+                                alt={alt}
+                                fill
+                                sizes="112px"
+                                className="object-contain"
+                              />
                             ) : (
                               <Images className="w-5 h-5 text-zinc-400" />
                             )}
@@ -387,14 +398,10 @@ export default function GalleryAdminPage() {
                           >
                             <Edit2 className="w-4 h-4 stroke-[1.75]" />
                           </button>
-                          <button
-                            type="button"
+                          <DeleteButton
                             onClick={() => handleDelete(img.id)}
-                            className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md cursor-pointer transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-4 h-4 stroke-[1.75]" />
-                          </button>
+                            pending={deletingId === img.id}
+                          />
                         </div>
                       </div>
                     );
@@ -417,7 +424,7 @@ export default function GalleryAdminPage() {
                             img.image_url ||
                             img.image ||
                             img.url;
-                          const alt = img.altTag || img.alt_tag || 'Fleet Showcase Photo';
+                          const alt = img.altTag || img.alt_tag || "Fleet Showcase Photo";
 
                           return (
                             <Draggable
@@ -433,8 +440,8 @@ export default function GalleryAdminPage() {
                                   style={providedDrag.draggableProps.style}
                                   className={`grid grid-cols-[144px_144px_minmax(0,1fr)_100px] items-center text-xs text-zinc-900 dark:text-zinc-100 transition-colors ${
                                     snapshot.isDragging
-                                      ? 'bg-white dark:bg-[#13161c] shadow-2xl ring-2 ring-teal-500 rounded-xl z-50'
-                                      : 'hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80'
+                                      ? "bg-white dark:bg-[#13161c] shadow-2xl ring-2 ring-teal-500 rounded-xl z-50"
+                                      : "hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80"
                                   }`}
                                 >
                                   <div className="px-5 py-3.5 whitespace-nowrap">
@@ -445,13 +452,13 @@ export default function GalleryAdminPage() {
                                         disabled={isFilterActive}
                                         className={`p-1 rounded transition-colors ${
                                           isFilterActive
-                                            ? 'opacity-30 cursor-not-allowed text-zinc-400'
-                                            : 'hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-grab active:cursor-grabbing'
+                                            ? "opacity-30 cursor-not-allowed text-zinc-400"
+                                            : "hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-grab active:cursor-grabbing"
                                         }`}
                                         title={
                                           isFilterActive
-                                            ? 'Clear search to reorder'
-                                            : 'Drag to reorder showroom position'
+                                            ? "Clear search to reorder"
+                                            : "Drag to reorder showroom position"
                                         }
                                       >
                                         <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
@@ -489,10 +496,12 @@ export default function GalleryAdminPage() {
                                   <div className="px-5 py-3.5">
                                     <div className="relative w-24 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                                       {src ? (
-                                        <img
+                                        <Image
                                           src={src}
                                           alt={alt}
-                                          className="object-contain w-full h-full"
+                                          fill
+                                          sizes="112px"
+                                          className="object-contain"
                                         />
                                       ) : (
                                         <Images className="w-5 h-5 text-zinc-400" />
@@ -515,14 +524,10 @@ export default function GalleryAdminPage() {
                                     >
                                       <Edit2 className="w-4 h-4 stroke-[1.75]" />
                                     </button>
-                                    <button
-                                      type="button"
+                                    <DeleteButton
                                       onClick={() => handleDelete(img.id)}
-                                      className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md transition-colors cursor-pointer"
-                                      title="Delete"
-                                    >
-                                      <Trash2 className="w-4 h-4 stroke-[1.75]" />
-                                    </button>
+                                      pending={deletingId === img.id}
+                                    />
                                   </div>
                                 </div>
                               )}
@@ -542,7 +547,7 @@ export default function GalleryAdminPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredImages.map((img, index) => {
             const src = img.imagePath || img.image_path || img.image_url || img.image || img.url;
-            const alt = img.altTag || img.alt_tag || 'Fleet Showcase Photo';
+            const alt = img.altTag || img.alt_tag || "Fleet Showcase Photo";
 
             return (
               <div
@@ -551,10 +556,12 @@ export default function GalleryAdminPage() {
               >
                 <div className="relative aspect-[16/10] w-full bg-[#f6f8fa] dark:bg-[#1a1e27] overflow-hidden">
                   {src ? (
-                    <img
+                    <Image
                       src={src}
                       alt={alt}
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300 ease-out"
+                      fill
+                      sizes="(max-width: 768px) 50vw, 320px"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-zinc-400">
@@ -615,14 +622,11 @@ export default function GalleryAdminPage() {
                       >
                         <Edit2 className="w-4 h-4 stroke-[1.75]" />
                       </button>
-                      <button
-                        type="button"
+                      <DeleteButton
                         onClick={() => handleDelete(img.id)}
-                        className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md transition-colors cursor-pointer"
                         title="Delete Photo"
-                      >
-                        <Trash2 className="w-4 h-4 stroke-[1.75]" />
-                      </button>
+                        pending={deletingId === img.id}
+                      />
                     </div>
                   </div>
                 </div>
@@ -682,6 +686,7 @@ export default function GalleryAdminPage() {
                 {uploadPreviewUrl && (
                   <div className="mb-3 p-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 flex items-center gap-3">
                     <div className="w-20 h-14 bg-white dark:bg-black rounded-lg overflow-hidden flex items-center justify-center shrink-0 border border-zinc-200/80 dark:border-zinc-800">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- blob preview urls can't use next/image */}
                       <img
                         src={uploadPreviewUrl}
                         alt="Preview"
@@ -717,10 +722,11 @@ export default function GalleryAdminPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-lg text-xs uppercase tracking-wider active:scale-[0.98] shadow-xs cursor-pointer"
+                  disabled={uploading}
+                  className="inline-flex items-center gap-2 px-5 py-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-70 text-white font-bold rounded-lg text-xs uppercase tracking-wider active:scale-[0.98] shadow-xs cursor-pointer"
                 >
-                  {loading ? 'Uploading...' : 'Upload Image'}
+                  {uploading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{uploading ? "Uploading..." : "Upload Image"}</span>
                 </button>
               </div>
             </form>
@@ -764,6 +770,7 @@ export default function GalleryAdminPage() {
 
                 <div className="relative aspect-[16/10] w-full bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-xl overflow-hidden flex items-center justify-center border border-zinc-200/60 dark:border-zinc-800">
                   {editPreviewUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- blob preview urls can't use next/image
                     <img
                       src={editPreviewUrl}
                       alt="New selection preview"
@@ -774,7 +781,7 @@ export default function GalleryAdminPage() {
                     editingImage.image_url ||
                     editingImage.image ||
                     editingImage.url ? (
-                    <img
+                    <Image
                       src={
                         editingImage.imagePath ||
                         editingImage.image_path ||
@@ -782,8 +789,10 @@ export default function GalleryAdminPage() {
                         editingImage.image ||
                         editingImage.url
                       }
-                      alt={editAltTag || 'Fleet Showcase Photo'}
-                      className="object-cover w-full h-full"
+                      alt={editAltTag || "Fleet Showcase Photo"}
+                      fill
+                      sizes="(max-width: 768px) 90vw, 480px"
+                      className="object-cover"
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center text-zinc-400 py-8">
@@ -800,7 +809,7 @@ export default function GalleryAdminPage() {
                 <div className="flex items-center justify-between mt-2.5">
                   <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27] hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium text-xs cursor-pointer transition-colors shadow-2xs">
                     <Upload className="w-3.5 h-3.5 stroke-[1.75] text-zinc-500 dark:text-zinc-400" />
-                    <span>{editPreviewUrl ? 'Choose Different Photo' : 'Replace Photo'}</span>
+                    <span>{editPreviewUrl ? "Choose Different Photo" : "Replace Photo"}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -814,7 +823,7 @@ export default function GalleryAdminPage() {
                       type="button"
                       onClick={() => {
                         setEditImageFile(null);
-                        setEditPreviewUrl('');
+                        setEditPreviewUrl("");
                       }}
                       className="inline-flex items-center gap-1 text-[11px] font-mono text-zinc-500 hover:text-zinc-900 dark:hover:text-white cursor-pointer px-2 py-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                     >
@@ -850,9 +859,10 @@ export default function GalleryAdminPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-lg text-xs uppercase tracking-wider active:scale-[0.98] shadow-xs cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-lg text-xs uppercase tracking-wider active:scale-[0.98] shadow-xs cursor-pointer disabled:opacity-50"
                 >
-                  {isSubmitting ? 'Saving...' : 'Save Changes'}
+                  {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{isSubmitting ? "Saving..." : "Save Changes"}</span>
                 </button>
               </div>
             </form>

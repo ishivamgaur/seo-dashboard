@@ -1,15 +1,15 @@
-import { body } from 'express-validator';
+import { body } from "express-validator";
 
 export const vehicleRules = [
-  body('vehicleName')
+  body("vehicleName")
     .notEmpty()
-    .withMessage('Vehicle name required')
+    .withMessage("Vehicle name required")
     .isLength({ max: 200 })
-    .withMessage('Max 200 characters'),
-  body('seatingCapacity')
+    .withMessage("Max 200 characters"),
+  body("seatingCapacity")
     .notEmpty()
-    .withMessage('Seating capacity required')
+    .withMessage("Seating capacity required")
     .isInt({ min: 1 })
-    .withMessage('Min capacity is 1'),
-  body('description').optional().isString(),
+    .withMessage("Min capacity is 1"),
+  body("description").optional().isString(),
 ];

@@ -1,44 +1,36 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, Suspense } from 'react';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import {
-  Save,
-  CheckCircle2,
-  AlertCircle,
-  Code,
-  Search,
-  Share2,
-  Plus,
-  Trash2,
-  X,
-  Copy,
-  Globe,
-  Check,
-} from 'lucide-react';
-import api from '@/lib/api';
+import React, { useState, useEffect, Suspense } from "react";
+import Image from "next/image";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { Save, Code, Search, Share2, Plus, X, Copy, Globe, Check, Loader2 } from "lucide-react";
+import DeleteButton from "@/components/common/DeleteButton";
+import { toast } from "sonner";
+import api from "@/lib/api";
 
-const VALID_TABS = ['meta', 'social', 'schemas'];
+const VALID_TABS = ["meta", "social", "schemas"];
 
 function SeoSettingsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
-  const tabParam = searchParams.get('tab');
-  const initialTab = VALID_TABS.includes(tabParam) ? tabParam : 'meta';
+  const tabParam = searchParams.get("tab");
+  const initialTab = VALID_TABS.includes(tabParam) ? tabParam : "meta";
 
   const [activeTab, setActiveTab] = useState(initialTab);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
+  const [schemaSaving, setSchemaSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
-    const currentTabInUrl = searchParams.get('tab');
+    const currentTabInUrl = searchParams.get("tab");
     if (!currentTabInUrl || !VALID_TABS.includes(currentTabInUrl)) {
       router.replace(`${pathname}?tab=meta`, { scroll: false });
-      setActiveTab('meta');
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- keeps tab in sync with url
+      setActiveTab("meta");
     } else if (currentTabInUrl !== activeTab) {
       setActiveTab(currentTabInUrl);
     }
@@ -50,18 +42,18 @@ function SeoSettingsContent() {
   };
 
   const [formData, setFormData] = useState({
-    metaTitle: '',
-    metaDescription: '',
-    canonicalUrl: '',
-    focusKeywords: '',
+    metaTitle: "",
+    metaDescription: "",
+    canonicalUrl: "",
+    focusKeywords: "",
     robotsIndex: true,
     robotsFollow: true,
-    ogTitle: '',
-    ogDescription: '',
-    ogImage: '',
-    twitterTitle: '',
-    twitterDescription: '',
-    twitterImage: '',
+    ogTitle: "",
+    ogDescription: "",
+    ogImage: "",
+    twitterTitle: "",
+    twitterDescription: "",
+    twitterImage: "",
   });
 
   const [schemas, setSchemas] = useState([]);
@@ -69,44 +61,44 @@ function SeoSettingsContent() {
   const [isSchemaModalOpen, setIsSchemaModalOpen] = useState(false);
   const [editingSchema, setEditingSchema] = useState(null);
 
-  const [schemaType, setSchemaType] = useState('organization');
+  const [schemaType, setSchemaType] = useState("organization");
 
-  const [orgName, setOrgName] = useState('Urban Cruise');
-  const [legalName, setLegalName] = useState('Urban Cruise India Private Limited');
-  const [siteUrl, setSiteUrl] = useState('https://urbancruise.in');
+  const [orgName, setOrgName] = useState("Urban Cruise");
+  const [legalName, setLegalName] = useState("Urban Cruise India Private Limited");
+  const [siteUrl, setSiteUrl] = useState("https://urbancruise.in");
   const [logoUrl, setLogoUrl] = useState(
-    'https://urbancruise.in/wp-content/uploads/gurugramlogo.webp'
+    "https://urbancruise.in/wp-content/uploads/gurugramlogo.webp"
   );
-  const [telephone, setTelephone] = useState('+91 98765 43210');
-  const [streetAddress, setStreetAddress] = useState('Plot No. 42, Sector 18');
-  const [addressLocality, setAddressLocality] = useState('Gurugram');
-  const [addressRegion, setAddressRegion] = useState('Haryana');
-  const [postalCode, setPostalCode] = useState('122008');
-  const [priceRange, setPriceRange] = useState('₹₹ - ₹₹₹');
+  const [telephone, setTelephone] = useState("+91 98765 43210");
+  const [streetAddress, setStreetAddress] = useState("Plot No. 42, Sector 18");
+  const [addressLocality, setAddressLocality] = useState("Gurugram");
+  const [addressRegion, setAddressRegion] = useState("Haryana");
+  const [postalCode, setPostalCode] = useState("122008");
+  const [priceRange, setPriceRange] = useState("₹₹ - ₹₹₹");
 
   const [faqItems, setFaqItems] = useState([
     {
-      question: 'What vehicles are available in your fleet?',
+      question: "What vehicles are available in your fleet?",
       answer:
-        'We offer 9, 12, 16, and 20 seater tempo travellers, Force Urbania luxury vans, and Volvo luxury coaches.',
+        "We offer 9, 12, 16, and 20 seater tempo travellers, Force Urbania luxury vans, and Volvo luxury coaches.",
     },
     {
-      question: 'Do you provide outstation chauffeur services?',
+      question: "Do you provide outstation chauffeur services?",
       answer:
-        'Yes, all our vehicles operate with verified commercial all-India tourist permits and experienced drivers.',
+        "Yes, all our vehicles operate with verified commercial all-India tourist permits and experienced drivers.",
     },
   ]);
 
   const [breadcrumbItems, setBreadcrumbItems] = useState([
-    { name: 'Home', url: 'https://urbancruise.in' },
-    { name: 'Fleet', url: 'https://urbancruise.in/#vehicles' },
+    { name: "Home", url: "https://urbancruise.in" },
+    { name: "Fleet", url: "https://urbancruise.in/#vehicles" },
   ]);
 
   const fetchSettings = async () => {
     try {
       const [seoRes, schemaRes] = await Promise.all([
-        api.get('/seo').catch(() => ({ data: {} })),
-        api.get('/schemas?all=true').catch(() => ({ data: {} })),
+        api.get("/seo").catch(() => ({ data: {} })),
+        api.get("/schemas?all=true").catch(() => ({ data: {} })),
       ]);
 
       if (seoRes.data?.data) {
@@ -124,43 +116,42 @@ function SeoSettingsContent() {
         }
       }
     } catch (error) {
-      console.error('Failed to fetch SEO configurations', error);
+      console.error("Failed to fetch SEO configurations", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial settings load on mount
     fetchSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const showToast = (type, text) => {
-    setStatusMsg({ type, text });
-    setTimeout(() => setStatusMsg({ type: '', text: '' }), 4000);
-  };
+  // single toast helper for this page (sonner renders it globally)
+  const showToast = (type, text) => (type === "success" ? toast.success(text) : toast.error(text));
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-    setStatusMsg({ type: '', text: '' });
 
     try {
-      const response = await api.put('/seo', formData);
+      const response = await api.put("/seo", formData);
       if (response.status === 200) {
-        showToast('success', 'SEO configurations saved. Live <head> tags updated.');
+        showToast("success", "SEO configurations saved. Live <head> tags updated.");
       } else {
-        showToast('error', response.data?.message || 'Failed to save settings.');
+        showToast("error", response.data?.message || "Failed to save settings.");
       }
     } catch (error) {
-      showToast('error', error.response?.data?.message || 'Error occurred while saving.');
+      showToast("error", error.response?.data?.message || "Error occurred while saving.");
     } finally {
       setSaving(false);
     }
@@ -169,12 +160,12 @@ function SeoSettingsContent() {
   const handleCopySchema = () => {
     if (!selectedSchema) return;
     const text =
-      typeof selectedSchema.schemaData === 'string'
+      typeof selectedSchema.schemaData === "string"
         ? selectedSchema.schemaData
         : JSON.stringify(selectedSchema.schemaData, null, 2);
     navigator.clipboard.writeText(text);
     setCopied(true);
-    showToast('success', 'JSON-LD schema copied to clipboard.');
+    showToast("success", "JSON-LD schema copied to clipboard.");
     setTimeout(() => setCopied(false), 2500);
   };
 
@@ -187,100 +178,103 @@ function SeoSettingsContent() {
       if (selectedSchema?.id === schemaId) {
         setSelectedSchema((prev) => ({ ...prev, isActive: !currentStatus }));
       }
-      showToast('success', 'Schema active state updated.');
+      showToast("success", "Schema active state updated.");
     } catch (err) {
-      showToast('error', 'Failed to toggle schema state.');
+      showToast("error", "Failed to toggle schema state.");
     }
   };
 
   const handleDeleteSchema = async (schemaId) => {
-    if (!confirm('Are you sure you want to delete this JSON-LD schema?')) return;
+    if (!confirm("Are you sure you want to delete this JSON-LD schema?")) return;
+    setDeletingId(schemaId);
     try {
       await api.delete(`/schemas/${schemaId}`);
       setSchemas((prev) => prev.filter((s) => s.id !== schemaId));
       if (selectedSchema?.id === schemaId) {
         setSelectedSchema(null);
       }
-      showToast('success', 'Schema deleted.');
+      showToast("success", "Schema deleted.");
     } catch (err) {
-      showToast('error', 'Failed to delete schema.');
+      showToast("error", err.response?.data?.message || "Failed to delete schema.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
   const generateJsonLd = () => {
-    if (schemaType === 'organization') {
+    if (schemaType === "organization") {
       return {
-        '@context': 'https://schema.org',
-        '@type': 'Organization',
+        "@context": "https://schema.org",
+        "@type": "Organization",
         name: orgName,
         legalName: legalName,
         url: siteUrl,
         logo: logoUrl,
         contactPoint: {
-          '@type': 'ContactPoint',
+          "@type": "ContactPoint",
           telephone: telephone,
-          contactType: 'customer service',
-          areaServed: 'IN',
-          availableLanguage: ['en', 'hi'],
+          contactType: "customer service",
+          areaServed: "IN",
+          availableLanguage: ["en", "hi"],
         },
       };
     }
 
-    if (schemaType === 'local_business') {
+    if (schemaType === "local_business") {
       return {
-        '@context': 'https://schema.org',
-        '@type': 'LocalBusiness',
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
         name: orgName,
         image: logoUrl,
         telephone: telephone,
         priceRange: priceRange,
         address: {
-          '@type': 'PostalAddress',
+          "@type": "PostalAddress",
           streetAddress: streetAddress,
           addressLocality: addressLocality,
           addressRegion: addressRegion,
           postalCode: postalCode,
-          addressCountry: 'IN',
+          addressCountry: "IN",
         },
         url: siteUrl,
       };
     }
 
-    if (schemaType === 'website') {
+    if (schemaType === "website") {
       return {
-        '@context': 'https://schema.org',
-        '@type': 'WebSite',
+        "@context": "https://schema.org",
+        "@type": "WebSite",
         name: orgName,
         url: siteUrl,
         potentialAction: {
-          '@type': 'SearchAction',
+          "@type": "SearchAction",
           target: `${siteUrl}/#vehicles`,
-          'query-input': 'required name=search_term_string',
+          "query-input": "required name=search_term_string",
         },
       };
     }
 
-    if (schemaType === 'faq') {
+    if (schemaType === "faq") {
       return {
-        '@context': 'https://schema.org',
-        '@type': 'FAQPage',
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
         mainEntity: faqItems.map((item) => ({
-          '@type': 'Question',
+          "@type": "Question",
           name: item.question,
           acceptedAnswer: {
-            '@type': 'Answer',
+            "@type": "Answer",
             text: item.answer,
           },
         })),
       };
     }
 
-    if (schemaType === 'breadcrumb') {
+    if (schemaType === "breadcrumb") {
       return {
-        '@context': 'https://schema.org',
-        '@type': 'BreadcrumbList',
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
         itemListElement: breadcrumbItems.map((item, idx) => ({
-          '@type': 'ListItem',
+          "@type": "ListItem",
           position: idx + 1,
           name: item.name,
           item: item.url,
@@ -293,6 +287,7 @@ function SeoSettingsContent() {
 
   const handleSaveSchema = async (e) => {
     e.preventDefault();
+    setSchemaSaving(true);
     const generatedData = generateJsonLd();
 
     const payload = {
@@ -305,25 +300,27 @@ function SeoSettingsContent() {
       if (editingSchema) {
         const res = await api.put(`/schemas/${editingSchema.id}`, payload);
         if (res.status === 200) {
-          showToast('success', `${schemaType.toUpperCase()} schema updated.`);
+          showToast("success", `${schemaType.toUpperCase()} schema updated.`);
         }
       } else {
-        const res = await api.post('/schemas', payload);
+        const res = await api.post("/schemas", payload);
         if (res.status === 201) {
-          showToast('success', `${schemaType.toUpperCase()} schema created.`);
+          showToast("success", `${schemaType.toUpperCase()} schema created.`);
         }
       }
       setIsSchemaModalOpen(false);
       setEditingSchema(null);
       fetchSettings();
     } catch (err) {
-      showToast('error', err.response?.data?.message || 'Failed to save schema.');
+      showToast("error", err.response?.data?.message || "Failed to save schema.");
+    } finally {
+      setSchemaSaving(false);
     }
   };
 
   const openCreateSchemaModal = () => {
     setEditingSchema(null);
-    setSchemaType('organization');
+    setSchemaType("organization");
     setIsSchemaModalOpen(true);
   };
 
@@ -335,8 +332,8 @@ function SeoSettingsContent() {
     );
   }
 
-  const titleLength = (formData.metaTitle || '').length;
-  const descLength = (formData.metaDescription || '').length;
+  const titleLength = (formData.metaTitle || "").length;
+  const descLength = (formData.metaDescription || "").length;
 
   return (
     <div className="w-full max-w-8xl min-h-full space-y-4 font-sans antialiased">
@@ -350,33 +347,16 @@ function SeoSettingsContent() {
             JSON-LD schemas.
           </p>
         </div>
-
-        {statusMsg.text && (
-          <div
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium ${
-              statusMsg.type === 'success'
-                ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300'
-                : 'bg-red-50 dark:bg-red-950/40 text-red-800 dark:text-red-300'
-            }`}
-          >
-            {statusMsg.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-teal-600 dark:text-teal-400 stroke-[2]" />
-            ) : (
-              <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 stroke-[2]" />
-            )}
-            <span>{statusMsg.text}</span>
-          </div>
-        )}
       </div>
 
       <div className="flex space-x-2 pb-1 overflow-x-auto">
         <button
           type="button"
-          onClick={() => handleTabChange('meta')}
+          onClick={() => handleTabChange("meta")}
           className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide active:scale-[0.98] cursor-pointer whitespace-nowrap transition-all ${
-            activeTab === 'meta'
-              ? 'bg-teal-600 text-white shadow-xs font-bold'
-              : 'text-zinc-600 dark:text-zinc-400 hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27]'
+            activeTab === "meta"
+              ? "bg-teal-600 text-white shadow-xs font-bold"
+              : "text-zinc-600 dark:text-zinc-400 hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27]"
           }`}
         >
           <Search className="w-3.5 h-3.5 stroke-[1.75]" />
@@ -385,11 +365,11 @@ function SeoSettingsContent() {
 
         <button
           type="button"
-          onClick={() => handleTabChange('social')}
+          onClick={() => handleTabChange("social")}
           className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide active:scale-[0.98] cursor-pointer whitespace-nowrap transition-all ${
-            activeTab === 'social'
-              ? 'bg-teal-600 text-white shadow-xs font-bold'
-              : 'text-zinc-600 dark:text-zinc-400 hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27]'
+            activeTab === "social"
+              ? "bg-teal-600 text-white shadow-xs font-bold"
+              : "text-zinc-600 dark:text-zinc-400 hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27]"
           }`}
         >
           <Share2 className="w-3.5 h-3.5 stroke-[1.75]" />
@@ -398,11 +378,11 @@ function SeoSettingsContent() {
 
         <button
           type="button"
-          onClick={() => handleTabChange('schemas')}
+          onClick={() => handleTabChange("schemas")}
           className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide active:scale-[0.98] cursor-pointer whitespace-nowrap transition-all ${
-            activeTab === 'schemas'
-              ? 'bg-teal-600 text-white shadow-xs font-bold'
-              : 'text-zinc-600 dark:text-zinc-400 hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27]'
+            activeTab === "schemas"
+              ? "bg-teal-600 text-white shadow-xs font-bold"
+              : "text-zinc-600 dark:text-zinc-400 hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27]"
           }`}
         >
           <Code className="w-3.5 h-3.5 stroke-[1.75]" />
@@ -410,7 +390,7 @@ function SeoSettingsContent() {
         </button>
       </div>
 
-      {activeTab === 'meta' && (
+      {activeTab === "meta" && (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             <div className="md:col-span-7 bg-white dark:bg-[#13161c] rounded-xl p-6 shadow-xs space-y-4 text-xs">
@@ -425,7 +405,7 @@ function SeoSettingsContent() {
                   </label>
                   <span
                     className={`text-[10px] font-mono font-semibold ${
-                      titleLength > 60 ? 'text-amber-500' : 'text-teal-500'
+                      titleLength > 60 ? "text-amber-500" : "text-teal-500"
                     }`}
                   >
                     {titleLength} / 60 chars (Optimal 40-60)
@@ -434,7 +414,7 @@ function SeoSettingsContent() {
                 <input
                   type="text"
                   name="metaTitle"
-                  value={formData.metaTitle || ''}
+                  value={formData.metaTitle || ""}
                   onChange={handleChange}
                   placeholder="Urban Cruise - Vehicle Rentals & Chauffeur Services India"
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
@@ -448,7 +428,7 @@ function SeoSettingsContent() {
                   </label>
                   <span
                     className={`text-[10px] font-mono font-semibold ${
-                      descLength > 160 ? 'text-amber-500' : 'text-teal-500'
+                      descLength > 160 ? "text-amber-500" : "text-teal-500"
                     }`}
                   >
                     {descLength} / 160 chars (Optimal 120-160)
@@ -457,7 +437,7 @@ function SeoSettingsContent() {
                 <textarea
                   rows={4}
                   name="metaDescription"
-                  value={formData.metaDescription || ''}
+                  value={formData.metaDescription || ""}
                   onChange={handleChange}
                   placeholder="Book luxury tempo travellers, Force Urbania vans, and Volvo coaches..."
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium leading-relaxed border-0"
@@ -471,7 +451,7 @@ function SeoSettingsContent() {
                 <input
                   type="url"
                   name="canonicalUrl"
-                  value={formData.canonicalUrl || ''}
+                  value={formData.canonicalUrl || ""}
                   onChange={handleChange}
                   placeholder="https://urbancruise.in"
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
@@ -485,7 +465,7 @@ function SeoSettingsContent() {
                 <input
                   type="text"
                   name="focusKeywords"
-                  value={formData.focusKeywords || ''}
+                  value={formData.focusKeywords || ""}
                   onChange={handleChange}
                   placeholder="tempo traveller rental, force urbania, luxury bus hire, wedding car rental"
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
@@ -513,19 +493,19 @@ function SeoSettingsContent() {
                         Urban Cruise
                       </span>
                       <span className="text-zinc-500 text-[10px] truncate block max-w-xs">
-                        {formData.canonicalUrl || 'https://urbancruise.in'}
+                        {formData.canonicalUrl || "https://urbancruise.in"}
                       </span>
                     </div>
                   </div>
 
                   <h4 className="text-sm font-medium text-[#1a0dab] dark:text-[#8ab4f8] hover:underline cursor-pointer line-clamp-1 pt-1">
                     {formData.metaTitle ||
-                      'Urban Cruise - Vehicle Rentals & Chauffeur Services India'}
+                      "Urban Cruise - Vehicle Rentals & Chauffeur Services India"}
                   </h4>
 
                   <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">
                     {formData.metaDescription ||
-                      'Book luxury tempo travellers, Force Urbania vans, and Volvo coaches across 15 Indian cities.'}
+                      "Book luxury tempo travellers, Force Urbania vans, and Volvo coaches across 15 Indian cities."}
                   </p>
                 </div>
               </div>
@@ -577,8 +557,8 @@ function SeoSettingsContent() {
 
                 <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/60 mt-4">
                   <span className="text-[11px] font-mono text-zinc-500">
-                    Directive: {Boolean(formData.robotsIndex) ? 'index' : 'noindex'},{' '}
-                    {Boolean(formData.robotsFollow) ? 'follow' : 'nofollow'}
+                    Directive: {Boolean(formData.robotsIndex) ? "index" : "noindex"},{" "}
+                    {Boolean(formData.robotsFollow) ? "follow" : "nofollow"}
                   </span>
                 </div>
               </div>
@@ -591,14 +571,18 @@ function SeoSettingsContent() {
               disabled={saving}
               className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
             >
-              <Save className="w-4 h-4 stroke-[2]" />
-              <span>{saving ? 'Saving...' : 'Save Meta Configuration'}</span>
+              {saving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4 stroke-[2]" />
+              )}
+              <span>{saving ? "Saving..." : "Save Meta Configuration"}</span>
             </button>
           </div>
         </form>
       )}
 
-      {activeTab === 'social' && (
+      {activeTab === "social" && (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
             <div className="bg-white dark:bg-[#13161c] rounded-xl p-6 shadow-xs space-y-4">
@@ -613,7 +597,7 @@ function SeoSettingsContent() {
                 <input
                   type="text"
                   name="ogTitle"
-                  value={formData.ogTitle || ''}
+                  value={formData.ogTitle || ""}
                   onChange={handleChange}
                   placeholder="Urban Cruise - Vehicle Rentals & Chauffeur Services"
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
@@ -627,7 +611,7 @@ function SeoSettingsContent() {
                 <textarea
                   rows={3}
                   name="ogDescription"
-                  value={formData.ogDescription || ''}
+                  value={formData.ogDescription || ""}
                   onChange={handleChange}
                   placeholder="Book luxury tempo travellers, Force Urbania vans, and Volvo coaches across 15 cities."
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium leading-relaxed border-0"
@@ -641,7 +625,7 @@ function SeoSettingsContent() {
                 <input
                   type="url"
                   name="ogImage"
-                  value={formData.ogImage || ''}
+                  value={formData.ogImage || ""}
                   onChange={handleChange}
                   placeholder="https://res.cloudinary.com/..."
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
@@ -653,12 +637,14 @@ function SeoSettingsContent() {
                   LIVE OPEN GRAPH SHARE PREVIEW:
                 </span>
                 <div className="rounded-xl overflow-hidden bg-[#f6f8fa] dark:bg-[#1a1e27]">
-                  <div className="aspect-[1.91/1] w-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
+                  <div className="relative aspect-[1.91/1] w-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
                     {formData.ogImage ? (
-                      <img
+                      <Image
                         src={formData.ogImage}
                         alt="OG Preview"
-                        className="object-cover w-full h-full"
+                        fill
+                        sizes="(max-width: 768px) 90vw, 640px"
+                        className="object-cover"
                       />
                     ) : (
                       <span className="text-[11px] font-mono text-zinc-400">og:image preview</span>
@@ -669,11 +655,11 @@ function SeoSettingsContent() {
                       URBANCRUISE.IN
                     </span>
                     <h5 className="font-bold text-zinc-900 dark:text-white truncate mt-0.5">
-                      {formData.ogTitle || 'Urban Cruise - Vehicle Rentals'}
+                      {formData.ogTitle || "Urban Cruise - Vehicle Rentals"}
                     </h5>
                     <p className="text-[11px] text-zinc-500 line-clamp-2 mt-0.5">
                       {formData.ogDescription ||
-                        'Book luxury tempo travellers, Force Urbania vans, and Volvo coaches.'}
+                        "Book luxury tempo travellers, Force Urbania vans, and Volvo coaches."}
                     </p>
                   </div>
                 </div>
@@ -692,7 +678,7 @@ function SeoSettingsContent() {
                 <input
                   type="text"
                   name="twitterTitle"
-                  value={formData.twitterTitle || ''}
+                  value={formData.twitterTitle || ""}
                   onChange={handleChange}
                   placeholder="Urban Cruise - Commercial Fleet in India"
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
@@ -706,7 +692,7 @@ function SeoSettingsContent() {
                 <textarea
                   rows={3}
                   name="twitterDescription"
-                  value={formData.twitterDescription || ''}
+                  value={formData.twitterDescription || ""}
                   onChange={handleChange}
                   placeholder="Official chauffeur and bus fleet portal across Delhi NCR, Mumbai, and Bengaluru."
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium leading-relaxed border-0"
@@ -720,7 +706,7 @@ function SeoSettingsContent() {
                 <input
                   type="url"
                   name="twitterImage"
-                  value={formData.twitterImage || ''}
+                  value={formData.twitterImage || ""}
                   onChange={handleChange}
                   placeholder="https://res.cloudinary.com/..."
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
@@ -732,12 +718,14 @@ function SeoSettingsContent() {
                   LIVE TWITTER SUMMARY CARD:
                 </span>
                 <div className="rounded-xl overflow-hidden bg-[#f6f8fa] dark:bg-[#1a1e27]">
-                  <div className="aspect-[2/1] w-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
+                  <div className="relative aspect-[2/1] w-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
                     {formData.twitterImage || formData.ogImage ? (
-                      <img
+                      <Image
                         src={formData.twitterImage || formData.ogImage}
                         alt="Twitter Preview"
-                        className="object-cover w-full h-full"
+                        fill
+                        sizes="(max-width: 768px) 90vw, 640px"
+                        className="object-cover"
                       />
                     ) : (
                       <span className="text-[11px] font-mono text-zinc-400">
@@ -747,12 +735,12 @@ function SeoSettingsContent() {
                   </div>
                   <div className="p-3">
                     <h5 className="font-bold text-zinc-900 dark:text-white truncate">
-                      {formData.twitterTitle || formData.ogTitle || 'Urban Cruise Fleet'}
+                      {formData.twitterTitle || formData.ogTitle || "Urban Cruise Fleet"}
                     </h5>
                     <p className="text-[11px] text-zinc-500 line-clamp-2 mt-0.5">
                       {formData.twitterDescription ||
                         formData.ogDescription ||
-                        'Commercial chauffeur services across India.'}
+                        "Commercial chauffeur services across India."}
                     </p>
                   </div>
                 </div>
@@ -766,14 +754,18 @@ function SeoSettingsContent() {
               disabled={saving}
               className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
             >
-              <Save className="w-4 h-4 stroke-[2]" />
-              <span>{saving ? 'Saving...' : 'Save Social Metadata'}</span>
+              {saving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4 stroke-[2]" />
+              )}
+              <span>{saving ? "Saving..." : "Save Social Metadata"}</span>
             </button>
           </div>
         </form>
       )}
 
-      {activeTab === 'schemas' && (
+      {activeTab === "schemas" && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
@@ -799,16 +791,16 @@ function SeoSettingsContent() {
                     onClick={() => setSelectedSchema(s)}
                     className={`p-4 rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] transition-all cursor-pointer flex items-center justify-between ${
                       isSelected
-                        ? 'bg-teal-50/70 dark:bg-teal-950/40 ring-1 ring-teal-500'
-                        : 'bg-white dark:bg-[#13161c] hover:bg-zinc-50 dark:hover:bg-[#1a1e27]'
+                        ? "bg-teal-50/70 dark:bg-teal-950/40 ring-1 ring-teal-500"
+                        : "bg-white dark:bg-[#13161c] hover:bg-zinc-50 dark:hover:bg-[#1a1e27]"
                     }`}
                   >
                     <div>
                       <span className="font-bold text-xs uppercase tracking-wider font-mono text-zinc-950 dark:text-white block">
-                        {s.schemaType.replace('_', ' ')}
+                        {s.schemaType.replace("_", " ")}
                       </span>
                       <span className="text-[11px] text-zinc-500 font-mono">
-                        {s.isActive ? 'Active (Injected in Head)' : 'Disabled'}
+                        {s.isActive ? "Active (Injected in Head)" : "Disabled"}
                       </span>
                     </div>
 
@@ -821,25 +813,22 @@ function SeoSettingsContent() {
                         }}
                         className={`px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold transition-colors cursor-pointer ${
                           s.isActive
-                            ? 'bg-teal-100 dark:bg-teal-950 text-teal-800 dark:text-teal-300'
-                            : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                            ? "bg-teal-100 dark:bg-teal-950 text-teal-800 dark:text-teal-300"
+                            : "bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
                         }`}
                         title="Toggle head injection"
                       >
-                        {s.isActive ? 'Active' : 'Off'}
+                        {s.isActive ? "Active" : "Off"}
                       </button>
 
-                      <button
-                        type="button"
+                      <DeleteButton
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteSchema(s.id);
                         }}
-                        className="p-1 rounded-md text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
                         title="Delete schema"
-                      >
-                        <Trash2 className="w-3.5 h-3.5 stroke-[1.75]" />
-                      </button>
+                        pending={deletingId === s.id}
+                      />
                     </div>
                   </div>
                 );
@@ -850,7 +839,7 @@ function SeoSettingsContent() {
               <div>
                 <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-4">
                   <span className="font-mono text-xs uppercase font-bold text-teal-600 dark:text-teal-400">
-                    {selectedSchema?.schemaType?.replace('_', ' ') || 'Schema'} JSON-LD Markup
+                    {selectedSchema?.schemaType?.replace("_", " ") || "Schema"} JSON-LD Markup
                   </span>
 
                   <div className="flex items-center gap-2">
@@ -873,17 +862,17 @@ function SeoSettingsContent() {
                       )}
                     </button>
                     <span className="text-[11px] font-mono text-zinc-400">
-                      {selectedSchema?.isActive ? 'Auto-injected' : 'Inactive'}
+                      {selectedSchema?.isActive ? "Auto-injected" : "Inactive"}
                     </span>
                   </div>
                 </div>
 
                 <pre className="p-4 rounded-xl bg-zinc-900 text-zinc-100 font-mono text-[11px] overflow-x-auto max-h-96 leading-relaxed">
                   {selectedSchema?.schemaData
-                    ? typeof selectedSchema.schemaData === 'string'
+                    ? typeof selectedSchema.schemaData === "string"
                       ? JSON.stringify(JSON.parse(selectedSchema.schemaData), null, 2)
                       : JSON.stringify(selectedSchema.schemaData, null, 2)
-                    : '// Select a schema from the list'}
+                    : "// Select a schema from the list"}
                 </pre>
               </div>
 
@@ -934,7 +923,7 @@ function SeoSettingsContent() {
                 </select>
               </div>
 
-              {schemaType === 'organization' && (
+              {schemaType === "organization" && (
                 <div className="space-y-3 pt-2">
                   <div>
                     <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
@@ -975,7 +964,7 @@ function SeoSettingsContent() {
                 </div>
               )}
 
-              {schemaType === 'local_business' && (
+              {schemaType === "local_business" && (
                 <div className="space-y-3 pt-2">
                   <div>
                     <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
@@ -1030,7 +1019,7 @@ function SeoSettingsContent() {
                 </div>
               )}
 
-              {schemaType === 'website' && (
+              {schemaType === "website" && (
                 <div className="space-y-3 pt-2">
                   <div>
                     <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">
@@ -1059,7 +1048,7 @@ function SeoSettingsContent() {
                 </div>
               )}
 
-              {schemaType === 'faq' && (
+              {schemaType === "faq" && (
                 <div className="space-y-3 pt-2">
                   <div className="flex justify-between items-center mb-1">
                     <span className="font-mono uppercase font-bold text-zinc-500 text-[11px]">
@@ -1067,7 +1056,7 @@ function SeoSettingsContent() {
                     </span>
                     <button
                       type="button"
-                      onClick={() => setFaqItems([...faqItems, { question: '', answer: '' }])}
+                      onClick={() => setFaqItems([...faqItems, { question: "", answer: "" }])}
                       className="text-xs text-teal-600 dark:text-teal-400 hover:underline font-mono cursor-pointer"
                     >
                       + Add Question
@@ -1120,7 +1109,7 @@ function SeoSettingsContent() {
                 </div>
               )}
 
-              {schemaType === 'breadcrumb' && (
+              {schemaType === "breadcrumb" && (
                 <div className="space-y-3 pt-2">
                   <div className="flex justify-between items-center mb-1">
                     <span className="font-mono uppercase font-bold text-zinc-500 text-[11px]">
@@ -1129,7 +1118,7 @@ function SeoSettingsContent() {
                     <button
                       type="button"
                       onClick={() =>
-                        setBreadcrumbItems([...breadcrumbItems, { name: '', url: '' }])
+                        setBreadcrumbItems([...breadcrumbItems, { name: "", url: "" }])
                       }
                       className="text-xs text-teal-600 dark:text-teal-400 hover:underline font-mono cursor-pointer"
                     >
@@ -1190,9 +1179,11 @@ function SeoSettingsContent() {
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
+                  disabled={schemaSaving}
+                  className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-70 text-white font-semibold px-4 py-2 rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
                 >
-                  Generate & Save Schema
+                  {schemaSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{schemaSaving ? "Saving..." : "Generate & Save Schema"}</span>
                 </button>
               </div>
             </form>

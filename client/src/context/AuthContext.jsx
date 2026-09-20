@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../lib/api';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import api from "../lib/api";
 
 const AuthContext = createContext({});
 
@@ -11,15 +11,15 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const loadUser = async () => {
-      if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('token');
+      if (typeof window !== "undefined") {
+        const token = localStorage.getItem("token");
         if (token) {
           try {
-            const res = await api.get('/auth/me');
+            const res = await api.get("/auth/me");
             setUser(res.data.data);
           } catch (error) {
-            console.error('Failed to load user', error);
-            localStorage.removeItem('token');
+            console.error("Failed to load user", error);
+            localStorage.removeItem("token");
           }
         }
       }
@@ -31,25 +31,25 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const res = await api.post('/auth/login', { email, password });
+      const res = await api.post("/auth/login", { email, password });
       const { token, user: userData } = res.data.data;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('token', token);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("token", token);
       }
       setUser(userData);
       return { success: true };
     } catch (error) {
-      console.error('Login error', error);
+      console.error("Login error", error);
       return {
         success: false,
-        message: error.response?.data?.message || 'Login failed',
+        message: error.response?.data?.message || "Login failed",
       };
     }
   };
 
   const logout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
     }
     setUser(null);
   };

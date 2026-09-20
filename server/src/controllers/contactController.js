@@ -1,10 +1,10 @@
-import catchAsync from '../utils/catchAsync.js';
-import ApiResponse from '../utils/ApiResponse.js';
-import ContactInfo from '../models/ContactInfo.js';
+import catchAsync from "../utils/catchAsync.js";
+import ApiResponse from "../utils/ApiResponse.js";
+import ContactInfo from "../models/ContactInfo.js";
 
 export const getContact = catchAsync(async (req, res) => {
   const contact = await ContactInfo.findOne();
-  return res.json(new ApiResponse(200, 'Contact info fetched successfully', contact));
+  return res.json(new ApiResponse(200, "Contact info fetched successfully", contact));
 });
 
 export const updateContact = catchAsync(async (req, res) => {
@@ -18,5 +18,5 @@ export const updateContact = catchAsync(async (req, res) => {
     contact = await ContactInfo.create(updateData);
   }
 
-  return res.json(new ApiResponse(200, 'Contact info updated successfully', contact));
+  return res.json(new ApiResponse(200, "Contact info updated successfully", contact));
 });

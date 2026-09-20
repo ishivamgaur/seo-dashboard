@@ -1,12 +1,12 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../config/database.js';
+import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
 
 const Testimonial = sequelize.define(
-  'Testimonial',
+  "Testimonial",
   {
     customerName: {
       type: DataTypes.STRING(150),
-      field: 'customer_name',
+      field: "customer_name",
       allowNull: false,
     },
     review: {
@@ -20,16 +20,16 @@ const Testimonial = sequelize.define(
     },
     customerImage: {
       type: DataTypes.STRING(500),
-      field: 'customer_image',
+      field: "customer_image",
     },
     isActive: {
       type: DataTypes.BOOLEAN,
-      field: 'is_active',
+      field: "is_active",
       defaultValue: true,
     },
   },
   {
-    tableName: 'testimonials',
+    tableName: "testimonials",
     freezeTableName: true,
     underscored: true,
     timestamps: true,

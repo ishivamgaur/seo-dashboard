@@ -1,24 +1,20 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
-import Reveal from './Reveal';
-import Button from '@/components/ui/Button';
-import { BRAND, FALLBACK_IMAGES, resolveMediaUrl } from '@/lib/site';
+import React from "react";
+import Image from "next/image";
+import { ArrowRight } from "lucide-react";
+import Reveal from "./Reveal";
+import Button from "@/components/ui/Button";
+import { BRAND, resolveMediaUrl } from "@/lib/site";
 
 const HeroSection = ({ data }) => {
-  const heading = data?.heading || 'Commercial fleet and chauffeur rentals in India';
-  const subHeading =
-    data?.subHeading ||
-    'Tempo travellers, Force Urbania vans, and luxury coaches for corporate events, weddings, and outstation trips.';
-  const bannerImage = resolveMediaUrl(data?.bannerImage, FALLBACK_IMAGES.hero);
-  const ctaText = data?.ctaText || 'Reserve a vehicle';
-  const ctaUrl = data?.ctaUrl || '#contact';
+  if (!data?.heading || !data?.bannerImage) return null;
+
+  const { heading, subHeading, ctaText, ctaUrl } = data;
+  const bannerImage = resolveMediaUrl(data.bannerImage);
 
   return (
     <section className="relative w-full overflow-hidden bg-zinc-950">
-      {/* Full-width image — covers the entire viewport width + section height, no vh lock */}
       <div className="absolute inset-0">
         <Image
           src={bannerImage}
@@ -30,7 +26,6 @@ const HeroSection = ({ data }) => {
         />
       </div>
       <div className="absolute inset-0 bg-black/50" />
-      {/* Curved scoop edge — photo pours into the page, no straight fade */}
       <svg
         aria-hidden="true"
         viewBox="0 0 1440 100"
@@ -48,16 +43,22 @@ const HeroSection = ({ data }) => {
           <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white text-balance leading-tight">
             {heading}
           </h1>
-          <p className="mt-4 text-sm sm:text-base text-zinc-300 leading-relaxed">{subHeading}</p>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <Button href={ctaUrl}>
-              <span>{ctaText}</span>
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-            <Button href="#vehicles" variant="ghostOnDark">
-              View fleet
-            </Button>
-          </div>
+          {subHeading && (
+            <p className="mt-4 text-sm sm:text-base text-zinc-300 leading-relaxed">{subHeading}</p>
+          )}
+          {(ctaText || ctaUrl) && (
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              {ctaText && (
+                <Button href={ctaUrl || "#contact"}>
+                  <span>{ctaText}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              )}
+              <Button href="#vehicles" variant="ghostOnDark">
+                View fleet
+              </Button>
+            </div>
+          )}
         </Reveal>
       </div>
     </section>

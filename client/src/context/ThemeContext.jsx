@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { ThemeProvider as NextThemesProvider, useTheme as useNextTheme } from 'next-themes';
+import React, { useEffect, useState } from "react";
+import { ThemeProvider as NextThemesProvider, useTheme as useNextTheme } from "next-themes";
 
 export function ThemeProvider({ children, ...props }) {
   return (
@@ -22,15 +22,16 @@ export function useTheme() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- mount flag avoids theme hydration mismatch
     setMounted(true);
   }, []);
 
-  const activeTheme = mounted ? nextTheme.resolvedTheme || nextTheme.theme || 'dark' : 'dark';
+  const activeTheme = mounted ? nextTheme.resolvedTheme || nextTheme.theme || "dark" : "dark";
 
   return {
     theme: activeTheme,
     setTheme: (t) => nextTheme.setTheme(t),
-    toggleTheme: () => nextTheme.setTheme(activeTheme === 'dark' ? 'light' : 'dark'),
+    toggleTheme: () => nextTheme.setTheme(activeTheme === "dark" ? "light" : "dark"),
     mounted,
     resolvedTheme: nextTheme.resolvedTheme,
     systemTheme: nextTheme.systemTheme,

@@ -1,8 +1,8 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../config/database.js';
+import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
 
 const Occasion = sequelize.define(
-  'Occasion',
+  "Occasion",
   {
     title: {
       type: DataTypes.STRING(200),
@@ -16,12 +16,12 @@ const Occasion = sequelize.define(
     },
     sortOrder: {
       type: DataTypes.INTEGER,
-      field: 'sort_order',
+      field: "sort_order",
       defaultValue: 0,
     },
   },
   {
-    tableName: 'occasions',
+    tableName: "occasions",
     freezeTableName: true,
     underscored: true,
     timestamps: true,

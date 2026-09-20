@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
 import {
   Edit2,
-  Trash2,
   Plus,
   X,
   Compass,
@@ -11,9 +11,12 @@ import {
   ArrowDown,
   GripVertical,
   Search,
-} from 'lucide-react';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import api from '@/lib/api';
+  Loader2,
+} from "lucide-react";
+import { toast } from "sonner";
+import DeleteButton from "@/components/common/DeleteButton";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import api from "@/lib/api";
 
 export default function OccasionsPage() {
   const [occasions, setOccasions] = useState([]);
@@ -21,36 +24,37 @@ export default function OccasionsPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingOccasion, setEditingOccasion] = useState(null);
-  const [statusMsg, setStatusMsg] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
-  const [imageUrl, setImageUrl] = useState('');
-  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState("");
+  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
 
   const fetchOccasions = async () => {
     try {
-      const res = await api.get('/occasions');
+      const res = await api.get("/occasions");
       if (res.data?.success) setOccasions(res.data.data || []);
     } catch (error) {
-      console.error('Failed to fetch occasions:', error);
+      console.error("Failed to fetch occasions:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- mount gate keeps drag-drop client-only
     setIsMounted(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial list load on mount
     fetchOccasions();
   }, []);
 
-  const showToast = (msg) => {
-    setStatusMsg(msg);
-    setTimeout(() => setStatusMsg(''), 3500);
-  };
+  // single toast helper for this page (sonner renders it globally)
+  const showToast = (msg) => toast.success(msg);
 
   const filteredOccasions = useMemo(() => {
     return occasions.filter((o) => {
@@ -67,7 +71,7 @@ export default function OccasionsPage() {
     if (!result.destination) return;
     if (result.destination.index === result.source.index) return;
     if (isFilterActive) {
-      showToast('Clear search filter before reordering.');
+      showToast("Clear search filter before reordering.");
       return;
     }
 
@@ -83,10 +87,11 @@ export default function OccasionsPage() {
     }));
 
     try {
-      await api.patch('/occasions/reorder', { order: orderPayload });
-      showToast('Occasions display order updated.');
+      await api.patch("/occasions/reorder", { order: orderPayload });
+      showToast("Occasions display order updated.");
     } catch (err) {
-      console.error('Failed to reorder occasions', err);
+      console.error("Failed to reorder occasions", err);
+      toast.error("Failed to update display order.");
       fetchOccasions();
     }
   };
@@ -107,10 +112,11 @@ export default function OccasionsPage() {
     }));
 
     try {
-      await api.patch('/occasions/reorder', { order: orderPayload });
-      showToast('Occasions display order updated.');
+      await api.patch("/occasions/reorder", { order: orderPayload });
+      showToast("Occasions display order updated.");
     } catch (err) {
-      console.error('Failed to reorder occasions', err);
+      console.error("Failed to reorder occasions", err);
+      toast.error("Failed to update display order.");
       fetchOccasions();
     }
   };
@@ -126,19 +132,20 @@ export default function OccasionsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append('title', title);
-    formData.append('description', description);
+    formData.append("title", title);
+    formData.append("description", description);
 
     if (image) {
-      formData.append('image', image);
+      formData.append("image", image);
     } else if (imageUrl) {
-      formData.append('image', imageUrl);
+      formData.append("image", imageUrl);
     }
 
     const occasionId = editingOccasion?.id;
-    const url = editingOccasion ? `/occasions/${occasionId}` : '/occasions';
-    const method = editingOccasion ? 'put' : 'post';
+    const url = editingOccasion ? `/occasions/${occasionId}` : "/occasions";
+    const method = editingOccasion ? "put" : "post";
 
+    setSaving(true);
     try {
       const res = await api[method](url, formData);
       if (res.status === 200 || res.status === 201) {
@@ -146,34 +153,41 @@ export default function OccasionsPage() {
         resetForm();
         fetchOccasions();
         showToast(
-          editingOccasion ? 'Occasion updated successfully.' : 'Occasion created successfully.'
+          editingOccasion ? "Occasion updated successfully." : "Occasion created successfully."
         );
       }
     } catch (error) {
-      console.error('Failed to save occasion:', error);
+      console.error("Failed to save occasion:", error);
+      toast.error(error.response?.data?.message || "Failed to save occasion.");
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this occasion?')) return;
+    if (!confirm("Are you sure you want to delete this occasion?")) return;
+    setDeletingId(id);
     try {
       const res = await api.delete(`/occasions/${id}`);
       if (res.status === 200) {
         fetchOccasions();
-        showToast('Occasion deleted successfully.');
+        showToast("Occasion deleted successfully.");
       }
     } catch (error) {
-      console.error('Failed to delete occasion:', error);
+      console.error("Failed to delete occasion:", error);
+      toast.error(error.response?.data?.message || "Failed to delete occasion.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
   const resetForm = () => {
     setEditingOccasion(null);
-    setTitle('');
-    setDescription('');
+    setTitle("");
+    setDescription("");
     setImage(null);
-    setImageUrl('');
-    setImagePreviewUrl('');
+    setImageUrl("");
+    setImagePreviewUrl("");
   };
 
   const openAddModal = () => {
@@ -183,11 +197,11 @@ export default function OccasionsPage() {
 
   const openEditModal = (occasion) => {
     setEditingOccasion(occasion);
-    setTitle(occasion.title || '');
-    setDescription(occasion.description || '');
+    setTitle(occasion.title || "");
+    setDescription(occasion.description || "");
     setImage(null);
-    setImageUrl(occasion.image || '');
-    setImagePreviewUrl(occasion.image || '');
+    setImageUrl(occasion.image || "");
+    setImagePreviewUrl(occasion.image || "");
     setIsModalOpen(true);
   };
 
@@ -204,12 +218,6 @@ export default function OccasionsPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {statusMsg && (
-            <span className="text-xs font-mono text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/40 px-3 py-1.5 rounded-lg font-medium">
-              {statusMsg}
-            </span>
-          )}
-
           <button
             type="button"
             onClick={openAddModal}
@@ -289,7 +297,13 @@ export default function OccasionsPage() {
                     <div className="px-5 py-3.5">
                       <div className="relative w-28 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                         {o.image ? (
-                          <img src={o.image} alt={o.title} className="object-cover w-full h-full" />
+                          <Image
+                            src={o.image}
+                            alt={o.title}
+                            fill
+                            sizes="112px"
+                            className="object-cover"
+                          />
                         ) : (
                           <Compass className="w-5 h-5 text-zinc-400" />
                         )}
@@ -315,14 +329,10 @@ export default function OccasionsPage() {
                       >
                         <Edit2 className="w-4 h-4 stroke-[1.75]" />
                       </button>
-                      <button
-                        type="button"
+                      <DeleteButton
                         onClick={() => handleDelete(o.id)}
-                        className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md transition-colors cursor-pointer"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4 stroke-[1.75]" />
-                      </button>
+                        pending={deletingId === o.id}
+                      />
                     </div>
                   </div>
                 ))}
@@ -352,8 +362,8 @@ export default function OccasionsPage() {
                                 style={providedDrag.draggableProps.style}
                                 className={`grid grid-cols-[144px_144px_200px_minmax(0,1fr)_100px] items-center text-xs text-zinc-900 dark:text-zinc-100 transition-colors ${
                                   snapshot.isDragging
-                                    ? 'bg-white dark:bg-[#13161c] shadow-2xl ring-2 ring-teal-500 rounded-xl z-50'
-                                    : 'hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80'
+                                    ? "bg-white dark:bg-[#13161c] shadow-2xl ring-2 ring-teal-500 rounded-xl z-50"
+                                    : "hover:bg-teal-50/40 dark:hover:bg-[#1a1e27]/80"
                                 }`}
                               >
                                 <div className="px-5 py-3.5 whitespace-nowrap">
@@ -364,13 +374,13 @@ export default function OccasionsPage() {
                                       disabled={isFilterActive}
                                       className={`p-1 rounded transition-colors ${
                                         isFilterActive
-                                          ? 'opacity-30 cursor-not-allowed text-zinc-400'
-                                          : 'hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-grab active:cursor-grabbing'
+                                          ? "opacity-30 cursor-not-allowed text-zinc-400"
+                                          : "hover:bg-[#f6f8fa] dark:hover:bg-[#1a1e27] text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 cursor-grab active:cursor-grabbing"
                                       }`}
                                       title={
                                         isFilterActive
-                                          ? 'Clear search to reorder'
-                                          : 'Drag to reorder occasion position'
+                                          ? "Clear search to reorder"
+                                          : "Drag to reorder occasion position"
                                       }
                                     >
                                       <GripVertical className="w-3.5 h-3.5 stroke-[1.75]" />
@@ -408,10 +418,12 @@ export default function OccasionsPage() {
                                 <div className="px-5 py-3.5">
                                   <div className="relative w-28 h-16 bg-[#f6f8fa] dark:bg-[#1a1e27] rounded-lg overflow-hidden flex items-center justify-center">
                                     {o.image ? (
-                                      <img
+                                      <Image
                                         src={o.image}
                                         alt={o.title}
-                                        className="object-cover w-full h-full"
+                                        fill
+                                        sizes="112px"
+                                        className="object-cover"
                                       />
                                     ) : (
                                       <Compass className="w-5 h-5 text-zinc-400" />
@@ -441,14 +453,10 @@ export default function OccasionsPage() {
                                   >
                                     <Edit2 className="w-4 h-4 stroke-[1.75]" />
                                   </button>
-                                  <button
-                                    type="button"
+                                  <DeleteButton
                                     onClick={() => handleDelete(o.id)}
-                                    className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md transition-colors cursor-pointer"
-                                    title="Delete"
-                                  >
-                                    <Trash2 className="w-4 h-4 stroke-[1.75]" />
-                                  </button>
+                                    pending={deletingId === o.id}
+                                  />
                                 </div>
                               </div>
                             )}
@@ -471,7 +479,7 @@ export default function OccasionsPage() {
             <div className="flex justify-between items-center mb-5 pb-3">
               <div>
                 <h2 className="text-base font-bold text-zinc-950 dark:text-white">
-                  {editingOccasion ? 'Edit Service Occasion' : 'Add Service Occasion'}
+                  {editingOccasion ? "Edit Service Occasion" : "Add Service Occasion"}
                 </h2>
                 <span className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
                   Widescreen 16:9 banner displays without cropping
@@ -523,6 +531,7 @@ export default function OccasionsPage() {
                 {imagePreviewUrl && (
                   <div className="mb-3 p-2.5 rounded-xl bg-[#f6f8fa] dark:bg-[#1a1e27] flex items-center gap-3">
                     <div className="w-24 h-14 bg-white dark:bg-[#13161c] rounded-lg overflow-hidden flex items-center justify-center shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- blob preview urls can't use next/image */}
                       <img
                         src={imagePreviewUrl}
                         alt="Preview"
@@ -568,9 +577,11 @@ export default function OccasionsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
+                  disabled={saving}
+                  className="inline-flex items-center gap-2 px-5 py-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-70 text-white font-semibold rounded-lg text-xs tracking-wide active:scale-[0.98] shadow-xs cursor-pointer transition-all"
                 >
-                  Save Occasion
+                  {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{saving ? "Saving..." : "Save Occasion"}</span>
                 </button>
               </div>
             </form>

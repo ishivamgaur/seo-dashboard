@@ -1,34 +1,34 @@
-'use client';
+"use client";
 
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
-import { LogOut, User, Menu, ExternalLink } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import ThemeSelector from '@/components/common/ThemeSelector';
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { LogOut, User, Menu, ExternalLink } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import ThemeSelector from "@/components/common/ThemeSelector";
 
 export default function Header({ onMenuClick = () => {} }) {
   const pathname = usePathname();
-  const auth = useAuth() || { user: { name: 'Admin User' }, logout: () => {} };
+  const auth = useAuth() || { user: { name: "Admin User" }, logout: () => {} };
   const { user, logout } = auth;
 
   const getPageTitle = () => {
-    if (pathname === '/admin') return 'Dashboard Overview';
-    const parts = pathname.split('/').filter(Boolean);
+    if (pathname === "/admin") return "Dashboard Overview";
+    const parts = pathname.split("/").filter(Boolean);
     if (parts.length > 1) {
       const page = parts[1];
-      if (page === 'seo') return 'SEO Settings & Schema Markup';
-      if (page === 'vehicles') return 'Fleet Vehicles Management';
-      if (page === 'occasions') return 'Services & Occasions';
-      if (page === 'testimonials') return 'Client Testimonials';
-      if (page === 'gallery') return 'Fleet Gallery';
-      if (page === 'content') return 'Homepage Content & Sections';
-      return page.charAt(0).toUpperCase() + page.slice(1).replace('-', ' ');
+      if (page === "seo") return "SEO Settings & Schema Markup";
+      if (page === "vehicles") return "Fleet Vehicles Management";
+      if (page === "occasions") return "Services & Occasions";
+      if (page === "testimonials") return "Client Testimonials";
+      if (page === "gallery") return "Fleet Gallery";
+      if (page === "content") return "Homepage Content & Sections";
+      return page.charAt(0).toUpperCase() + page.slice(1).replace("-", " ");
     }
-    return 'Dashboard Overview';
+    return "Dashboard Overview";
   };
 
   return (
-    <header className="h-14 bg-white dark:bg-[#0d1117] shadow-[0_1px_2px_rgba(0,0,0,0.03)] flex items-center justify-between px-4 sm:px-6 z-10 shrink-0">
+    <header className="h-16 bg-white dark:bg-[#0d1117] shadow-[0_1px_2px_rgba(0,0,0,0.03)] flex items-center justify-between px-4 sm:px-6 z-10 shrink-0">
       <div className="flex items-center gap-3 min-w-0">
         <button
           type="button"
@@ -60,7 +60,7 @@ export default function Header({ onMenuClick = () => {} }) {
 
         <div
           className="h-8 px-3 inline-flex items-center gap-1.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27] text-xs font-medium text-zinc-700 dark:text-zinc-300 select-none"
-          title={`Administrator: ${user?.name || 'Admin'} (${user?.email || 'admin@seodashboard.com'})`}
+          title={`Administrator: ${user?.name || "Admin"} (${user?.email || "admin@seodashboard.com"})`}
         >
           <User className="w-3.5 h-3.5 shrink-0 text-teal-600 dark:text-teal-400 stroke-[1.75]" />
           <span className="leading-none">Admin</span>
