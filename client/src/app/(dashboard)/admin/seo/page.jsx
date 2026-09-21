@@ -380,11 +380,23 @@ function SeoSettingsContent() {
       if (editingSchema) {
         const res = await api.put(`/schemas/${editingSchema.id}`, payload);
         if (res.status === 200) {
+          const updated = res.data?.data ?? {
+            ...editingSchema,
+            ...payload,
+          };
+          setSchemas((prev) => prev.map((s) => (s.id === editingSchema.id ? updated : s)));
+          setSelectedSchema((prev) => (prev && prev.id === editingSchema.id ? updated : prev));
           showToast("success", `${schemaType.toUpperCase()} schema updated.`);
         }
       } else {
         const res = await api.post("/schemas", payload);
         if (res.status === 201) {
+          const created = res.data?.data ?? {
+            id: Date.now(),
+            ...payload,
+          };
+          setSchemas((prev) => [created, ...prev]);
+          setSelectedSchema(created);
           showToast("success", `${schemaType.toUpperCase()} schema created.`);
         }
       }
@@ -1096,7 +1108,7 @@ function SeoSettingsContent() {
                   </div>
                 </div>
 
-                <pre className="p-3 sm:p-4 rounded-xl bg-zinc-900 text-zinc-100 font-mono text-[11px] overflow-auto max-w-full max-h-96 leading-relaxed">
+                <pre className="p-3 sm:p-4 rounded-xl bg-[#090a0d] text-teal-200/90 font-mono text-[11px] overflow-auto max-w-full max-h-96 leading-relaxed whitespace-pre-wrap break-words">
                   {selectedSchema?.schemaData
                     ? typeof selectedSchema.schemaData === "string"
                       ? JSON.stringify(JSON.parse(selectedSchema.schemaData), null, 2)
@@ -1526,7 +1538,6 @@ function SeoSettingsContent() {
                   ))}
                 </div>
               )}
-
               <div className="rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800">
                 <div className="px-3.5 py-2 bg-[#f6f8fa] dark:bg-[#1a1e27] flex items-center justify-between">
                   <span className="font-mono uppercase text-[11px] font-semibold tracking-wider text-zinc-500 dark:text-zinc-400">
