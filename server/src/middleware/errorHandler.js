@@ -24,7 +24,9 @@ const errorHandler = (err, req, res, next) => {
   } else if (err instanceof multer.MulterError) {
     statusCode = 400;
     message =
-      err.code === "LIMIT_FILE_SIZE" ? "File too large. Maximum allowed size is 10MB." : err.message;
+      err.code === "LIMIT_FILE_SIZE"
+        ? "File too large. Maximum allowed size is 10MB."
+        : err.message;
     errors = [{ field: err.field || "file", message: err.message }];
   } else if (config.env === "development") {
     message = err.message || message;

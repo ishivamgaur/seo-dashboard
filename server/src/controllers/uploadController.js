@@ -2,12 +2,7 @@ import multer from "multer";
 import catchAsync from "../utils/catchAsync.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
-import {
-  optimizeBuffer,
-  uploadBuffer,
-  PRESETS,
-  fileFilterFor,
-} from "../middleware/upload.js";
+import { optimizeBuffer, uploadBuffer, PRESETS, fileFilterFor } from "../middleware/upload.js";
 
 const memory = multer({
   storage: multer.memoryStorage(),
@@ -29,12 +24,10 @@ export const uploadImage = [
     }
     const preset = PRESETS[req.query.preset] || PRESETS.standard;
     const folder = (req.query.folder || "general").replace(/[^a-z-]/g, "") || "general";
-    const { buffer, format } = await optimizeBuffer(
-      req.file.buffer,
-      req.file.mimetype,
-      preset
-    );
+    const { buffer, format } = await optimizeBuffer(req.file.buffer, req.file.mimetype, preset);
     const result = await uploadBuffer(buffer, folder, format);
-    return res.json(new ApiResponse(200, "Image uploaded successfully", { url: result.secure_url }));
+    return res.json(
+      new ApiResponse(200, "Image uploaded successfully", { url: result.secure_url })
+    );
   }),
 ];

@@ -147,10 +147,7 @@ function ContentManagementContent() {
   const uploadSingleImage = async (file, folder, preset) => {
     const payload = new FormData();
     payload.append("image", file);
-    const res = await api.post(
-      `/upload?folder=${folder}&preset=${preset}`,
-      payload
-    );
+    const res = await api.post(`/upload?folder=${folder}&preset=${preset}`, payload);
     if (res.status === 200 && res.data?.data?.url) return res.data.data.url;
     throw new Error("Image upload failed.");
   };
@@ -165,10 +162,7 @@ function ContentManagementContent() {
 
   const tooBig = (file) => {
     if (file && file.size > 10 * 1024 * 1024) {
-      showToast(
-        "error",
-        `Image is ${(file.size / 1048576).toFixed(1)}MB — maximum is 10MB.`
-      );
+      showToast("error", `Image is ${(file.size / 1048576).toFixed(1)}MB — maximum is 10MB.`);
       return true;
     }
     return false;

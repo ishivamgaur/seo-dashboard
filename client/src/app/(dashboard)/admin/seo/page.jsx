@@ -3,7 +3,19 @@
 import React, { useState, useEffect, Suspense } from "react";
 import SafeImage from "@/components/ui/SafeImage";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { Save, Code, Search, Share2, Plus, X, Copy, Globe, Check, Loader2 } from "lucide-react";
+import {
+  Save,
+  Code,
+  Search,
+  Share2,
+  Plus,
+  X,
+  Copy,
+  Globe,
+  Check,
+  Loader2,
+  Edit2,
+} from "lucide-react";
 import DeleteButton from "@/components/common/DeleteButton";
 import { toast } from "sonner";
 import api from "@/lib/api";
@@ -26,7 +38,7 @@ function SeoSettingsContent() {
   const [twitterFile, setTwitterFile] = useState(null);
   const [ogPreviewUrl, setOgPreviewUrl] = useState("");
   const [twitterPreviewUrl, setTwitterPreviewUrl] = useState("");
-  const [uploadingSocial, setUploadingSocial] = useState(false);
+  const [uploadingSocial, setUploadingSocial] = useState(null);
 
   const handleSocialUpload = async (which) => {
     const file = which === "og" ? ogFile : twitterFile;
@@ -35,7 +47,7 @@ function SeoSettingsContent() {
       toast.error(`Image is ${(file.size / 1048576).toFixed(1)}MB — maximum is 10MB.`);
       return;
     }
-    setUploadingSocial(true);
+    setUploadingSocial(which);
     try {
       const payload = new FormData();
       payload.append("image", file);
@@ -56,7 +68,7 @@ function SeoSettingsContent() {
     } catch (err) {
       showToast("error", err.response?.data?.message || "Image upload failed.");
     } finally {
-      setUploadingSocial(false);
+      setUploadingSocial(null);
     }
   };
   const [schemaSaving, setSchemaSaving] = useState(false);
@@ -277,6 +289,14 @@ function SeoSettingsContent() {
           areaServed: "IN",
           availableLanguage: ["en", "hi"],
         },
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: streetAddress,
+          addressLocality: addressLocality,
+          addressRegion: addressRegion,
+          postalCode: postalCode,
+          addressCountry: "IN",
+        },
       };
     }
 
@@ -353,7 +373,7 @@ function SeoSettingsContent() {
     const payload = {
       schemaType,
       schemaData: generatedData,
-      isActive: true,
+      isActive: editingSchema ? editingSchema.isActive : true,
     };
 
     try {
@@ -401,6 +421,64 @@ function SeoSettingsContent() {
     setEditingSchema(null);
     setSchemaType("organization");
     setSavedSchemaSig(schemaSignature("organization"));
+    setIsSchemaModalOpen(true);
+  };
+
+  const openEditSchemaModal = (schema) => {
+    const raw = schema.schemaData;
+    let data = raw;
+    if (typeof raw === "string") {
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        data = {};
+      }
+    }
+    data = data && typeof data === "object" ? data : {};
+
+    setEditingSchema(schema);
+    setSchemaType(schema.schemaType);
+    setOrgName(data.name || "");
+    setLegalName(data.legalName || "");
+    setSiteUrl(data.url || "");
+    setLogoUrl(data.logo || data.image || "");
+    setTelephone(data.telephone || data.contactPoint?.telephone || "");
+    setPriceRange(data.priceRange || "");
+    const addr = data.address || {};
+    setStreetAddress(addr.streetAddress || "");
+    setAddressLocality(addr.addressLocality || "");
+    setAddressRegion(addr.addressRegion || "");
+    setPostalCode(addr.postalCode || "");
+    const faqNext =
+      Array.isArray(data.mainEntity) && data.mainEntity.length > 0
+        ? data.mainEntity.map((q) => ({
+            question: q.name || "",
+            answer: q.acceptedAnswer?.text || "",
+          }))
+        : [{ question: "", answer: "" }];
+    const crumbNext =
+      Array.isArray(data.itemListElement) && data.itemListElement.length > 0
+        ? data.itemListElement.map((b) => ({ name: b.name || "", url: b.item || "" }))
+        : [{ name: "Home", url: "" }];
+    setFaqItems(faqNext);
+    setBreadcrumbItems(crumbNext);
+    setSavedSchemaSig(
+      JSON.stringify({
+        schemaType: schema.schemaType,
+        orgName: data.name || "",
+        legalName: data.legalName || "",
+        siteUrl: data.url || "",
+        logoUrl: data.logo || data.image || "",
+        telephone: data.telephone || data.contactPoint?.telephone || "",
+        streetAddress: addr.streetAddress || "",
+        addressLocality: addr.addressLocality || "",
+        addressRegion: addr.addressRegion || "",
+        postalCode: addr.postalCode || "",
+        priceRange: data.priceRange || "",
+        faqItems: faqNext,
+        breadcrumbItems: crumbNext,
+      })
+    );
     setIsSchemaModalOpen(true);
   };
 
@@ -730,8 +808,8 @@ function SeoSettingsContent() {
                     disabled={!ogFile || uploadingSocial}
                     className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold shrink-0 cursor-pointer transition-all"
                   >
-                    {uploadingSocial && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                    <span>{uploadingSocial ? "Uploading..." : "Upload"}</span>
+                    {uploadingSocial === "og" && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{uploadingSocial === "og" ? "Uploading..." : "Upload"}</span>
                   </button>
                 </div>
                 {ogFile && (
@@ -840,8 +918,10 @@ function SeoSettingsContent() {
                     disabled={!twitterFile || uploadingSocial}
                     className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold shrink-0 cursor-pointer transition-all"
                   >
-                    {uploadingSocial && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                    <span>{uploadingSocial ? "Uploading..." : "Upload"}</span>
+                    {uploadingSocial === "twitter" && (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    )}
+                    <span>{uploadingSocial === "twitter" ? "Uploading..." : "Upload"}</span>
                   </button>
                 </div>
                 {twitterFile && (
@@ -943,6 +1023,17 @@ function SeoSettingsContent() {
                     </div>
 
                     <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEditSchemaModal(s);
+                        }}
+                        className="p-1 rounded-md text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                        title="Edit schema"
+                      >
+                        <Edit2 className="w-3.5 h-3.5 stroke-[1.75]" />
+                      </button>
                       <button
                         type="button"
                         onClick={(e) => {
@@ -1089,15 +1180,84 @@ function SeoSettingsContent() {
                   </div>
                   <div>
                     <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
+                      Legal Name
+                    </label>
+                    <input
+                      type="text"
+                      value={legalName}
+                      onChange={(e) => setLegalName(e.target.value)}
+                      className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
                       Logo Image URL
                     </label>
                     <input
                       type="url"
                       value={logoUrl}
                       onChange={(e) => setLogoUrl(e.target.value)}
-                      className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
+                      className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
                       required
                     />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="col-span-2">
+                      <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
+                        Contact Phone
+                      </label>
+                      <input
+                        type="tel"
+                        value={telephone}
+                        onChange={(e) => setTelephone(e.target.value)}
+                        className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
+                        required
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
+                        Street Address
+                      </label>
+                      <input
+                        type="text"
+                        value={streetAddress}
+                        onChange={(e) => setStreetAddress(e.target.value)}
+                        className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+                      />
+                    </div>
+                    <div>
+                      <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        value={addressLocality}
+                        onChange={(e) => setAddressLocality(e.target.value)}
+                        className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+                      />
+                    </div>
+                    <div>
+                      <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
+                        State
+                      </label>
+                      <input
+                        type="text"
+                        value={addressRegion}
+                        onChange={(e) => setAddressRegion(e.target.value)}
+                        className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-medium border-0"
+                      />
+                    </div>
+                    <div>
+                      <label className="block uppercase font-mono text-[11px] tracking-wider font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">
+                        Postal Code
+                      </label>
+                      <input
+                        type="text"
+                        value={postalCode}
+                        onChange={(e) => setPostalCode(e.target.value)}
+                        className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
+                      />
+                    </div>
                   </div>
                 </div>
               )}

@@ -117,8 +117,7 @@ const GallerySection = ({ data }) => {
                   {current.altTag || "Fleet photo"}
                 </span>
                 <span className="font-mono tabular-nums text-xs text-zinc-300 shrink-0">
-                  {String(current.n).padStart(2, "0")} /{" "}
-                  {String(photos.length).padStart(2, "0")}
+                  {String(current.n).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
                 </span>
               </div>
             </motion.div>

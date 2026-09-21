@@ -48,7 +48,7 @@ export const toggleActive = catchAsync(async (req, res) => {
   if (!schema) {
     throw new ApiError(404, "Schema not found");
   }
-  schema.is_active = !schema.is_active;
+  schema.isActive = !schema.isActive;
   await schema.save();
   res.status(200).json(new ApiResponse(200, "Schema status toggled successfully", schema));
 });
