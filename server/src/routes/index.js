@@ -10,6 +10,7 @@ import occasionRoutes from "./occasionRoutes.js";
 import testimonialRoutes from "./testimonialRoutes.js";
 import galleryRoutes from "./galleryRoutes.js";
 import contactRoutes from "./contactRoutes.js";
+import uploadRoutes from "./uploadRoutes.js";
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.use("/occasions", occasionRoutes);
 router.use("/testimonials", testimonialRoutes);
 router.use("/gallery", galleryRoutes);
 router.use("/contact", contactRoutes);
+router.use("/upload", uploadRoutes);
 
 export default router;

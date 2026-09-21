@@ -39,6 +39,11 @@ export const update = catchAsync(async (req, res) => {
       deleteFile(image.imagePath);
     }
     updates.imagePath = req.file.path;
+  } else if (typeof req.body.imageUrl === "string" && req.body.imageUrl.trim()) {
+    if (image.imagePath && image.imagePath !== req.body.imageUrl.trim()) {
+      deleteFile(image.imagePath);
+    }
+    updates.imagePath = req.body.imageUrl.trim();
   }
 
   await image.update(updates);

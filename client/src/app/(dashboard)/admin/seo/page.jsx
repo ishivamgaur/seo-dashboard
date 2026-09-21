@@ -26,6 +26,35 @@ function SeoSettingsContent() {
   const [twitterFile, setTwitterFile] = useState(null);
   const [ogPreviewUrl, setOgPreviewUrl] = useState("");
   const [twitterPreviewUrl, setTwitterPreviewUrl] = useState("");
+  const [uploadingSocial, setUploadingSocial] = useState(false);
+
+  const handleSocialUpload = async (which) => {
+    const file = which === "og" ? ogFile : twitterFile;
+    if (!file) return;
+    setUploadingSocial(true);
+    try {
+      const payload = new FormData();
+      payload.append("image", file);
+      const res = await api.post("/upload?folder=seo&preset=social", payload);
+      const url = res.data?.data?.url;
+      if (res.status === 200 && url) {
+        if (which === "og") {
+          setFormData((prev) => ({ ...prev, ogImage: url }));
+          setOgPreviewUrl(url);
+          setOgFile(null);
+        } else {
+          setFormData((prev) => ({ ...prev, twitterImage: url }));
+          setTwitterPreviewUrl(url);
+          setTwitterFile(null);
+        }
+        showToast("success", "Social image uploaded. Save to publish it.");
+      }
+    } catch (err) {
+      showToast("error", err.response?.data?.message || "Image upload failed.");
+    } finally {
+      setUploadingSocial(false);
+    }
+  };
   const [schemaSaving, setSchemaSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [savedMeta, setSavedMeta] = useState(null);
@@ -677,19 +706,30 @@ function SeoSettingsContent() {
                   placeholder="https://res.cloudinary.com/..."
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
                 />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files[0] || null;
-                    setOgFile(file);
-                    setOgPreviewUrl((prev) => {
-                      if (prev && prev.startsWith("blob:")) URL.revokeObjectURL(prev);
-                      return file ? URL.createObjectURL(file) : formData.ogImage || "";
-                    });
-                  }}
-                  className="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer mt-2"
-                />
+                <div className="flex items-center gap-2 mt-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0] || null;
+                      setOgFile(file);
+                      setOgPreviewUrl((prev) => {
+                        if (prev && prev.startsWith("blob:")) URL.revokeObjectURL(prev);
+                        return file ? URL.createObjectURL(file) : formData.ogImage || "";
+                      });
+                    }}
+                    className="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleSocialUpload("og")}
+                    disabled={!ogFile || uploadingSocial}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold shrink-0 cursor-pointer transition-all"
+                  >
+                    {uploadingSocial && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{uploadingSocial ? "Uploading..." : "Upload"}</span>
+                  </button>
+                </div>
                 {ogFile && (
                   <p className="text-[11px] font-mono text-teal-600 dark:text-teal-400 mt-1">
                     New upload: {ogFile.name} (replaces the URL above on save)
@@ -776,19 +816,30 @@ function SeoSettingsContent() {
                   placeholder="https://res.cloudinary.com/..."
                   className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2.5 focus:ring-1 focus:ring-teal-500 outline-none text-xs font-mono border-0"
                 />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files[0] || null;
-                    setTwitterFile(file);
-                    setTwitterPreviewUrl((prev) => {
-                      if (prev && prev.startsWith("blob:")) URL.revokeObjectURL(prev);
-                      return file ? URL.createObjectURL(file) : formData.twitterImage || "";
-                    });
-                  }}
-                  className="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer mt-2"
-                />
+                <div className="flex items-center gap-2 mt-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0] || null;
+                      setTwitterFile(file);
+                      setTwitterPreviewUrl((prev) => {
+                        if (prev && prev.startsWith("blob:")) URL.revokeObjectURL(prev);
+                        return file ? URL.createObjectURL(file) : formData.twitterImage || "";
+                      });
+                    }}
+                    className="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleSocialUpload("twitter")}
+                    disabled={!twitterFile || uploadingSocial}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold shrink-0 cursor-pointer transition-all"
+                  >
+                    {uploadingSocial && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{uploadingSocial ? "Uploading..." : "Upload"}</span>
+                  </button>
+                </div>
                 {twitterFile && (
                   <p className="text-[11px] font-mono text-teal-600 dark:text-teal-400 mt-1">
                     New upload: {twitterFile.name} (replaces the URL above on save)

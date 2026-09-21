@@ -136,11 +136,34 @@ export default function VehiclesPage() {
     }
   };
 
+  const [uploadingImage, setUploadingImage] = useState(false);
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setImage(file);
       setImagePreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handleImageUpload = async () => {
+    if (!image) return;
+    setUploadingImage(true);
+    try {
+      const payload = new FormData();
+      payload.append("image", image);
+      const res = await api.post("/upload?folder=vehicles&preset=standard", payload);
+      const url = res.data?.data?.url;
+      if (res.status === 200 && url) {
+        setImageUrl(url);
+        setImagePreviewUrl(url);
+        setImage(null);
+        showToast("Image uploaded. Save the vehicle to publish it.");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Image upload failed.");
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -699,12 +722,23 @@ export default function VehiclesPage() {
                   </div>
                 )}
 
-                <input
-                  type="file"
-                  onChange={handleFileChange}
-                  className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2 focus:ring-1 focus:ring-teal-500 outline-none text-xs mb-2 cursor-pointer border-0"
-                  accept="image/*"
-                />
+                <div className="flex items-center gap-2 mb-2">
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    className="w-full bg-[#f6f8fa] dark:bg-[#1a1e27] text-zinc-900 dark:text-white rounded-lg px-3.5 py-2 focus:ring-1 focus:ring-teal-500 outline-none text-xs cursor-pointer border-0"
+                    accept="image/*"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleImageUpload}
+                    disabled={!image || uploadingImage}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold shrink-0 cursor-pointer transition-all"
+                  >
+                    {uploadingImage && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{uploadingImage ? "Uploading..." : "Upload"}</span>
+                  </button>
+                </div>
                 <input
                   type="url"
                   value={imageUrl}

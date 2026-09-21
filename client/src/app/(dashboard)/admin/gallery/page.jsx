@@ -42,8 +42,11 @@ export default function GalleryAdminPage() {
   const [uploadPreviewUrl, setUploadPreviewUrl] = useState("");
   const [editAltTag, setEditAltTag] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadingEditImage, setUploadingEditImage] = useState(false);
+  const [editPhotoChanged, setEditPhotoChanged] = useState(false);
   const [savedEdit, setSavedEdit] = useState(null);
-  const editDirty = !!editImageFile || !savedEdit || editAltTag !== savedEdit;
+  const editDirty =
+    !!editImageFile || editPhotoChanged || !savedEdit || editAltTag !== savedEdit;
   const [deletingId, setDeletingId] = useState(null);
   const [error, setError] = useState(null);
 
@@ -92,6 +95,7 @@ export default function GalleryAdminPage() {
 
   const openEditModal = (img) => {
     setEditingImage(img);
+    setEditPhotoChanged(false);
     setEditAltTag(img.altTag || img.alt_tag || "");
     setSavedEdit(img.altTag || img.alt_tag || "");
     setEditImageFile(null);
@@ -107,11 +111,32 @@ export default function GalleryAdminPage() {
     setEditModalOpen(false);
   };
 
+  const handleEditImageUpload = async () => {
+    if (!editImageFile) return;
+    setUploadingEditImage(true);
+    try {
+      const payload = new FormData();
+      payload.append("image", editImageFile);
+      const res = await api.post("/upload?folder=gallery&preset=standard", payload);
+      const url = res.data?.data?.url;
+      if (res.status === 200 && url) {
+        setEditPreviewUrl(url);
+        setEditImageFile(null);
+        showToast("Photo uploaded. Save changes to publish it.");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Image upload failed.");
+    } finally {
+      setUploadingEditImage(false);
+    }
+  };
+
   const handleEditFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
       setEditImageFile(file);
       setEditPreviewUrl(URL.createObjectURL(file));
+      setEditPhotoChanged(true);
     }
   };
 
@@ -160,6 +185,8 @@ export default function GalleryAdminPage() {
     form.append("altTag", editAltTag);
     if (editImageFile) {
       form.append("image", editImageFile);
+    } else if (editPreviewUrl && !editPreviewUrl.startsWith("blob:")) {
+      form.append("imageUrl", editPreviewUrl);
     }
 
     try {
@@ -809,7 +836,7 @@ export default function GalleryAdminPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between mt-2.5">
+                <div className="flex items-center justify-between gap-2 mt-2.5">
                   <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#f6f8fa] dark:bg-[#1a1e27] hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium text-xs cursor-pointer transition-colors shadow-2xs">
                     <Upload className="w-3.5 h-3.5 stroke-[1.75] text-zinc-500 dark:text-zinc-400" />
                     <span>{editPreviewUrl ? "Choose Different Photo" : "Replace Photo"}</span>
@@ -820,6 +847,16 @@ export default function GalleryAdminPage() {
                       className="hidden"
                     />
                   </label>
+
+                  <button
+                    type="button"
+                    onClick={handleEditImageUpload}
+                    disabled={!editImageFile || uploadingEditImage}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold shrink-0 cursor-pointer transition-all"
+                  >
+                    {uploadingEditImage && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{uploadingEditImage ? "Uploading..." : "Upload"}</span>
+                  </button>
 
                   {editPreviewUrl && (
                     <button

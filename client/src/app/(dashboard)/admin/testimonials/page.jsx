@@ -136,6 +136,27 @@ export default function TestimonialsAdminPage() {
     }
   };
 
+  const handleImageUpload = async () => {
+    if (!imageFile) return;
+    setUploadingImage(true);
+    try {
+      const payload = new FormData();
+      payload.append("image", imageFile);
+      const res = await api.post("/upload?folder=testimonials&preset=avatar", payload);
+      const url = res.data?.data?.url;
+      if (res.status === 200 && url) {
+        setFormData((prev) => ({ ...prev, customerImage: url }));
+        setImagePreviewUrl(url);
+        setImageFile(null);
+        showToast("Photo uploaded. Save the review to publish it.");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Image upload failed.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -589,12 +610,23 @@ export default function TestimonialsAdminPage() {
                 )}
 
                 <div className="border border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl p-3 text-center bg-[#f6f8fa]/50 dark:bg-[#1a1e27]/50">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageSelect}
-                    className="w-full text-xs text-zinc-500 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer"
-                  />
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      className="w-full text-xs text-zinc-500 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleImageUpload}
+                      disabled={!imageFile || uploadingImage}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold shrink-0 cursor-pointer transition-all"
+                    >
+                      {uploadingImage && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                      <span>{uploadingImage ? "Uploading..." : "Upload"}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 

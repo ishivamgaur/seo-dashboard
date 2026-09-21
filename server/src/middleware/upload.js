@@ -51,25 +51,28 @@ const fileFilterFor = (formats) => (req, file, cb) => {
 
 const optimizeBuffer = async (buffer, mimetype, preset) => {
   const image = sharp(buffer).rotate();
-  if (mimetype === "image/gif") return image.toBuffer();
-  image.resize({
-    width: preset.width,
-    height: preset.height,
-    fit: preset.fit,
-    withoutEnlargement: preset.withoutEnlargement ?? true,
-  });
-  if (mimetype === "image/png") return image.png({ compressionLevel: 8 }).toBuffer();
-  if (mimetype === "image/webp") return image.webp({ quality: preset.quality }).toBuffer();
-  return image.jpeg({ quality: preset.quality, mozjpeg: true }).toBuffer();
+  if (mimetype === "image/gif") {
+    return { buffer: await image.toBuffer(), format: "gif" };
+  }
+  const optimized = await image
+    .resize({
+      width: preset.width,
+      height: preset.height,
+      fit: preset.fit,
+      withoutEnlargement: preset.withoutEnlargement ?? true,
+    })
+    .webp({ quality: preset.quality })
+    .toBuffer();
+  return { buffer: optimized, format: "webp" };
 };
 
-const uploadBuffer = (buffer, subfolder, mimetype) =>
+const uploadBuffer = (buffer, subfolder, format) =>
   new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: `seo-dashboard/${subfolder}`,
         resource_type: "image",
-        format: mimetype.split("/")[1] === "jpeg" ? "jpg" : mimetype.split("/")[1],
+        format,
       },
       (error, result) => (error ? reject(error) : resolve(result))
     );
@@ -87,8 +90,12 @@ const createOptimizedStorage = (subfolder, presetName = "standard") => ({
     file.stream.on("end", async () => {
       try {
         const preset = PRESETS[presetName] || PRESETS.standard;
-        const optimized = await optimizeBuffer(Buffer.concat(chunks), file.mimetype, preset);
-        const result = await uploadBuffer(optimized, subfolder, file.mimetype);
+        const { buffer, format } = await optimizeBuffer(
+          Buffer.concat(chunks),
+          file.mimetype,
+          preset
+        );
+        const result = await uploadBuffer(buffer, subfolder, format);
         cb(null, {
           destination: subfolder,
           filename: result.public_id,
@@ -111,7 +118,7 @@ const createUploader = (subfolder = "", preset = "standard") => {
     storage: createOptimizedStorage(subfolder, preset),
     fileFilter: fileFilterFor(presetDef.formats),
     limits: {
-      fileSize: 5 * 1024 * 1024,
+      fileSize: 10 * 1024 * 1024,
     },
   });
 };
@@ -129,5 +136,9 @@ export {
   occasionUpload,
   testimonialUpload,
   galleryUpload,
+  optimizeBuffer,
+  uploadBuffer,
+  fileFilterFor,
+  PRESETS,
 };
 export default createUploader;

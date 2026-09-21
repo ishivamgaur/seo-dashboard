@@ -141,12 +141,57 @@ function ContentManagementContent() {
 
   // single toast helper for this page (sonner renders it globally)
   const showToast = (type, text) => (type === "success" ? toast.success(text) : toast.error(text));
+  const [uploadingHero, setUploadingHero] = useState(false);
+  const [uploadingAbout, setUploadingAbout] = useState(false);
+
+  const uploadSingleImage = async (file, folder, preset) => {
+    const payload = new FormData();
+    payload.append("image", file);
+    const res = await api.post(
+      `/upload?folder=${folder}&preset=${preset}`,
+      payload
+    );
+    if (res.status === 200 && res.data?.data?.url) return res.data.data.url;
+    throw new Error("Image upload failed.");
+  };
 
   const handleHeroFile = (e) => {
     const file = e.target.files[0];
     if (file) {
       setHeroFile(file);
       setHeroPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleHeroUpload = async () => {
+    if (!heroFile) return;
+    setUploadingHero(true);
+    try {
+      const url = await uploadSingleImage(heroFile, "hero", "standard");
+      setHeroForm((prev) => ({ ...prev, bannerImage: url }));
+      setHeroPreview(url);
+      setHeroFile(null);
+      showToast("success", "Banner uploaded. Save the section to publish it.");
+    } catch (err) {
+      showToast("error", err.response?.data?.message || "Image upload failed.");
+    } finally {
+      setUploadingHero(false);
+    }
+  };
+
+  const handleAboutUpload = async () => {
+    if (!aboutFile) return;
+    setUploadingAbout(true);
+    try {
+      const url = await uploadSingleImage(aboutFile, "about", "standard");
+      setAboutForm((prev) => ({ ...prev, featuredImage: url }));
+      setAboutPreview(url);
+      setAboutFile(null);
+      showToast("success", "Photo uploaded. Save the section to publish it.");
+    } catch (err) {
+      showToast("error", err.response?.data?.message || "Image upload failed.");
+    } finally {
+      setUploadingAbout(false);
     }
   };
 
@@ -441,12 +486,23 @@ function ContentManagementContent() {
                 </div>
               )}
 
-              <input
-                type="file"
-                onChange={handleHeroFile}
-                className="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer mb-2"
-                accept="image/*"
-              />
+              <div className="flex items-center gap-2 mb-2">
+                <input
+                  type="file"
+                  onChange={handleHeroFile}
+                  className="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer"
+                  accept="image/*"
+                />
+                <button
+                  type="button"
+                  onClick={handleHeroUpload}
+                  disabled={!heroFile || uploadingHero}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold shrink-0 cursor-pointer transition-all"
+                >
+                  {uploadingHero && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{uploadingHero ? "Uploading..." : "Upload"}</span>
+                </button>
+              </div>
               <input
                 type="url"
                 value={heroForm.bannerImage}
@@ -553,12 +609,23 @@ function ContentManagementContent() {
                 </div>
               )}
 
-              <input
-                type="file"
-                onChange={handleAboutFile}
-                className="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer mb-2"
-                accept="image/*"
-              />
+              <div className="flex items-center gap-2 mb-2">
+                <input
+                  type="file"
+                  onChange={handleAboutFile}
+                  className="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 dark:file:bg-zinc-800 file:text-zinc-800 dark:file:text-zinc-200 cursor-pointer"
+                  accept="image/*"
+                />
+                <button
+                  type="button"
+                  onClick={handleAboutUpload}
+                  disabled={!aboutFile || uploadingAbout}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold shrink-0 cursor-pointer transition-all"
+                >
+                  {uploadingAbout && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{uploadingAbout ? "Uploading..." : "Upload"}</span>
+                </button>
+              </div>
               <input
                 type="url"
                 value={aboutForm.featuredImage}
