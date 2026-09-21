@@ -23,14 +23,14 @@ export const fetchSection = (endpoint, section) =>
   fetchJson(endpoint, section ? ["site", `section:${section}`] : ["site"]);
 
 const HOME_SECTIONS = {
-  schemas: "schemas",
-  hero: "hero",
-  about: "about",
-  vehicles: "vehicles",
-  occasions: "occasions",
-  testimonials: "testimonials",
-  gallery: "gallery",
-  contact: "contact",
+  schema: "/schemas",
+  hero: "/hero",
+  about: "/about",
+  vehicles: "/vehicles",
+  occasions: "/occasions",
+  testimonials: "/testimonials",
+  gallery: "/gallery",
+  contact: "/contact",
 };
 
 export const siteBaseUrl = (seo) =>
@@ -68,8 +68,8 @@ export const fetchHomeData = async () => {
   // own section tag, so purging one section refreshes the homepage
   // without touching unrelated cached pages.
   const entries = await Promise.all(
-    Object.entries(HOME_SECTIONS).map(([key, section]) =>
-      fetchJson(`/${key}`, ["site", "home", `section:${section}`]).then((data) => [key, data])
+    Object.entries(HOME_SECTIONS).map(([key, endpoint]) =>
+      fetchJson(endpoint, ["site", "home", `section:${key}`]).then((data) => [key, data])
     )
   );
   const byKey = Object.fromEntries(entries);
