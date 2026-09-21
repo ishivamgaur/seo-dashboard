@@ -163,8 +163,20 @@ function ContentManagementContent() {
     }
   };
 
+  const tooBig = (file) => {
+    if (file && file.size > 10 * 1024 * 1024) {
+      showToast(
+        "error",
+        `Image is ${(file.size / 1048576).toFixed(1)}MB — maximum is 10MB.`
+      );
+      return true;
+    }
+    return false;
+  };
+
   const handleHeroUpload = async () => {
     if (!heroFile) return;
+    if (tooBig(heroFile)) return;
     setUploadingHero(true);
     try {
       const url = await uploadSingleImage(heroFile, "hero", "standard");
@@ -181,6 +193,7 @@ function ContentManagementContent() {
 
   const handleAboutUpload = async () => {
     if (!aboutFile) return;
+    if (tooBig(aboutFile)) return;
     setUploadingAbout(true);
     try {
       const url = await uploadSingleImage(aboutFile, "about", "standard");

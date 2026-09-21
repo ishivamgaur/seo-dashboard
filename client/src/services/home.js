@@ -1,5 +1,8 @@
 import { API_BASE, FALLBACK_IMAGES, BRAND } from "@/lib/site";
 
+// Long cache is the goal: visitors never touch the database.
+// Freshness comes from the webhook purge on save; this window only
+// bounds staleness if a webhook ever fails.
 const REVALIDATE_SECONDS = 3600;
 
 const fetchJson = async (endpoint, tags = ["site"]) => {

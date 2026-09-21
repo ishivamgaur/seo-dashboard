@@ -31,6 +31,10 @@ function SeoSettingsContent() {
   const handleSocialUpload = async (which) => {
     const file = which === "og" ? ogFile : twitterFile;
     if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error(`Image is ${(file.size / 1048576).toFixed(1)}MB — maximum is 10MB.`);
+      return;
+    }
     setUploadingSocial(true);
     try {
       const payload = new FormData();

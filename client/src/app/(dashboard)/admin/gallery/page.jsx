@@ -113,6 +113,10 @@ export default function GalleryAdminPage() {
 
   const handleEditImageUpload = async () => {
     if (!editImageFile) return;
+    if (editImageFile.size > 10 * 1024 * 1024) {
+      toast.error(`Image is ${(editImageFile.size / 1048576).toFixed(1)}MB — maximum is 10MB.`);
+      return;
+    }
     setUploadingEditImage(true);
     try {
       const payload = new FormData();
@@ -152,6 +156,12 @@ export default function GalleryAdminPage() {
     e.preventDefault();
     if (!formData.file) {
       setError("Please select an image file to upload.");
+      return;
+    }
+    if (formData.file.size > 10 * 1024 * 1024) {
+      const mb = (formData.file.size / 1048576).toFixed(1);
+      setError(`Image is ${mb}MB — maximum is 10MB.`);
+      toast.error(`Image is ${mb}MB — maximum is 10MB.`);
       return;
     }
     setUploading(true);

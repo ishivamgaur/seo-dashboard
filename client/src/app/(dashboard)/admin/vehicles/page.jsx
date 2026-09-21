@@ -57,8 +57,8 @@ export default function VehiclesPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- mount gate keeps drag-drop client-only
     setIsMounted(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial list load on mount
     fetchVehicles();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // single toast helper for this page (sonner renders it globally)
@@ -148,6 +148,10 @@ export default function VehiclesPage() {
 
   const handleImageUpload = async () => {
     if (!image) return;
+    if (image.size > 10 * 1024 * 1024) {
+      toast.error(`Image is ${(image.size / 1048576).toFixed(1)}MB — maximum is 10MB.`);
+      return;
+    }
     setUploadingImage(true);
     try {
       const payload = new FormData();

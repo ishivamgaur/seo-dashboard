@@ -127,6 +127,10 @@ export default function OccasionsPage() {
 
   const handleImageUpload = async () => {
     if (!image) return;
+    if (image.size > 10 * 1024 * 1024) {
+      toast.error(`Image is ${(image.size / 1048576).toFixed(1)}MB — maximum is 10MB.`);
+      return;
+    }
     setUploadingImage(true);
     try {
       const payload = new FormData();

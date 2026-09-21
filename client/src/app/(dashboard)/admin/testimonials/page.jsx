@@ -139,6 +139,10 @@ export default function TestimonialsAdminPage() {
 
   const handleImageUpload = async () => {
     if (!imageFile) return;
+    if (imageFile.size > 10 * 1024 * 1024) {
+      toast.error(`Image is ${(imageFile.size / 1048576).toFixed(1)}MB — maximum is 10MB.`);
+      return;
+    }
     setUploadingImage(true);
     try {
       const payload = new FormData();
