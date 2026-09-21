@@ -1527,6 +1527,21 @@ function SeoSettingsContent() {
                 </div>
               )}
 
+              <div className="rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800">
+                <div className="px-3.5 py-2 bg-[#f6f8fa] dark:bg-[#1a1e27] flex items-center justify-between">
+                  <span className="font-mono uppercase text-[11px] font-semibold tracking-wider text-zinc-500 dark:text-zinc-400">
+                    Live JSON-LD Preview
+                  </span>
+                  <span className="flex items-center gap-1.5 font-mono text-[10px] text-teal-600 dark:text-teal-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+                    updates as you type
+                  </span>
+                </div>
+                <pre className="max-h-56 overflow-auto bg-[#090a0d] text-teal-200/90 text-[11px] leading-relaxed font-mono p-3.5 whitespace-pre-wrap break-words">
+                  {JSON.stringify(generateJsonLd(), null, 2)}
+                </pre>
+              </div>
+
               <div className="pt-4 flex justify-end gap-2 border-t border-zinc-100 dark:border-zinc-800/60">
                 <button
                   type="button"
