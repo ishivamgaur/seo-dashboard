@@ -40,6 +40,7 @@ export default function TestimonialsAdminPage() {
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [savedReview, setSavedReview] = useState(null);
   const reviewSnapshot = () =>
     JSON.stringify({
